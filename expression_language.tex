@@ -1,0 +1,302 @@
+\documentclass{article}
+
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
+\usepackage{wasysym}
+\let\wasysymLightning\lightning
+
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\Ctxt}       {\mathcal{E}}
+\newcommand{\InCtxt} [1] {\Ctxt[#1]}
+\newcommand{\ssosredex}        {\rightarrow}
+\newcommand{\ctxtreduce}       {\mapsto}
+\newcommand{\sstep}     [3] [] {#2 &\ssosredex&  #3 &\textsc{#1}}
+\newcommand{\ctxtstep}  [3] [] {#2 &\ctxtreduce& #3 &\textsc{#1}}
+
+\begin{document}
+
+\section{Expression Language}
+
+ $e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ \texttt{true} \ | 
+ \ \texttt{false} \ | \\$
+\-\hspace{.8cm}$\ e  ==  e \ | \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
+ $v \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ \texttt{true} \ |  \ \texttt{false} \ 
+ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
+$\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \tau \rightarrow \tau$
+
+\section{Denotational Semantics}
+\begin{align*}
+ \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
+  \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
+  \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket
+\text{ s.t. } \forall d \in \llbracket \tau \rrbracket, f(d) = \llbracket e \rrbracket\eta\{ x \mapsto d \} \\
+ \llbracket e_1 \ e_2 \rrbracket \eta &= \llbracket e_1 \rrbracket\eta ( \llbracket e_2 \rrbracket\eta ) \\
+ \llbracket e_1 + e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta + \llbracket e_2 \rrbracket\eta \\
+ \llbracket e_1 - e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta - \llbracket e_2 \rrbracket\eta \\
+ \llbracket e_1 * e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta * \llbracket e_2 \rrbracket\eta \\
+  \llbracket \texttt{true} \rrbracket\eta &= true \\
+   \llbracket \texttt{false} \rrbracket\eta &= false \\
+ \llbracket e_1 == e_2 \rrbracket\eta &= 
+ \begin{cases} 
+      true \text{ if } (\llbracket e_1 \rrbracket\eta = \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      false \text{  if } (\llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
+      \perp \text{ otherwise}
+   \end{cases}
+ \\
+  \llbracket \ if \ e_1 \ then \ e_2 \ else \ e_3 \ \rrbracket \eta &= 
+ \begin{cases} 
+      \llbracket e_2 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = true \\
+      \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\
+      \perp \text{      otherwise} \\
+   \end{cases}
+  \\
+   \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= \underline{fix}\llbracket \lambda f.\lambda x.e \rrbracket\eta \
+ \text{, where } \underline{fix} \text{ assigns the least fixed point} \\ 
+ &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
+\\
+ \llbracket \texttt{real} \rrbracket &= \R_{\perp} \\
+ \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
+ \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
+ \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
+ \ f \text{ is continuous}\}
+ \end{align*}
+ \underline{Claim 1:} For all expressions $e$ and environments $\Gamma$,
+\begin{enumerate}
+\item $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a continuous function. 
+\item for all $\Gamma$-environments $\eta$, $\llbracket \Gamma \vdash e : \tau \rrbracket\eta \in \llbracket \tau \rrbracket$ 
+\end{enumerate}
+ \underline{Proof:} by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a sequence of $
+ \Gamma$-environments, and suppose $ \eta = \bigvee \ \{ \eta_i \}^{\infty}_{i=1}$. Note that 2 is trivial in all but the abstraction
+ and $\texttt{fix}$ cases.\\
+ \emph{Base Cases: } 
+ \begin{itemize}
+ % real number constants
+ \item $e \in \{ \texttt{0}, \ \texttt{1}, \ \ldots \}$
+ % boolean constants
+ \item $e \in \{ \texttt{true}, \ \texttt{false} \}$\\ \\
+ %
+  In both of these cases, $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a constant function from a $\Gamma$-environment
+ $\eta$ to an element of $\llbracket \tau \rrbracket$, so clearly it is continuous. 
+% variable
+ \item $e = x : \tau$ \\ \\
+ In order to show that $\llbracket \Gamma \vdash x : \tau \rrbracket$ is continuous, we 
+ must show that $\llbracket \Gamma \vdash x : \tau \rrbracket\eta = \bigvee \{ \llbracket \Gamma \vdash x : \tau \rrbracket
+  \eta_i \}^{\infty}_{i=1}$. See that
+  \begin{align*}
+  \llbracket \Gamma \vdash x : \tau \rrbracket\eta &= \eta(x) \\
+  &= \bigvee\{\eta_i\}^{\infty}_{i=1}(x) \\
+  &= \bigvee\{\eta_i(x)\}^{\infty}_{i=1} \\
+  &= \bigvee\{\llbracket \Gamma \vdash x : \tau \rrbracket\eta_i \}^{\infty}_{i=1}
+  \end{align*}
+ \end{itemize}
+ \emph{Inductive Cases: }
+ \begin{itemize}
+ % arithmetic operations
+ \item $e = e_1 \circ e_2, \ \circ \in \{+, -, *\}$ \\ \\
+ Then $\llbracket \Gamma \vdash e : \tau \rrbracket = \llbracket \Gamma e_1 : \tau \rrbracket \circ \llbracket \Gamma e_2 : \tau 
+ \rrbracket$, and by inductive hypothesis $\llbracket \Gamma e_1 : \tau \rrbracket$ and $\llbracket \Gamma e_2 : \tau 
+ \rrbracket$ are both continuous functions. Thus $\llbracket \Gamma \vdash e : \tau \rrbracket$ is the sum, difference, or 
+ product of two continuous functions, so it is continuous as well. 
+  % equality operation
+  \item $e = (e_1 == e_2)$\\ \\
+  In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta = \perp$ or $\llbracket \Gamma \vdash e_2 : \tau 
+  \rrbracket\eta = \perp$, note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = \perp$. By inductive hypothesis, 
+  $\llbracket \Gamma \vdash e_1 : \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau \rrbracket$ are continuous, so 
+  assuming WLOG that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta = \perp$, it must be that for $\forall i, \llbracket 
+  \Gamma \vdash e_1 : \tau \rrbracket\eta_i = \perp$. Thus, $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}
+  ^{\infty}_{i=1} = \perp$, so $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}
+  ^{\infty}_{i=1} = \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta$.\\ \\
+  In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta = \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta \neq 
+  \perp$, note that\\ $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = true$. By inductive hypothesis, $\llbracket 
+  \Gamma \vdash e_1 : \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau \rrbracket$, so $\bigvee\{\llbracket \Gamma 
+  \vdash e_1 : \tau \rrbracket\eta_i\}^{\infty}_{i=1} = \bigvee\{\llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta_i\}^{\infty}_{i=1} 
+  \neq \perp$. Thus there must $\exists n \in \mathbb{N} \text{ s.t. } \forall i \geq n, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta_i = 
+  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta_i \neq \perp$. Therefore, $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\} = true$, so $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = \bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1}$. \\ \\
+ In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \neq \llbracket \Gamma \vdash e_2 : \tau\rrbracket\eta, \ \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \neq \perp, \\ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta \neq \perp$, by reasoning similar to the previous case see that $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous.
+  % conditional
+ \item $e = \ if \ e_1 : \texttt{bool} \ then \ e_2 : \tau \ else \ e_3 : \tau$ \\ \\
+In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = \perp$, note that $\llbracket \Gamma \vdash e : 
+\tau \rrbracket\eta =  \perp$. By inductive hypothesis, $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket$ is a 
+continuous function, so $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = \bigvee\{\llbracket \Gamma \vdash e_1 : 
+\tau \rrbracket\eta_i\}^{\infty}_{i=1} = \perp$. Then it must be that for $\forall i, \llbracket \Gamma \vdash e_1 : \tau 
+\rrbracket\eta_i = \perp$. Thus, $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1} = \perp$, so $
+\llbracket \Gamma \vdash e : \tau \rrbracket\eta = \bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1}$. \\ \\
+In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = true$, note that $\llbracket \Gamma \vdash e : 
+\tau \rrbracket\eta =  \llbracket \Gamma \vdash e_2 \rrbracket\eta$. By inductive hypothesis, $\llbracket \Gamma \vdash e_1 : 
+\texttt{bool} \rrbracket$ is a continuous function, so $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = \bigvee
+\{\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta_i\}^{\infty}_{i=1} = true$. Since $\{ \eta_i\}^{\infty}_{i=1}$ is a chain 
+and $\llbracket\texttt{bool}\rrbracket$ is a flat CPO, there must exist $n \in \mathbb{N}$ such that $\forall i > n, \llbracket \Gamma \vdash e_1 : 
+\texttt{bool}
+\rrbracket\eta_i = true$ and $\forall i \leq n, \llbracket \Gamma \vdash e_1 : \texttt{bool}\rrbracket\eta_i = \perp$. Thus, it must 
+be that $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1} = \llbracket \Gamma \vdash e_2 
+\rrbracket\eta$, and $\llbracket \Gamma \vdash e : \tau \rrbracket$ is therefore continuous. \\ \\
+In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = false$, by reasoning parallel to the previous 
+case $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous.
+% application
+ \item $ e = e_1 \ e_2$ \\ \\
+ Then $\llbracket \Gamma \vdash e : \tau \rrbracket$ is the composition of $\llbracket \Gamma \vdash e_1 : \tau' \rightarrow
+ \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau' \rrbracket$. By inductive hypothesis, these are both continuous 
+ functions. Thus, $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous as well. 
+ % abstraction
+ \item $e = \lambda (x : \tau) . (e' : \tau')$
+ \begin{enumerate}
+ \item Then $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta$ is a function $f: \llbracket \tau \rrbracket 
+ \rightarrow 
+ \llbracket \tau'  \rrbracket$ such that for $\forall d \in \llbracket \tau \rrbracket, \ f(d) = \llbracket \Gamma \vdash e' : \tau 
+ \rrbracket\eta\{x \mapsto d\}$. In order to show that $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous, we 
+ must show that $\llbracket \Gamma \vdash e : \tau \rrbracket\eta = \bigvee \{ \llbracket \Gamma \vdash e : \tau \rrbracket
+  \eta_i \}^{\infty}_{i=1}$. 
+ 
+Let $d \in \llbracket \tau \rrbracket$, and consider that
+\begin{align*}
+\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(d) &= \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\eta
+\{x \mapsto d\} \\
+&= \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket(\bigvee \{\eta_i\})\{x \mapsto d\} \\
+&= \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket(\bigvee \{\eta_i\{x \mapsto d\}\}) \\
+\text{(by inductive hypothesis)}&=\bigvee\{\llbracket \Gamma.x:\tau\vdash e':\tau'\rrbracket\eta_i\{x\mapsto d\}\}^{\infty}_{i=1} \\
+&= \bigvee \{\llbracket \Gamma \vdash \lambda x : \tau.e' : \tau' \rrbracket \eta_i(d)\}^{\infty}_{i=1} \\
+&= \bigvee \{\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket \eta_i(d)\}^{\infty}_{i=1} \\ 
+&= \bigvee \{\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket \eta_i\}^{\infty}_{i=1}(d) 
+\end{align*}
+ Therefore, $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket$ is a continuous function.
+ \item We want to show that $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta \in \llbracket \tau \rightarrow 
+ \tau'\rrbracket$---that is, it is a continuous function from $\llbracket \tau \rrbracket$ to $\llbracket \tau' \rrbracket$. Let $\{d_i\}
+ ^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$, and see that
+ \begin{align*}
+ \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(\bigvee\{d_i\}^{\infty}_{i=1}) &= \llbracket \Gamma.x : \tau 
+ \vdash e' : \tau'\rrbracket\eta \{x \mapsto \bigvee\{d_i\}^{\infty}_{i=1}\} \\
+ &= \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\bigvee\{\eta \{x \mapsto d_i\}\}^{\infty}_{i=1} \\
+ \text{(by inductive hypothesis)} &= \bigvee\{ \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\eta\{x\mapsto d_i\}\}
+ ^{\infty}_{i=1}\\
+ &= \bigvee\{ \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(d_i) \}^{\infty}_{i=1}
+ \end{align*}
+ \end{enumerate} 
+ % fix operation
+ \item $e = \texttt{fix} (\lambda f.\lambda x.e)$ \\
+ \begin{enumerate}
+\item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta_i$, and consider that 
+ \begin{align*}
+ \llbracket \texttt{fix} (\lambda f.\lambda x.e)\rrbracket\eta &= \underline{\text{fix}}(\llbracket \lambda f. \lambda x.e 
+ \rrbracket\eta)\\
+ \text{(by inductive hypothesis)} &= \underline{\text{fix}}(\bigvee\{F_i\}^{\infty}_{i=1}) \\
+ &= \bigvee\{\bigvee\{(F_i)^j \}^{\infty}_{i=1}\perp\}^{\infty}_{j=1} \\
+ &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \\ 
+\text{(by Lemma 1)} &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1} \\ 
+&= \bigvee\{\underline{\text{fix}}(F_i)\}^{\infty}_{i=1}\\
+&= \bigvee\{\llbracket \Gamma \vdash \texttt{fix}(\lambda f \lambda x.e)\rrbracket\eta_i\}^{\infty}_{i=1}
+ \end{align*}
+ Therefore, $\llbracket \Gamma \vdash e \rrbracket$ is a continuous function.
+ \item Let $F = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta$ and $F_i = \llbracket \Gamma \vdash \lambda 
+ f. \lambda x.e\rrbracket\eta_i$. We want to show that $\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau 
+ \rightarrow\tau\rrbracket\eta \in \llbracket \tau \rightarrow \tau \rrbracket$---that is, it is a continuous function from $\llbracket 
+ \tau \rrbracket$ to $\llbracket \tau \rrbracket$. Let $\{x_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$,
+  and see that 
+ \begin{align*}
+ \llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta \bigvee\{x_i\}^{\infty}_{i=1}&= 
+ \underline{\text{fix}}(F)\bigvee\{x_i\}^{\infty}_{i=1}\\
+ &=\bigvee\{F^j \perp\}^{\infty}_{j=1}\bigvee\{x_i\}^{\infty}_{i=1}\\
+ &= \bigvee\{F^j \perp(\bigvee\{x_i\}^{\infty}_{i=1})\}^{\infty}_{j=1}\\ 
+ \text{(by continuity of $F^j \perp$) }&= \bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1}\\ 
+ \text{(by Lemma 2)} &=\bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{j=1}\}^{\infty}_{i=1}\\
+ &= \bigvee\{\underline{\text{fix}}(F)(x_i)\}^{\infty}_{i=1}\\
+ &= \bigvee\{\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta(x_i)\}^{\infty}_{i=1}\\
+ \end{align*}
+ \end{enumerate}
+ \end{itemize}
+ % Lemmas
+ \underline{Lemma 1:} $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1}= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}
+ _{j=1}\}^{\infty}_{i=1}$\\
+ \underline{Proof: } $\Rightarrow$ We want to show that\\ \\ \centerline{$\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}
+ _{j=1} \geq  \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1}$} \\ \\ First, notice that $\forall i, j \bigvee\{\bigvee
+ \{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \geq (F_i)^j$. \\
+ Suppose, now, that 
+ \begin{align*}
+ &\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} < \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1}\\ 
+ \Rightarrow \exists i \text{ s.t. \ \  \ } &\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} < \bigvee\{(F_i)^j \perp\}
+ ^{\infty}_{j=1}\\
+ \Rightarrow \exists i, j \text{ s.t. } &\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} < (F_i)^j \perp 
+ \Rightarrow\Leftarrow\\
+ \end{align*}
+ Thus, it must be that $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \geq  \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}
+ _{j=1}\}^{\infty}_{i=1}$ \\ \\
+ $\Leftarrow$ By parallel reasoning, $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \leq  \bigvee\{\bigvee\{(F_i)^j 
+ \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1}$ \\ \\
+ Therefore, $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} = \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}
+ ^{\infty}_{i=1}$ \\ \\
+ %
+ \underline{Lemma 2:} $\bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1} = \bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}
+ _{j=1}\}^{\infty}_{i=1}$\\ 
+ \underline{Proof:} By reasoning similar to Lemma 1. \\ \\
+ %
+\underline{Claim 2:} For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO - that is, $\llbracket \tau \rrbracket$ is an ordered 
+set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
+upper bound in $\llbracket \tau \rrbracket$. \\
+\underline{Proof:} by induction on the structure of $\tau$. \\
+\emph{Base Cases: }
+\begin{itemize}
+\item $\tau = \texttt{real}$
+\item $\tau = \texttt{bool}$
+\end{itemize}
+In either of these cases, $\llbracket \tau \rrbracket$ is set with flat ordering, and is thus a CPO. \\ 
+\emph{Inductive Cases: }
+\begin{itemize}
+\item $\tau = \tau_1 \times \tau_2$ \\ \\
+Note $\llbracket \tau \rrbracket = \llbracket \tau_1 \rrbracket \times \llbracket \tau_2 \rrbracket$. By inductive hypothesis,
+$\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom elements $\perp_1$ and $
+\perp_2$, respectively. Thus $(\perp_1, \perp_2)$ is a bottom element of $\tau$. 
+
+Let $C \subset \llbracket \tau \rrbracket$ be a
+chain, and define
+\begin{center}
+$C_1 = \{x \in \llbracket \tau_1 \rrbracket : (x,y) \in C\},$ \\
+$C_2 = \{ y \in \llbracket \tau_2 \rrbracket: (x,y) \in C\}$. \\ 
+\end{center}
+Then $C_1 \subset \llbracket \tau_1 \rrbracket$ and $C_2 \subset \llbracket \tau_2 \rrbracket$ are chains, so $\bigvee C_1$
+and $\bigvee C_2$ exist. See, then, that $(\bigvee C_1, \bigvee C_2)$ is the least upper bound of C. Therefore, $\llbracket 
+\tau \rrbracket$ is a CPO.
+\item $\tau = \tau_1 \rightarrow \tau_2$ \\ \\
+Note $\llbracket \tau \rrbracket = \{f : \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket : f \text{ is continuous}\}
+$. By inductive hypothesis, $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom
+elements $\perp_1$ and $\perp_2$, respectively. Let $f_{\perp}: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 
+\rrbracket$ be a function such that, for $\forall x \in \llbracket \tau_1 \rrbracket, \ f_{\perp}(x) = \perp_2$. See, then, that 
+$f_{\perp}$ is a continuous function that is less than or equal to every function in $\llbracket \tau \rrbracket$ (using pointwise
+ordering), so $f_{\perp}$ is the bottom element of $\llbracket \tau \rrbracket$.  
+
+Let $C \subset \llbracket \tau \rrbracket$ be a 
+chain, and consider that for $\forall x \in \tau_1, \{f(x) : f \in C\}$ is a chain in $\llbracket \tau_2 \rrbracket$. Call this set $F_x$,
+and note that $\bigvee F_x$ exists. We define a function $g: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket$ 
+such that $\forall x \in \llbracket \tau_1 \rrbracket, \ g(x) = \bigvee F_x$. See, then, that $g = \bigvee C$. Therefore, $\llbracket
+\tau \rrbracket$ is a CPO.
+\end{itemize}
+\section{Operational Semantics}
+
+$\dfrac{e_1 \downarrow \lambda x.e \ \ e_2 \downarrow v \ \ e\{x \mapsto v\} \downarrow v'}{e_1 \ e_2 \downarrow v'}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 + e_2 \downarrow v_1 + v_2}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 - e_2 \downarrow v_1 - v_2}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 * e_2 \downarrow v_1 * v_2}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v}{e_1 == e_2 \downarrow \texttt{true}}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v' \neq v}{e_1 == e_2 \downarrow \texttt{false}}$ \\ \\ \\
+$\dfrac{e_1 \downarrow \texttt{true} \ \ e_2 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
+$\dfrac{e_1 \downarrow \texttt{false} \ \ e_3 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
+$\dfrac{\lambda x.e\{ f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\} \downarrow v}{\texttt{fix} (\lambda f.\lambda x.e) \downarrow 
+v}$
+
+\section{Equational Semantics}
+$e = e$ \\ \\
+$\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots$  \\
+equivalent rules for $-$ and $*$ operations.
+\\ \\
+$(n ==n) = \texttt{true}$ \\ $(n==m) = \texttt{false}$, provided $n, m$ distinct numerals \\ \\ 
+$if \texttt{ true } then \ e_1 \ else \ e_2 = e_1$ \\
+$if \texttt{ false } then \ e_1 \ else \ e_2 = e_2$ \\ \\ 
+$\lambda x.e = \lambda y.e\{x \mapsto y \}$, provided $y$ not free in $e$. \\ \\ \\
+$\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\}$ \\
+$\lambda x.e \ x = e$, provided $x$ not free in $e$. \\ \\
+$\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}$
+
+\end{document}
+
