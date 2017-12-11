@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{westhesis}
 
 
 \usepackage{amsmath}
@@ -20,7 +20,6 @@
 \begin{document}
 
 \section{Expression Language}
-
  $e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ \texttt{true} \ | 
  \ \texttt{false} \ | \\$
 \-\hspace{.8cm}$\ e  ==  e \ | \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
@@ -272,8 +271,7 @@ and note that $\bigvee F_x$ exists. We define a function $g: \llbracket \tau_1 \
 such that $\forall x \in \llbracket \tau_1 \rrbracket, \ g(x) = \bigvee F_x$. See, then, that $g = \bigvee C$. Therefore, $\llbracket
 \tau \rrbracket$ is a CPO.
 \end{itemize}
-\section{Operational Semantics}
-
+\section{Operational Semantics} 
 $\dfrac{e_1 \downarrow \lambda x.e \ \ e_2 \downarrow v \ \ e\{x \mapsto v\} \downarrow v'}{e_1 \ e_2 \downarrow v'}$ \\ \\ \\
 $\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 + e_2 \downarrow v_1 + v_2}$ \\ \\ \\
 $\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 - e_2 \downarrow v_1 - v_2}$ \\ \\ \\
@@ -298,5 +296,29 @@ $\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\}$ \\
 $\lambda x.e \ x = e$, provided $x$ not free in $e$. \\ \\
 $\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}$
 
+\section{Example 1}
+Consider the simple example Karp offers, wherein $m(x) = px$, where $p$ is a positive constant less than 1, and $a(x) = 0, \ x < 1, \ a(x) = 1, \ x \geq 1$. Then $T(x) = a(x) + T(px)$, so by a simple inductive argument we can show that 
+\begin{align*}
+T(x) &= 
+ \begin{cases}
+ 0 \text{ if } x < 1 \\
+ 1 \text{ if } 1 \leq x < \dfrac{1}{p} \\
+ k \text{ if }  \dfrac{1}{p^{k-1}} \leq x < \dfrac{1}{p^k} \\
+ \end{cases}
+ \end{align*}
+ We can express this function in our expression language as follows: \\
+ \begin{align*}
+ \texttt{T} = \texttt{fix}(\lambda f. \lambda x. (\text{if } x<1 \text{ then } 0 \texttt{ else } 1) + f (p * x))
+ \end{align*}
+ We want to show that the denotation of this expression has the same behavior as the random variable described by Karp. First, let $F = \lambda f. \lambda x. (\text{if } x<1 \text{ then } 0 \texttt{ else } 1) + f (p * x)$ and $a = \text{if } x<1 \text{ then } 0 \texttt{ else } 1$, and see that 
+ \begin{align*}
+ \llbracket T \rrbracket &= \underline{\text{fix}}(\llbracket F \rrbracket) \\
+ \llbracket F \rrbracket &= g : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ &\text{ \ \ \ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real}\rrbracket, \ 
+ g(\alpha) = \llbracket \lambda x.a + f (p * x)]\rrbracket\{f \mapsto \alpha\} \\
+ \llbracket \texttt{real}\rrbracket &= \R_{\perp} \\
+\text{By the CPO fixpoint theorem, } \underline{\text{fix}}(\llbracket F \rrbracket) &= \underline{\text{fix}}(g) \\
+&= \bigvee\{g^n (\perp)\}^{\infty}_{n=1}
+ \end{align*}
+ 
 \end{document}
 
