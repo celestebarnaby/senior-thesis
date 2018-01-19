@@ -22,7 +22,7 @@
 \section{Expression Language}
  $e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ \texttt{true} \ | 
  \ \texttt{false} \ | \\$
-\-\hspace{.8cm}$\ e  ==  e \ | \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
+\-\hspace{.8cm}$\ e  =  e \ | \ e < e \ | \ e > e \ | e \leq e \ | \ e \geq e \ | \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
  $v \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ \texttt{true} \ |  \ \texttt{false} \ 
  | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
 $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \tau \rightarrow \tau$
@@ -39,10 +39,38 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
  \llbracket e_1 * e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta * \llbracket e_2 \rrbracket\eta \\
   \llbracket \texttt{true} \rrbracket\eta &= true \\
    \llbracket \texttt{false} \rrbracket\eta &= false \\
- \llbracket e_1 == e_2 \rrbracket\eta &= 
+ \llbracket e_1 = e_2 \rrbracket\eta &= 
  \begin{cases} 
       true \text{ if } (\llbracket e_1 \rrbracket\eta = \llbracket e_2 \rrbracket\eta \neq \perp) \\
       false \text{  if } (\llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
+      \perp \text{ otherwise}
+   \end{cases}
+ \\
+  \llbracket e_1 < e_2 \rrbracket\eta &= 
+ \begin{cases} 
+      true \text{ if } (\llbracket e_1 \rrbracket\eta < \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      false \text{  if } (\llbracket e_1 \rrbracket\eta \geq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
+      \perp \text{ otherwise}
+   \end{cases}
+ \\
+  \llbracket e_1 > e_2 \rrbracket\eta &= 
+ \begin{cases} 
+      true \text{ if } (\llbracket e_1 \rrbracket\eta > \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      false \text{  if } (\llbracket e_1 \rrbracket\eta \leq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
+      \perp \text{ otherwise}
+   \end{cases}
+ \\
+  \llbracket e_1 \leq e_2 \rrbracket\eta &= 
+ \begin{cases} 
+      true \text{ if } (\llbracket e_1 \rrbracket\eta leq \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      false \text{  if } (\llbracket e_1 \rrbracket\eta > \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
+      \perp \text{ otherwise}
+   \end{cases}
+ \\
+  \llbracket e_1 \geq e_2 \rrbracket\eta &= 
+ \begin{cases} 
+      true \text{ if } (\llbracket e_1 \rrbracket\eta \geq \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      false \text{  if } (\llbracket e_1 \rrbracket\eta < \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
       \perp \text{ otherwise}
    \end{cases}
  \\
@@ -56,7 +84,8 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
    \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= \underline{fix}\llbracket \lambda f.\lambda x.e \rrbracket\eta \
  \text{, where } \underline{fix} \text{ assigns the least fixed point} \\ 
  &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
-\\
+ \end{align*}
+ \begin{align*}
 \llbracket \texttt{real} \rrbracket &= \R_{[0, +\infty]} = \{x \in \R \ | \ x \geq 0\} \cup \{+\infty\} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
  \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
@@ -101,7 +130,7 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
  \rrbracket$ are both continuous functions. Thus $\llbracket \Gamma \vdash e : \tau \rrbracket$ is the sum, difference, or 
  product of two continuous functions, so it is continuous as well. 
   % equality operation
-  \item $e = (e_1 == e_2)$\\ \\
+  \item $e = (e_1 = e_2)$\\ \\
   In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta = \perp$ or $\llbracket \Gamma \vdash e_2 : \tau 
   \rrbracket\eta = \perp$, note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = \perp$. By inductive hypothesis, 
   $\llbracket \Gamma \vdash e_1 : \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau \rrbracket$ are continuous, so 
@@ -278,8 +307,8 @@ $\dfrac{e_1 \downarrow \lambda x.e \ \ e_2 \downarrow v \ \ e\{x \mapsto v\} \do
 $\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 + e_2 \downarrow v_1 + v_2}$ \\ \\ \\
 $\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 - e_2 \downarrow v_1 - v_2}$ \\ \\ \\
 $\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 * e_2 \downarrow v_1 * v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v}{e_1 == e_2 \downarrow \texttt{true}}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v' \neq v}{e_1 == e_2 \downarrow \texttt{false}}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v}{e_1 = e_2 \downarrow \texttt{true}}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v' \neq v}{e_1 = e_2 \downarrow \texttt{false}}$ \\ \\ \\
 $\dfrac{e_1 \downarrow \texttt{true} \ \ e_2 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
 $\dfrac{e_1 \downarrow \texttt{false} \ \ e_3 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
 $\dfrac{\lambda x.e\{ f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\} \downarrow v}{\texttt{fix} (\lambda f.\lambda x.e) \downarrow 
@@ -290,7 +319,7 @@ $e = e$ \\ \\
 $\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots$  \\
 equivalent rules for $-$ and $*$ operations.
 \\ \\
-$(n ==n) = \texttt{true}$ \\ $(n==m) = \texttt{false}$, provided $n, m$ distinct numerals \\ \\ 
+$(n =n) = \texttt{true}$ \\ $(n=m) = \texttt{false}$, provided $n, m$ distinct numerals \\ \\ 
 $if \texttt{ true } then \ e_1 \ else \ e_2 = e_1$ \\
 $if \texttt{ false } then \ e_1 \ else \ e_2 = e_2$ \\ \\ 
 $\lambda x.e = \lambda y.e\{x \mapsto y \}$, provided $y$ not free in $e$. \\ \\ \\
@@ -310,9 +339,9 @@ T(x) &=
  \end{align*}
  We can express this function in our expression language as follows: 
  \begin{align*}
- \texttt{T} = \texttt{fix}(\lambda f. \lambda x. (\text{if } x<1 \text{ then } 0 \texttt{ else } 1) + f (p * x))
+ \texttt{T} = \texttt{fix}(\lambda f. \lambda x. (\emph{if } x<1 \emph{ then } 0 \emph{ else } 1) + f (p * x))
  \end{align*}
- We want to show that the denotation of this expression has the same behavior as the random variable described by Karp. First, let $F = \lambda f. \lambda x. (\text{if } x<1 \text{ then } 0 \texttt{ else } 1) + f (p * x)$ and $a = \texttt{if } x<1 \texttt{ then } 0 \texttt{ else } 1$, and see that 
+ We want to show that the denotation of this expression has the same behavior as the random variable described by Karp. First, let $F = \lambda f. \lambda x. (\emph{if } x<1 \emph{ then } 0 \emph{ else } 1) + f (p * x)$ and \\ $a = \emph{if } x<1 \emph{ then } 0 \emph{ else } 1$, and see that 
  \begin{align*}
  \llbracket \texttt{T} \rrbracket &= \underline{\text{fix}}(\llbracket F \rrbracket) \\
  \llbracket F \rrbracket &= g : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ &\text{ \ \ \ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real}\rrbracket, \ 
@@ -334,6 +363,21 @@ T(x) &=
  \lim_{n \to \infty}\{g^n (f_{\perp})\}(x) &= \sum_{i=1}^{\infty} \llbracket a \rrbracket (p^{i-1}*x) \\
  \end{align*}
  See, then, that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the random variable $T$ described by Karp.
+
+\section{Type System}
+$\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots$ \\ \\ \\
+$\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}}$ \\ \\ \\
+$\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau }$ \\ \\ \\
+$\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda (x : \sigma).e : \sigma \rightarrow \tau }$ \\ \\ \\ 
+$\dfrac{\Gamma \vdash e_1: \sigma \rightarrow \tau \ \ \ \Gamma \vdash e_2 : \sigma}{\Gamma \vdash e_1 \ e_2 : \tau}$ \\ \\ \\
+$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
+, \circ \in \{+,-,*\}$ \\ \\ \\
+$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
+, \circ \in \{=, <, >, \geq, \leq\}$ \\ \\ \\
+$\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
+{\Gamma \vdash \emph{if } e_1 \emph{ then } e_2 \emph{ else } e_3 : \tau} $ \\ \\ \\
+$\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
+{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau}$ \\ \\ \\ 
 
 \end{document}
 
