@@ -6,6 +6,7 @@
 \usepackage{stmaryrd}
 \usepackage{enumerate}
 \usepackage{wasysym}
+\usepackage{slashed}
 \let\wasysymLightning\lightning
 
 \newcommand{\R}{\mathbb{R}}
@@ -20,14 +21,59 @@
 \begin{document}
 
 \section{Expression Language}
- $e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ \texttt{true} \ | 
- \ \texttt{false} \ | \\$
-\-\hspace{.8cm}$\ e  =  e \ | \ e < e \ | \ e > e \ | e \leq e \ | \ e \geq e \ | \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
+$\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \tau \rightarrow \tau$ \\ \\
+ $e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ e / e \ | \ \texttt{true} \ | \ \texttt{false} \ | \\$\-\hspace{.8cm}$\ e  =  e \ | \ e < e \ | \ e > e \ | e \leq e \ | \ e \geq e \ | 
+ \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
  $v \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ \texttt{true} \ |  \ \texttt{false} \ 
- | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
-$\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \tau \rightarrow \tau$
+ | \ \texttt{fix} (\lambda f.\lambda x.e)$
+
+\section{Type System}
+$\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots$ \\ \\ \\
+$\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}}$ \\ \\ \\
+$\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau }$ \\ \\ \\
+$\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda (x : \sigma).e : \sigma \rightarrow \tau }$ \\ \\ \\ 
+$\dfrac{\Gamma \vdash e_1: \sigma \rightarrow \tau \ \ \ \Gamma \vdash e_2 : \sigma}{\Gamma \vdash e_1 \ e_2 : \tau}$ \\ \\ \\
+$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
+, \circ \in \{+,-,*\}$ \\ \\ \\
+$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
+, \circ \in \{=, <, >, \geq, \leq\}$ \\ \\ \\
+$\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
+{\Gamma \vdash \emph{if } e_1 \emph{ then } e_2 \emph{ else } e_3 : \tau} $ \\ \\ \\
+$\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
+{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau}$ \\ \\ \\ 
+
+\section{Equational Semantics}
+$e = e$ \\ \\
+$\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots$  \\
+equivalent rules for $-$ and $*$ operations.
+\\ \\
+$(n =n) = \texttt{true}$ \\ $(n=m) = \texttt{false}$, provided $n, m$ distinct numerals \\ \\ 
+$if \texttt{ true } then \ e_1 \ else \ e_2 = e_1$ \\
+$if \texttt{ false } then \ e_1 \ else \ e_2 = e_2$ \\ \\ 
+$\lambda x.e = \lambda y.e\{x \mapsto y \}$, provided $y$ not free in $e$. \\ \\ \\
+$\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\}$ \\
+$\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}$
+
+\section{Operational Semantics} 
+$\dfrac{e_1 \downarrow \lambda x.e \ \ e_2 \downarrow v \ \ e\{x \mapsto v\} \downarrow v'}{e_1 \ e_2 \downarrow v'}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 + e_2 \downarrow v_1 + v_2}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 - e_2 \downarrow v_1 - v_2}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 * e_2 \downarrow v_1 * v_2}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v}{e_1 = e_2 \downarrow \texttt{true}}$ \\ \\ \\
+$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v' \neq v}{e_1 = e_2 \downarrow \texttt{false}}$ \\ \\ \\
+$\dfrac{e_1 \downarrow \texttt{true} \ \ e_2 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
+$\dfrac{e_1 \downarrow \texttt{false} \ \ e_3 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
+$\dfrac{\lambda x.e\{ f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\} \downarrow v}{\texttt{fix} (\lambda f.\lambda x.e) \downarrow 
+v}$
 
 \section{Denotational Semantics}
+ \begin{align*}
+\llbracket \texttt{real} \rrbracket &= \R_{[0, +\infty]} = \{x \in \R \ | \ x \geq 0\} \cup \{+\infty\} \\
+ \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
+ \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
+ \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
+ \ f \text{ is continuous}\}
+ \end{align*}
 \begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
   \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
@@ -37,8 +83,8 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
  \llbracket e_1 + e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta + \llbracket e_2 \rrbracket\eta \\
  \llbracket e_1 - e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta - \llbracket e_2 \rrbracket\eta \\
  \llbracket e_1 * e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta * \llbracket e_2 \rrbracket\eta \\
-  \llbracket \texttt{true} \rrbracket\eta &= true \\
-   \llbracket \texttt{false} \rrbracket\eta &= false \\
+  \llbracket e_1 / e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta / \llbracket e_2 \rrbracket\eta \\
+  \llbracket \texttt{true} \rrbracket\eta &= true, \ \llbracket \texttt{false} \rrbracket\eta = false \\
  \llbracket e_1 = e_2 \rrbracket\eta &= 
  \begin{cases} 
       true \text{ if } (\llbracket e_1 \rrbracket\eta = \llbracket e_2 \rrbracket\eta \neq \perp) \\
@@ -48,28 +94,28 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
  \\
   \llbracket e_1 < e_2 \rrbracket\eta &= 
  \begin{cases} 
-      true \text{ if } (\llbracket e_1 \rrbracket\eta < \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      true \text{ if } (\llbracket e_1 \rrbracket\eta < \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp) \\
       false \text{  if } (\llbracket e_1 \rrbracket\eta \geq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
       \perp \text{ otherwise}
    \end{cases}
  \\
   \llbracket e_1 > e_2 \rrbracket\eta &= 
  \begin{cases} 
-      true \text{ if } (\llbracket e_1 \rrbracket\eta > \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      true \text{ if } (\llbracket e_1 \rrbracket\eta > \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp) \\
       false \text{  if } (\llbracket e_1 \rrbracket\eta \leq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
       \perp \text{ otherwise}
    \end{cases}
  \\
   \llbracket e_1 \leq e_2 \rrbracket\eta &= 
  \begin{cases} 
-      true \text{ if } (\llbracket e_1 \rrbracket\eta leq \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      true \text{ if } (\llbracket e_1 \rrbracket\eta \leq \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp) \\
       false \text{  if } (\llbracket e_1 \rrbracket\eta > \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
       \perp \text{ otherwise}
    \end{cases}
  \\
   \llbracket e_1 \geq e_2 \rrbracket\eta &= 
  \begin{cases} 
-      true \text{ if } (\llbracket e_1 \rrbracket\eta \geq \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      true \text{ if } (\llbracket e_1 \rrbracket\eta \geq \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp) \\
       false \text{  if } (\llbracket e_1 \rrbracket\eta < \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
       \perp \text{ otherwise}
    \end{cases}
@@ -85,14 +131,50 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
  \text{, where } \underline{fix} \text{ assigns the least fixed point} \\ 
  &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
  \end{align*}
- \begin{align*}
-\llbracket \texttt{real} \rrbracket &= \R_{[0, +\infty]} = \{x \in \R \ | \ x \geq 0\} \cup \{+\infty\} \\
- \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
- \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
- \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
- \ f \text{ is continuous}\}
- \end{align*}
- \underline{Claim 1:} For all expressions $e$ and environments $\Gamma$,
+\underline{Claim 1:} For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
+set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
+upper bound in $\llbracket \tau \rrbracket$. \\
+\underline{Proof:} by induction on the structure of $\tau$. \\
+\emph{Base Cases: }
+\begin{itemize}
+\item $\tau = \texttt{real}$ \\ \\
+In this case, $\llbracket \tau \rrbracket$ is the set of all nonnegative reals, with an additional element $+\infty$ such that for all
+$x \in \R, \ x < +\infty$. Then $0$ is a bottom element of $\llbracket \tau \rrbracket$, and for any chain $C \subset \R, \ C$ is bounded by $+\infty$, so by the least upper bound property $C$ has a least upper bound in $\llbracket \tau \rrbracket$.
+\item $\tau = \texttt{bool}$ \\ \\
+In this case, $\llbracket \tau \rrbracket$ is set with flat ordering, and is thus a CPO. \\ 
+\end{itemize}
+\emph{Inductive Cases: }
+\begin{itemize}
+\item $\tau = \tau_1 \times \tau_2$ \\ \\
+Note $\llbracket \tau \rrbracket = \llbracket \tau_1 \rrbracket \times \llbracket \tau_2 \rrbracket$. By inductive hypothesis,
+$\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom elements $\perp_1$ and $
+\perp_2$, respectively. Thus $(\perp_1, \perp_2)$ is a bottom element of $\tau$. 
+
+Let $C \subset \llbracket \tau \rrbracket$ be a
+chain, and define
+\begin{center}
+$C_1 = \{x \in \llbracket \tau_1 \rrbracket : (x,y) \in C\},$ \\
+$C_2 = \{ y \in \llbracket \tau_2 \rrbracket: (x,y) \in C\}$. \\ 
+\end{center}
+Then $C_1 \subset \llbracket \tau_1 \rrbracket$ and $C_2 \subset \llbracket \tau_2 \rrbracket$ are chains, so $\bigvee C_1$
+and $\bigvee C_2$ exist. See, then, that $(\bigvee C_1, \bigvee C_2)$ is the least upper bound of C. Therefore, $\llbracket 
+\tau \rrbracket$ is a CPO.
+\item $\tau = \tau_1 \rightarrow \tau_2$ \\ \\
+Note $\llbracket \tau \rrbracket = \{f : \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket : f \text{ is continuous}\}
+$. By inductive hypothesis, $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom
+elements $\perp_1$ and $\perp_2$, respectively. Let $f_{\perp}: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 
+\rrbracket$ be a function such that, for $\forall x \in \llbracket \tau_1 \rrbracket, \ f_{\perp}(x) = \perp_2$. See, then, that 
+$f_{\perp}$ is a continuous function that is less than or equal to every function in $\llbracket \tau \rrbracket$ (using pointwise
+ordering), so $f_{\perp}$ is the bottom element of $\llbracket \tau \rrbracket$.  
+
+Let $C \subset \llbracket \tau \rrbracket$ be a 
+chain, and consider that for $\forall x \in \tau_1, \{f(x) : f \in C\}$ is a chain in $\llbracket \tau_2 \rrbracket$. Call this set $F_x$,
+and note that $\bigvee F_x$ exists. We define a function $g: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket$ 
+such that $\forall x \in \llbracket \tau_1 \rrbracket, \ g(x) = \bigvee F_x$. See, then, that $g = \bigvee C$. Therefore, $\llbracket
+\tau \rrbracket$ is a CPO. \\
+\end{itemize} 
+%
+ \underline{Claim 2:} For all expressions $e$ and environments $\Gamma$,
 \begin{enumerate}
 \item $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a continuous function. 
 \item for all $\Gamma$-environments $\eta$, $\llbracket \Gamma \vdash e : \tau \rrbracket\eta \in \llbracket \tau \rrbracket$ 
@@ -124,13 +206,13 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
  \emph{Inductive Cases: }
  \begin{itemize}
  % arithmetic operations
- \item $e = e_1 \circ e_2, \ \circ \in \{+, -, *\}$ \\ \\
+ \item $e = e_1 \circ e_2, \ \circ \in \{+, -, *, / \}$ \\ \\
  Then $\llbracket \Gamma \vdash e : \tau \rrbracket = \llbracket \Gamma e_1 : \tau \rrbracket \circ \llbracket \Gamma e_2 : \tau 
  \rrbracket$, and by inductive hypothesis $\llbracket \Gamma e_1 : \tau \rrbracket$ and $\llbracket \Gamma e_2 : \tau 
  \rrbracket$ are both continuous functions. Thus $\llbracket \Gamma \vdash e : \tau \rrbracket$ is the sum, difference, or 
  product of two continuous functions, so it is continuous as well. 
   % equality operation
-  \item $e = (e_1 = e_2)$\\ \\
+  \item $e = e_1 \circ e_2, \ \circ \in \{=,<,>,\leq,\geq\}$\\ \\
   In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta = \perp$ or $\llbracket \Gamma \vdash e_2 : \tau 
   \rrbracket\eta = \perp$, note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = \perp$. By inductive hypothesis, 
   $\llbracket \Gamma \vdash e_1 : \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau \rrbracket$ are continuous, so 
@@ -138,13 +220,14 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
   \Gamma \vdash e_1 : \tau \rrbracket\eta_i = \perp$. Thus, $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}
   ^{\infty}_{i=1} = \perp$, so $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}
   ^{\infty}_{i=1} = \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta$.\\ \\
-  In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta = \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta \neq 
-  \perp$, note that\\ $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = true$. By inductive hypothesis, $\llbracket 
-  \Gamma \vdash e_1 : \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau \rrbracket$, so $\bigvee\{\llbracket \Gamma 
-  \vdash e_1 : \tau \rrbracket\eta_i\}^{\infty}_{i=1} = \bigvee\{\llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta_i\}^{\infty}_{i=1} 
-  \neq \perp$. Thus there must $\exists n \in \mathbb{N} \text{ s.t. } \forall i \geq n, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta_i = 
-  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta_i \neq \perp$. Therefore, $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\} = true$, so $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = \bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1}$. \\ \\
- In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \neq \llbracket \Gamma \vdash e_2 : \tau\rrbracket\eta, \ \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \neq \perp, \\ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta \neq \perp$, by reasoning similar to the previous case see that $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous.
+  %
+  In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \circ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta, \ 
+  \llbracket \Gamma \vdash e_1:\tau \rrbracket\eta \neq \perp, \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta \neq \perp$, 
+  note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = true$. By inductive hypothesis, $\llbracket 
+  \Gamma \vdash e_1 : \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau \rrbracket$ are continuous, so $\bigvee\{\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta_i\}^{\infty}_{i=1} \circ \bigvee\{\llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta_i\}^{\infty}_{i=1}$, with neither supremum equal to bottom. Thus there must $\exists n \in \mathbb{N} \text{ s.t. } \forall i \geq n, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta_i \circ
+  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta_i$. Therefore, $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\} = true$, so $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = \bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1}$. \\ \\
+  %
+ In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \ \slashed{\circ} \ \llbracket \Gamma \vdash e_2 : \tau\rrbracket\eta, \ \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \neq \perp, \\ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta \neq \perp$, by reasoning similar to the previous case see that $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous.
   % conditional
  \item $e = \ if \ e_1 : \texttt{bool} \ then \ e_2 : \tau \ else \ e_3 : \tau$ \\ \\
 In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = \perp$, note that $\llbracket \Gamma \vdash e : 
@@ -259,76 +342,10 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \underline{Lemma 2:} $\bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1} = \bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}
  _{j=1}\}^{\infty}_{i=1}$\\ 
  \underline{Proof:} By reasoning similar to Lemma 1. \\ \\
- %
-\underline{Claim 2:} For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO - that is, $\llbracket \tau \rrbracket$ is an ordered 
-set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
-upper bound in $\llbracket \tau \rrbracket$. \\
-\underline{Proof:} by induction on the structure of $\tau$. \\
-\emph{Base Cases: }
-\begin{itemize}
-\item $\tau = \texttt{real}$ \\ \\
-In this case, $\llbracket \tau \rrbracket$ is the set of all nonnegative reals, with an additional element $+\infty$ such that for all
-$x \in \R, \ x < +\infty$. Then $0$ is a bottom element of $\llbracket \tau \rrbracket$, and for any chain $C \subset \R, \ C$ is bounded by $+\infty$, so by the least upper bound property $C$ has a least upper bound in $\llbracket \tau \rrbracket$.
-\item $\tau = \texttt{bool}$ \\ \\
-In this case, $\llbracket \tau \rrbracket$ is set with flat ordering, and is thus a CPO. \\ 
-\end{itemize}
-\emph{Inductive Cases: }
-\begin{itemize}
-\item $\tau = \tau_1 \times \tau_2$ \\ \\
-Note $\llbracket \tau \rrbracket = \llbracket \tau_1 \rrbracket \times \llbracket \tau_2 \rrbracket$. By inductive hypothesis,
-$\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom elements $\perp_1$ and $
-\perp_2$, respectively. Thus $(\perp_1, \perp_2)$ is a bottom element of $\tau$. 
-
-Let $C \subset \llbracket \tau \rrbracket$ be a
-chain, and define
-\begin{center}
-$C_1 = \{x \in \llbracket \tau_1 \rrbracket : (x,y) \in C\},$ \\
-$C_2 = \{ y \in \llbracket \tau_2 \rrbracket: (x,y) \in C\}$. \\ 
-\end{center}
-Then $C_1 \subset \llbracket \tau_1 \rrbracket$ and $C_2 \subset \llbracket \tau_2 \rrbracket$ are chains, so $\bigvee C_1$
-and $\bigvee C_2$ exist. See, then, that $(\bigvee C_1, \bigvee C_2)$ is the least upper bound of C. Therefore, $\llbracket 
-\tau \rrbracket$ is a CPO.
-\item $\tau = \tau_1 \rightarrow \tau_2$ \\ \\
-Note $\llbracket \tau \rrbracket = \{f : \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket : f \text{ is continuous}\}
-$. By inductive hypothesis, $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom
-elements $\perp_1$ and $\perp_2$, respectively. Let $f_{\perp}: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 
-\rrbracket$ be a function such that, for $\forall x \in \llbracket \tau_1 \rrbracket, \ f_{\perp}(x) = \perp_2$. See, then, that 
-$f_{\perp}$ is a continuous function that is less than or equal to every function in $\llbracket \tau \rrbracket$ (using pointwise
-ordering), so $f_{\perp}$ is the bottom element of $\llbracket \tau \rrbracket$.  
-
-Let $C \subset \llbracket \tau \rrbracket$ be a 
-chain, and consider that for $\forall x \in \tau_1, \{f(x) : f \in C\}$ is a chain in $\llbracket \tau_2 \rrbracket$. Call this set $F_x$,
-and note that $\bigvee F_x$ exists. We define a function $g: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket$ 
-such that $\forall x \in \llbracket \tau_1 \rrbracket, \ g(x) = \bigvee F_x$. See, then, that $g = \bigvee C$. Therefore, $\llbracket
-\tau \rrbracket$ is a CPO.
-\end{itemize}
-\section{Operational Semantics} 
-$\dfrac{e_1 \downarrow \lambda x.e \ \ e_2 \downarrow v \ \ e\{x \mapsto v\} \downarrow v'}{e_1 \ e_2 \downarrow v'}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 + e_2 \downarrow v_1 + v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 - e_2 \downarrow v_1 - v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 * e_2 \downarrow v_1 * v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v}{e_1 = e_2 \downarrow \texttt{true}}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v' \neq v}{e_1 = e_2 \downarrow \texttt{false}}$ \\ \\ \\
-$\dfrac{e_1 \downarrow \texttt{true} \ \ e_2 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
-$\dfrac{e_1 \downarrow \texttt{false} \ \ e_3 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
-$\dfrac{\lambda x.e\{ f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\} \downarrow v}{\texttt{fix} (\lambda f.\lambda x.e) \downarrow 
-v}$
-
-\section{Equational Semantics}
-$e = e$ \\ \\
-$\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots$  \\
-equivalent rules for $-$ and $*$ operations.
-\\ \\
-$(n =n) = \texttt{true}$ \\ $(n=m) = \texttt{false}$, provided $n, m$ distinct numerals \\ \\ 
-$if \texttt{ true } then \ e_1 \ else \ e_2 = e_1$ \\
-$if \texttt{ false } then \ e_1 \ else \ e_2 = e_2$ \\ \\ 
-$\lambda x.e = \lambda y.e\{x \mapsto y \}$, provided $y$ not free in $e$. \\ \\ \\
-$\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\}$ \\
-$\lambda x.e \ x = e$, provided $x$ not free in $e$. \\ \\
-$\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}$
-
-\section{Example 1}
-Consider the simple example Karp offers, wherein $m(x) = px$, where $p$ is a positive constant less than 1, and $a(x) = 0, \ x < 1, \ a(x) = 1, \ x \geq 1$. Then $T(x) = a(x) + T(px)$, so by a simple inductive argument we can show that 
+ 
+\section{Examples}
+\subsection{Example 1}
+Consider the simple example Karp offers, wherein $m(x) = px$, with $p$ a positive constant less than 1, and $a(x) = 0, \ x < 1, \ a(x) = 1, \ x \geq 1$. Then $T(x) = a(x) + T(px)$, so by a simple inductive argument we can show that 
 \begin{align*}
 T(x) &= 
  \begin{cases}
@@ -337,47 +354,119 @@ T(x) &=
  k \text{ if }  \dfrac{1}{p^{k-1}} \leq x < \dfrac{1}{p^k} \\
  \end{cases}
  \end{align*}
- We can express this function in our expression language as follows: 
+ We express this function in our expression language as follows: 
  \begin{align*}
  \texttt{T} = \texttt{fix}(\lambda f. \lambda x. (\emph{if } x<1 \emph{ then } 0 \emph{ else } 1) + f (p * x))
  \end{align*}
- We want to show that the denotation of this expression has the same behavior as the random variable described by Karp. First, let $F = \lambda f. \lambda x. (\emph{if } x<1 \emph{ then } 0 \emph{ else } 1) + f (p * x)$ and \\ $a = \emph{if } x<1 \emph{ then } 0 \emph{ else } 1$, and see that 
+ We want to show that the denotation of this expression has the same behavior as the function described by Karp. First, let $F 
+ = \lambda f. \lambda x. (\emph{if } x<1 \emph{ then } 0 \emph{ else } 1) + f (p * x)$ and \\ $a = \emph{if } x<1 \emph{ then } 0 
+ \emph{ else } 1$, and see that 
  \begin{align*}
  \llbracket \texttt{T} \rrbracket &= \underline{\text{fix}}(\llbracket F \rrbracket) \\
- \llbracket F \rrbracket &= g : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ &\text{ \ \ \ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real}\rrbracket, \ 
+ \llbracket F \rrbracket &= g : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow 
+ \texttt{real}\rrbracket \\ &\text{ \ \ \ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real}
+ \rrbracket, \ 
  g(\alpha) = \llbracket \lambda x.a + f (p * x)\rrbracket\{f \mapsto \alpha\} \\
  \llbracket \texttt{real}\rrbracket &= \R_{[0, +\infty]}  
  \\\text{By the CPO fixpoint theorem, } \underline{\text{fix}}(\llbracket F \rrbracket) &= \underline{\text{fix}}(g) \\
 &= \bigvee\{g^n (\perp)\}^{\infty}_{n=1} \\
 &= \lim_{n \to \infty}\{g^n (\perp)\}
  \end{align*}
- Recall that the bottom element of $\llbracket \texttt{real} \rrbracket$ is $0$, so the bottom element of $\llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket$ is the function $f_{\perp}$ that maps every element in $\llbracket \texttt{real} \rrbracket$ to $0$. 
+ Recall that the bottom element of $\llbracket \texttt{real} \rrbracket$ is $0$, so the bottom element of $\llbracket \texttt{real} 
+ \rightarrow \texttt{real}\rrbracket$ is the function $f_{\perp}$ that maps every element in $\llbracket \texttt{real} \rrbracket$ to 
+ $0$. 
  \begin{align*}
- \forall x \in \R, \ g(f_{\perp})(x) &= \llbracket \lambda x.a + f(p*x)\rrbracket\{f \mapsto f_{\perp}\} \\
- &= \llbracket a \rrbracket(x) + f_{\perp}(p*x) \\
- &= \llbracket a \rrbracket(x)  \\
- \forall x \in \R, g(g(f_{\perp}))(x) &= g(\llbracket a \rrbracket(x)) \\
- &= \llbracket a \rrbracket(x) + \llbracket a \rrbracket(p*x) \\
+ \forall d \in \R_{[0,+\infty]}, \ g(f_{\perp})(d) &= \llbracket \lambda x.a + f(p*x)\rrbracket\{f \mapsto f_{\perp}, x \mapsto d\} \\
+ &= \llbracket a \rrbracket(d) + f_{\perp}(pd) \\
+ &= \llbracket a \rrbracket(d)  \\
+ \forall d \in \R_{[0,+\infty]}, \ g(g(f_{\perp}))(d) &= \llbracket \lambda x.a + f(p*x)\rrbracket\{f \mapsto g(f_{\perp}),x\mapsto d\} \\
+ &= \llbracket a \rrbracket(d) + g(f_\perp)(pd) \\
+ &= \llbracket a \rrbracket(d) + \llbracket \lambda x.a + f(p * x)\rrbracket\{f\mapsto f_\perp, x\mapsto pd\} \\
+ &= \llbracket a \rrbracket(d) + \llbracket a \rrbracket(pd) + f_\perp(p^2d) \\
+ &= \llbracket a \rrbracket(d) + \llbracket a \rrbracket(pd) \\ 
  &\ldots \\
- g^n(f_{\perp})(x) &= \sum_{i=1}^{n} \llbracket a \rrbracket (p^{i-1}*x) \\
- \lim_{n \to \infty}\{g^n (f_{\perp})\}(x) &= \sum_{i=1}^{\infty} \llbracket a \rrbracket (p^{i-1}*x) \\
+ \forall d \in \R_{[0,+\infty]}, \ g^n(f_{\perp})(d) &= \sum_{i=0}^{n-1} \llbracket a \rrbracket (p^{i}d) \\
+ \lim_{n \to \infty}\{g^n (f_{\perp})\}(d) &= \sum_{i=0}^{\infty} \llbracket a \rrbracket (p^{i}d) \\
  \end{align*}
- See, then, that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the random variable $T$ described by Karp.
+ See, then, that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described by Karp.
 
-\section{Type System}
-$\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots$ \\ \\ \\
-$\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}}$ \\ \\ \\
-$\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau }$ \\ \\ \\
-$\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda (x : \sigma).e : \sigma \rightarrow \tau }$ \\ \\ \\ 
-$\dfrac{\Gamma \vdash e_1: \sigma \rightarrow \tau \ \ \ \Gamma \vdash e_2 : \sigma}{\Gamma \vdash e_1 \ e_2 : \tau}$ \\ \\ \\
-$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
-, \circ \in \{+,-,*\}$ \\ \\ \\
-$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
-, \circ \in \{=, <, >, \geq, \leq\}$ \\ \\ \\
-$\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
-{\Gamma \vdash \emph{if } e_1 \emph{ then } e_2 \emph{ else } e_3 : \tau} $ \\ \\ \\
-$\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
-{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau}$ \\ \\ \\ 
-
+\subsection{Example 2}
+Let $m(x) = px$, where $p$ is a positive constant less than 1, and $a(x) = x$. Then $m(x), a(x)$, and $m(x)/x$ are all non-decreasing functions and thus meet the assumptions specified by Karp. Note that $T(x) = x + T(px)$, so, for instance,
+\begin{align*}
+T(1) = 1 + p + p^2 + p^3 + \ldots
+\end{align*}
+See, then, that this function describes the following geometric series:
+\begin{align*}
+T(x) &= \sum_{i=0}^{\infty} p^ix \\ 
+&= \frac{x}{1 - p} \ (\text{since } 0 \leq p \leq 1)
+\end{align*}
+We express this function in our expression language as follows:
+\begin{align*}
+ \texttt{T} = \texttt{fix}(\lambda f. \lambda x.x + f (p * x))
+ \end{align*}
+We want to show that the denotation of this expression has the same behavior as the function describe above. Let $F = \lambda f. \lambda x.x + f (p * x)$, and see that 
+ \begin{align*}
+ \llbracket \texttt{T} \rrbracket &= \underline{\text{fix}}(\llbracket F \rrbracket) \\
+ \llbracket F \rrbracket &= g : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ &\text{ \ \ \ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real}\rrbracket, \ 
+ g(\alpha) = \llbracket \lambda x.x + f (p * x)\rrbracket\{f \mapsto \alpha\} \\
+ \llbracket \texttt{real}\rrbracket &= \R_{[0, +\infty]}  
+ \\\text{By the CPO fixpoint theorem, } \underline{\text{fix}}(\llbracket F \rrbracket) &= \underline{\text{fix}}(g) \\
+&= \bigvee\{g^n (\perp)\}^{\infty}_{n=1} \\
+&= \lim_{n \to \infty}\{g^n (\perp)\}
+ \end{align*}
+As in Example 1, let $f_{\perp}$ be the bottom element of $\llbracket \texttt{real} \rightarrow \texttt{real} \rrbracket$ --- that is, 
+the function that maps every element in $\llbracket \texttt{real} \rrbracket$ to $0$. 
+ \begin{align*}
+ \forall d \in \R_{[0,+\infty]}, \ g(f_{\perp})(d) &= \llbracket \lambda x.x + f(p*x)\rrbracket\{f \mapsto f_{\perp}, x \mapsto d\} \\
+ &= d + f_{\perp}(pd) \\
+ &= d  \\
+ \forall d \in \R_{[0,+\infty]}, \ g(g(f_{\perp}))(d) &= \llbracket \lambda x.x + f(p*x)\rrbracket\{f \mapsto g(f_{\perp}),x\mapsto d\} \\
+ &= d + g(f_\perp)(pd) \\
+ &= d + \llbracket \lambda x.x + f(p * x)\rrbracket\{f\mapsto f_\perp, x\mapsto pd\} \\
+ &= d + pd + f_\perp(p^2d) \\
+ &= d + pd \\ 
+ &\ldots \\
+ \forall d \in \R_{[0,+\infty]}, \ g^n(f_{\perp})(d) &= \sum_{i=1}^{n-1} p^{i}d \\
+ \lim_{n \to \infty}\{g^n (f_{\perp})\}(d) &= \sum_{i=1}^{\infty} p^{i}d 
+ \end{align*}
+ See, then, that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described above.
+ \subsection{Example 3} Let $m(x) = x$ and $a(x) = x$. Then $m(x), a(x)$, and $m(x)/x$ are all non-decreasing functions and thus meet the assumptions specified by Karp. Note that $T(x) = x + T(x)$, so, for instance,
+\begin{align*}
+T(1) = 1 + 1 + 1 + \ldots
+\end{align*}
+See, then, that this function describes the following series:
+\begin{align*}
+T(x) &= \sum_{i=0}^{\infty} x 
+\end{align*}
+Clearly this series diverges for $\forall x \in \R$. We express this function in our expression language as follows:
+\begin{align*}
+ \texttt{T} = \texttt{fix}(\lambda f. \lambda x.x + f(x))
+ \end{align*}
+ We want to show that the denotation of this expression has the same behavior as the function describe above. Let $F = \lambda f. \lambda x.x + f (x)$, and see that 
+ \begin{align*}
+ \llbracket \texttt{T} \rrbracket &= \underline{\text{fix}}(\llbracket F \rrbracket) \\
+ \llbracket F \rrbracket &= g : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ &\text{ \ \ \ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real}\rrbracket, \ 
+ g(\alpha) = \llbracket \lambda x.x + f (x)\rrbracket\{f \mapsto \alpha\} \\
+ \llbracket \texttt{real}\rrbracket &= \R_{[0, +\infty]}  
+ \\\text{By the CPO fixpoint theorem, } \underline{\text{fix}}(\llbracket F \rrbracket) &= \underline{\text{fix}}(g) \\
+&= \bigvee\{g^n (\perp)\}^{\infty}_{n=1} \\
+&= \lim_{n \to \infty}\{g^n (\perp)\}
+ \end{align*}
+As in Example 1, let $f_{\perp}$ be the bottom element of $\llbracket \texttt{real} \rightarrow \texttt{real} \rrbracket$ --- that is, 
+the function that maps every element in $\llbracket \texttt{real} \rrbracket$ to $0$. 
+ \begin{align*}
+ \forall d \in \R_{[0,+\infty]}, \ g(f_{\perp})(d) &= \llbracket \lambda x.x + f(x)\rrbracket\{f \mapsto f_{\perp}, x \mapsto d\} \\
+ &= d + f_{\perp}(d) \\
+ &= d  \\
+ \forall d \in \R_{[0,+\infty]}, \ g(g(f_{\perp}))(d) &= \llbracket \lambda x.x + f(x)\rrbracket\{f \mapsto g(f_{\perp}),x\mapsto d\} \\
+ &= d + g(f_\perp)(d) \\
+ &= d + \llbracket \lambda x.x + f(x)\rrbracket\{f\mapsto f_\perp, x\mapsto d\} \\
+ &= d + d + f_\perp(d) \\
+ &= d + d \\ 
+ &\ldots \\
+ \forall d \in \R_{[0,+\infty]}, \ g^n(f_{\perp})(d) &= \sum_{i=0}^{n-1} d \\
+ \lim_{n \to \infty}\{g^n (f_{\perp})\}(d) &= \sum_{i=0}^{\infty} d 
+ \end{align*}
+ See, then, that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described above.
 \end{document}
 
