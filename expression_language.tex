@@ -1,5 +1,24 @@
 \documentclass{westhesis}
 
+% ND comments.
+\usepackage{framed}
+\usepackage[normalem]{ulem}
+\setlength{\marginparwidth}{1in}
+\reversemarginpar
+\newcommand{\ndComment}[2][\relax]{\ifx#1\relax\else\uline{#1}\fi\marginpar{\renewcommand{\baselinestretch}{1.0}\tiny ND \ifx#1\relax\else(#1)\fi: {#2}}}
+\newenvironment{ndBlockComment}{\begin{oframed}\noindent ND:\\}{\end{oframed}}
+\newcommand{\ndTypo}[1]{\ndComment[#1]{$\longrightarrow$}}
+\newcommand{\ndDel}[1]{\sout{#1}\ndComment{$\longrightarrow$}}
+
+\newcommand{\tmden}[2]{\llbracket{#1}\rrbracket{#2}}
+\newcommand{\tyden}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\typing}[3]{{#1}\vdash{#2}:{#3}}
+\newcommand{\extend}[3]{#1\{{#2}\mapsto{#3}\}}
+\newcommand{\sfix}{\mathtt{fix}}
+\newcommand{\smfix}{\underline{\mathit{fix}}}
+\newcommand{\set}[1]{\{#1\}}
+\let\bottom\bot
+
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -92,6 +111,34 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
  \ f \text{ is continuous}\}
  \end{align*}
+
+\begin{ndBlockComment}
+I think I've led you a bit astray on the right way to prove this
+type-soundness.  The theorem that you want to prove is this:
+\begin{enumerate}
+\item For all $\Gamma\vdash e : \tau$ and all $\Gamma$-environments~$\eta$,
+$\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
+\item For all chains $a_0\leq\dots a_1\leq\dotsb$,
+$\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
+\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$.
+\end{enumerate}
+The tricky cases, of course, are abstraction and $\sfix$.  For
+$\sfix$, you need to prove that the semantic fixpoint function~$\smfix$
+is continuous.  That is, you need to show that if $f_0\leq f_1\leq\dotsb$
+is an increasing chain, then
+$\smfix(\bigvee f_i) = \bigvee\smfix(f_i)$.  From the definition
+of $\smfix$, that means showing that
+$\bigvee_n\set{(\bigvee_i f_i)^n\bottom} =
+\bigvee_i\set{\bigvee_n\set{f_i^n(\bottom)}}$.  And the way to prove this
+is to show that if for all~$n$, $b$ is an upper bound for
+$(\bigvee_i f_i)^n(\bot)$, then for all~$i$, $b$ is an upper bound
+for $\bigvee_n\set{f_i^n(\bot)}$, and vice-versa (because if two chains
+have the same set of upper bounds, then they have the same least upper
+bound).
+\end{ndBlockComment}
+
+\ndComment{Use a theorem(-like) environment for theorems, propositions,
+etc.}
  \underline{Claim 1:} For all expressions $e$ and environments $\Gamma$,
 \begin{enumerate}
 \item $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a continuous function. 
