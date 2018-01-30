@@ -3,7 +3,7 @@
 % ND comments.
 \usepackage{framed}
 \usepackage[normalem]{ulem}
-\setlength{\marginparwidth}{1in}
+\setlength{\marginparwidth}{1.25in}
 \reversemarginpar
 \newcommand{\ndComment}[2][\relax]{\ifx#1\relax\else\uline{#1}\fi\marginpar{\renewcommand{\baselinestretch}{1.0}\tiny ND \ifx#1\relax\else(#1)\fi: {#2}}}
 \newenvironment{ndBlockComment}{\begin{oframed}\noindent ND:\\}{\end{oframed}}
@@ -18,6 +18,8 @@
 \newcommand{\smfix}{\underline{\mathit{fix}}}
 \newcommand{\set}[1]{\{#1\}}
 \let\bottom\bot
+\newcommand{\env}[1]{\{#1\}}
+\newcommand{\bind}[2]{{#1}\mapsto{#2}}
 
 
 \usepackage{amsmath}
@@ -376,6 +378,7 @@ $\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\l
 
 \section{Example 1}
 Consider the simple example Karp offers, wherein $m(x) = px$, where $p$ is a positive constant less than 1, and $a(x) = 0, \ x < 1, \ a(x) = 1, \ x \geq 1$. Then $T(x) = a(x) + T(px)$, so by a simple inductive argument we can show that 
+\ndComment{Second branch is subsumed by the third branch.}
 \begin{align*}
 T(x) &= 
  \begin{cases}
@@ -398,6 +401,16 @@ T(x) &=
 &= \bigvee\{g^n (\perp)\}^{\infty}_{n=1} \\
 &= \lim_{n \to \infty}\{g^n (\perp)\}
  \end{align*}
+ \ndComment{Let's just call this bottom element $\bot$, not $f_\bot$.}
+ \ndComment{I think you want a proper proof by induction to show that
+ $g^n(\bot)(x) = \sum_{i=1}^n\tmden{a}{\env{\bind x {p^{i-1}x}}}$.}
+ \ndComment{Is it obvious that $\tmden{T}{}(x) = T(x)$, where $T$ is defined
+ by the clauses above?}
+ \ndComment{As you mentioned when we met, you can probably prove a more
+ general result, which is the one stated by Karp:  if
+ $T(x) = a(x) + T(m(x))$, then 
+ $\tmden{T}{}(x) = \sum_{i=1}^\infty\tmden{a}(m^{i-1}(x))$.  Then you can
+ show what this means for various choices of~$m$.}
  Recall that the bottom element of $\llbracket \texttt{real} \rrbracket$ is $0$, so the bottom element of $\llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket$ is the function $f_{\perp}$ that maps every element in $\llbracket \texttt{real} \rrbracket$ to $0$. 
  \begin{align*}
  \forall x \in \R, \ g(f_{\perp})(x) &= \llbracket \lambda x.a + f(p*x)\rrbracket\{f \mapsto f_{\perp}\} \\
