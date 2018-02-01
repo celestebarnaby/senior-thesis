@@ -17,10 +17,21 @@
 \newcommand{\ctxtreduce}       {\mapsto}
 \newcommand{\sstep}     [3] [] {#2 &\ssosredex&  #3 &\textsc{#1}}
 \newcommand{\ctxtstep}  [3] [] {#2 &\ctxtreduce& #3 &\textsc{#1}}
+\newcommand{\tmden}[2]{\llbracket{#1}\rrbracket{#2}}
+\newcommand{\tyden}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\typing}[3]{{#1}\vdash{#2}:{#3}}
+\newcommand{\extend}[3]{#1\{{#2}\mapsto{#3}\}}
+\newcommand{\sfix}{\mathtt{fix}}
+\newcommand{\smfix}{\underline{\mathit{fix}}}
+\newcommand{\set}[1]{\{#1\}}
+\let\bottom\bot
+\newcommand{\env}[1]{\{#1\}}
+\newcommand{\bind}[2]{{#1}\mapsto{#2}}
 
 \begin{document}
 
 \section{Expression Language}
+We define an expression language which will allow us to write and type-check recurrences on random variables such as those described by Karp. The syntax of this language is mostly analogous to PCF, with one key exception: instead of a $\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses. \\ \\
 $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \tau \rightarrow \tau$ \\ \\
  $e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ e / e \ | \ \texttt{true} \ | \ \texttt{false} \ | \\$\-\hspace{.8cm}$\ e  =  e \ | \ e < e \ | \ e > e \ | e \leq e \ | \ e \geq e \ | 
  \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
@@ -53,7 +64,6 @@ $if \texttt{ false } then \ e_1 \ else \ e_2 = e_2$ \\ \\
 $\lambda x.e = \lambda y.e\{x \mapsto y \}$, provided $y$ not free in $e$. \\ \\ \\
 $\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\}$ \\
 $\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}$
-
 \section{Operational Semantics} 
 $\dfrac{e_1 \downarrow \lambda x.e \ \ e_2 \downarrow v \ \ e\{x \mapsto v\} \downarrow v'}{e_1 \ e_2 \downarrow v'}$ \\ \\ \\
 $\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 + e_2 \downarrow v_1 + v_2}$ \\ \\ \\
@@ -67,6 +77,9 @@ $\dfrac{\lambda x.e\{ f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\} \downarrow
 v}$
 
 \section{Denotational Semantics}
+The denotational semantics of our expression language is mostly standard, with types interpreting to flat-ordered sets. Again, 
+the exception is the $\texttt{real}$ type, which interprets to the non-negative reals, with an additional element $+\infty$ such 
+that for $\forall x \in R$, $x<+\infty$. (Need more explanation of this here).
  \begin{align*}
 \llbracket \texttt{real} \rrbracket &= \R_{[0, +\infty]} = \{x \in \R \ | \ x \geq 0\} \cup \{+\infty\} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
@@ -138,8 +151,9 @@ upper bound in $\llbracket \tau \rrbracket$. \\
 \emph{Base Cases: }
 \begin{itemize}
 \item $\tau = \texttt{real}$ \\ \\
-In this case, $\llbracket \tau \rrbracket$ is the set of all nonnegative reals, with an additional element $+\infty$ such that for all
-$x \in \R, \ x < +\infty$. Then $0$ is a bottom element of $\llbracket \tau \rrbracket$, and for any chain $C \subset \R, \ C$ is bounded by $+\infty$, so by the least upper bound property $C$ has a least upper bound in $\llbracket \tau \rrbracket$.
+In this case, $\llbracket \tau \rrbracket = \R_{[0,+\infty]}$. Then $0$ is a bottom element of $\llbracket \tau \rrbracket$, and for 
+any chain $C \subset \R, \ C$ is bounded by $+\infty$, so by the least upper bound property $C$ has a least upper bound in 
+$\llbracket \tau \rrbracket$.
 \item $\tau = \texttt{bool}$ \\ \\
 In this case, $\llbracket \tau \rrbracket$ is set with flat ordering, and is thus a CPO. \\ 
 \end{itemize}
@@ -162,10 +176,10 @@ and $\bigvee C_2$ exist. See, then, that $(\bigvee C_1, \bigvee C_2)$ is the lea
 \item $\tau = \tau_1 \rightarrow \tau_2$ \\ \\
 Note $\llbracket \tau \rrbracket = \{f : \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket : f \text{ is continuous}\}
 $. By inductive hypothesis, $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom
-elements $\perp_1$ and $\perp_2$, respectively. Let $f_{\perp}: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 
-\rrbracket$ be a function such that, for $\forall x \in \llbracket \tau_1 \rrbracket, \ f_{\perp}(x) = \perp_2$. See, then, that 
-$f_{\perp}$ is a continuous function that is less than or equal to every function in $\llbracket \tau \rrbracket$ (using pointwise
-ordering), so $f_{\perp}$ is the bottom element of $\llbracket \tau \rrbracket$.  
+elements $\perp_1$ and $\perp_2$, respectively. Let $\perp: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 
+\rrbracket$ be a function such that, for $\forall x \in \llbracket \tau_1 \rrbracket, \ \perp(x) = \perp_2$. See, then, that 
+$\perp$ is a continuous function that is less than or equal to every function in $\llbracket \tau \rrbracket$ (using pointwise
+ordering), so $\perp$ is the bottom element of $\llbracket \tau \rrbracket$.  
 
 Let $C \subset \llbracket \tau \rrbracket$ be a 
 chain, and consider that for $\forall x \in \tau_1, \{f(x) : f \in C\}$ is a chain in $\llbracket \tau_2 \rrbracket$. Call this set $F_x$,
@@ -174,10 +188,13 @@ such that $\forall x \in \llbracket \tau_1 \rrbracket, \ g(x) = \bigvee F_x$. Se
 \tau \rrbracket$ is a CPO. \\
 \end{itemize} 
 %
- \underline{Claim 2:} For all expressions $e$ and environments $\Gamma$,
+ \underline{Claim 2:} (Need to update these proofs)
 \begin{enumerate}
-\item $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a continuous function. 
-\item for all $\Gamma$-environments $\eta$, $\llbracket \Gamma \vdash e : \tau \rrbracket\eta \in \llbracket \tau \rrbracket$ 
+\item For all $\Gamma\vdash e : \tau$ and all $\Gamma$-environments~$\eta$,
+$\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
+\item For all chains $a_0\leq a_1\leq\dots$,
+$\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
+\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$.
 \end{enumerate}
  \underline{Proof:} by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a sequence of $
  \Gamma$-environments, and suppose $ \eta = \bigvee \ \{ \eta_i \}^{\infty}_{i=1}$. Note that 2 is trivial in all but the abstraction
@@ -350,7 +367,6 @@ Consider the simple example Karp offers, wherein $m(x) = px$, with $p$ a positiv
 T(x) &= 
  \begin{cases}
  0 \text{ if } x < 1 \\
- 1 \text{ if } 1 \leq x < \dfrac{1}{p} \\
  k \text{ if }  \dfrac{1}{p^{k-1}} \leq x < \dfrac{1}{p^k} \\
  \end{cases}
  \end{align*}
@@ -373,20 +389,34 @@ T(x) &=
 &= \lim_{n \to \infty}\{g^n (\perp)\}
  \end{align*}
  Recall that the bottom element of $\llbracket \texttt{real} \rrbracket$ is $0$, so the bottom element of $\llbracket \texttt{real} 
- \rightarrow \texttt{real}\rrbracket$ is the function $f_{\perp}$ that maps every element in $\llbracket \texttt{real} \rrbracket$ to 
- $0$. 
+ \rightarrow \texttt{real}\rrbracket$ is the function $\perp$ that maps every element in $\llbracket \texttt{real} \rrbracket$ to 
+ $0$.  \\
+ %
+ \underline{Claim:}
  \begin{align*}
- \forall d \in \R_{[0,+\infty]}, \ g(f_{\perp})(d) &= \llbracket \lambda x.a + f(p*x)\rrbracket\{f \mapsto f_{\perp}, x \mapsto d\} \\
- &= \llbracket a \rrbracket(d) + f_{\perp}(pd) \\
- &= \llbracket a \rrbracket(d)  \\
- \forall d \in \R_{[0,+\infty]}, \ g(g(f_{\perp}))(d) &= \llbracket \lambda x.a + f(p*x)\rrbracket\{f \mapsto g(f_{\perp}),x\mapsto d\} \\
- &= \llbracket a \rrbracket(d) + g(f_\perp)(pd) \\
- &= \llbracket a \rrbracket(d) + \llbracket \lambda x.a + f(p * x)\rrbracket\{f\mapsto f_\perp, x\mapsto pd\} \\
- &= \llbracket a \rrbracket(d) + \llbracket a \rrbracket(pd) + f_\perp(p^2d) \\
- &= \llbracket a \rrbracket(d) + \llbracket a \rrbracket(pd) \\ 
- &\ldots \\
- \forall d \in \R_{[0,+\infty]}, \ g^n(f_{\perp})(d) &= \sum_{i=0}^{n-1} \llbracket a \rrbracket (p^{i}d) \\
- \lim_{n \to \infty}\{g^n (f_{\perp})\}(d) &= \sum_{i=0}^{\infty} \llbracket a \rrbracket (p^{i}d) \\
+ \forall d \in \R_{[0, +\infty]}, \ g^n(\perp)(d) = \sum_{i = 0}^{n-1}\llbracket a \rrbracket\{ x \mapsto p^{i}d\}
+ \end{align*}
+ %
+ \underline{Proof:} by induction on n. \\
+ \emph{Base case:} n = 1
+ \begin{align*}
+ \forall d \in \R_{[0,+\infty]}, \ g(\perp)(d) &= \llbracket \lambda x.a + f(p*x)\rrbracket\{f \mapsto \perp, x \mapsto d\} \\
+ &= \llbracket a \rrbracket\{x \mapsto d\} + \perp(pd) \\
+ &= \llbracket a \rrbracket\{x \mapsto d\}  \\
+ \end{align*}
+ \emph{Inductive case:} Suppose the claim hold for $\forall k < n$.
+ \begin{align*}
+ \forall d \in \R_{[0,+\infty]}, \ g^n(\perp)(d) &= \llbracket \lambda x.a + f(p*x)\rrbracket\{f \mapsto g^{n-1}(\perp),x\mapsto d\} \\
+ &= \llbracket a \rrbracket\{x \mapsto d\} + g^{n-1}(\perp)(pd) \\
+\text{(by inductive hypothesis)} &= \llbracket a \rrbracket\{x \mapsto d\} 
+					    + \sum_{i = 0}^{n-2}\llbracket a \rrbracket\{x \mapsto p^{i}(pd)\} \\
+&= \llbracket a \rrbracket\{x \mapsto d\} + \sum_{i = 0}^{n-1}\llbracket a \rrbracket\{x \mapsto p^{i+1}d)\} \\
+&= \sum_{i=0}^{n}\llbracket a \rrbracket\{x \mapsto p^{i}d\} \\
+\end{align*}
+Therefore, 
+\begin{align*}
+\forall d \in \R_{[0,+\infty]}, \ \llbracket \texttt{T} \rrbracket\{x \mapsto d\} &= \lim_{n \to \infty}\{g^n (\perp)\}(d) \\
+&= \sum_{i=0}^{\infty} \llbracket a \rrbracket (p^{i}d) \\
  \end{align*}
  See, then, that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described by Karp.
 
@@ -414,20 +444,18 @@ We want to show that the denotation of this expression has the same behavior as 
 &= \bigvee\{g^n (\perp)\}^{\infty}_{n=1} \\
 &= \lim_{n \to \infty}\{g^n (\perp)\}
  \end{align*}
-As in Example 1, let $f_{\perp}$ be the bottom element of $\llbracket \texttt{real} \rightarrow \texttt{real} \rrbracket$ --- that is, 
-the function that maps every element in $\llbracket \texttt{real} \rrbracket$ to $0$. 
+As in Example 1, let $\perp$ be the bottom element of $\llbracket \texttt{real} \rightarrow \texttt{real} \rrbracket$ --- that is, 
+the function that maps every element in $\llbracket \texttt{real} \rrbracket$ to $0$. \\
+ \underline{Claim:}
  \begin{align*}
- \forall d \in \R_{[0,+\infty]}, \ g(f_{\perp})(d) &= \llbracket \lambda x.x + f(p*x)\rrbracket\{f \mapsto f_{\perp}, x \mapsto d\} \\
- &= d + f_{\perp}(pd) \\
- &= d  \\
- \forall d \in \R_{[0,+\infty]}, \ g(g(f_{\perp}))(d) &= \llbracket \lambda x.x + f(p*x)\rrbracket\{f \mapsto g(f_{\perp}),x\mapsto d\} \\
- &= d + g(f_\perp)(pd) \\
- &= d + \llbracket \lambda x.x + f(p * x)\rrbracket\{f\mapsto f_\perp, x\mapsto pd\} \\
- &= d + pd + f_\perp(p^2d) \\
- &= d + pd \\ 
- &\ldots \\
- \forall d \in \R_{[0,+\infty]}, \ g^n(f_{\perp})(d) &= \sum_{i=1}^{n-1} p^{i}d \\
- \lim_{n \to \infty}\{g^n (f_{\perp})\}(d) &= \sum_{i=1}^{\infty} p^{i}d 
+ \forall d \in \R_{[0, +\infty]}, \ g^n(\perp)(d) = \sum_{i = 0}^{n-1}p^{i}d
+ \end{align*}
+ %
+ \underline{Proof:} Parallel to example 1. \\
+Therefore, 
+ \begin{align*}
+ \forall d \in \R_{[0,+\infty]}, \llbracket T \rrbracket\{x \mapsto d \} =  \lim_{n \to \infty}\{g^n (\perp)\}(d) &= \sum_{i=1}^{\infty} 
+ p^{i}d 
  \end{align*}
  See, then, that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described above.
  \subsection{Example 3} Let $m(x) = x$ and $a(x) = x$. Then $m(x), a(x)$, and $m(x)/x$ are all non-decreasing functions and thus meet the assumptions specified by Karp. Note that $T(x) = x + T(x)$, so, for instance,
@@ -452,20 +480,18 @@ Clearly this series diverges for $\forall x \in \R$. We express this function in
 &= \bigvee\{g^n (\perp)\}^{\infty}_{n=1} \\
 &= \lim_{n \to \infty}\{g^n (\perp)\}
  \end{align*}
-As in Example 1, let $f_{\perp}$ be the bottom element of $\llbracket \texttt{real} \rightarrow \texttt{real} \rrbracket$ --- that is, 
+As in Example 1, let $\perp$ be the bottom element of $\llbracket \texttt{real} \rightarrow \texttt{real} \rrbracket$ --- that is, 
 the function that maps every element in $\llbracket \texttt{real} \rrbracket$ to $0$. 
+  \underline{Claim:}
  \begin{align*}
- \forall d \in \R_{[0,+\infty]}, \ g(f_{\perp})(d) &= \llbracket \lambda x.x + f(x)\rrbracket\{f \mapsto f_{\perp}, x \mapsto d\} \\
- &= d + f_{\perp}(d) \\
- &= d  \\
- \forall d \in \R_{[0,+\infty]}, \ g(g(f_{\perp}))(d) &= \llbracket \lambda x.x + f(x)\rrbracket\{f \mapsto g(f_{\perp}),x\mapsto d\} \\
- &= d + g(f_\perp)(d) \\
- &= d + \llbracket \lambda x.x + f(x)\rrbracket\{f\mapsto f_\perp, x\mapsto d\} \\
- &= d + d + f_\perp(d) \\
- &= d + d \\ 
- &\ldots \\
- \forall d \in \R_{[0,+\infty]}, \ g^n(f_{\perp})(d) &= \sum_{i=0}^{n-1} d \\
- \lim_{n \to \infty}\{g^n (f_{\perp})\}(d) &= \sum_{i=0}^{\infty} d 
+ \forall d \in \R_{[0, +\infty]}, \ g^n(\perp)(d) = \sum_{i = 0}^{n-1}d
+ \end{align*}
+ %
+ \underline{Proof:} Parallel to example 1. \\
+Therefore, 
+ \begin{align*}
+ \forall d \in \R_{[0,+\infty]}, \llbracket T \rrbracket\{x \mapsto d \} =  \lim_{n \to \infty}\{g^n (\perp)\}(d) &= \sum_{i=1}^{\infty} 
+ d 
  \end{align*}
  See, then, that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described above.
 \end{document}
