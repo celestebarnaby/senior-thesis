@@ -1,5 +1,15 @@
 \documentclass{westhesis}
 
+\usepackage{amsthm}
+	% Some theorem-like environments, all of which share the same numbering.
+	\theoremstyle{plain}
+	\newtheorem{thm}{Theorem}
+	\newtheorem{lemma}[thm]{Lemma}
+	\newtheorem{prop}[thm]{Proposition}
+
+	\theoremstyle{definition}
+	\newtheorem{defn}{Definition}
+
 % ND comments.
 \usepackage{framed}
 \usepackage[normalem]{ulem}
@@ -140,13 +150,17 @@ bound).
 \end{ndBlockComment}
 
 \ndComment{Use a theorem(-like) environment for theorems, propositions,
-etc.}
- \underline{Claim 1:} For all expressions $e$ and environments $\Gamma$,
+etc.  I've rewritten your Claim 1 using the thm environment from the
+\textsf{amsthm} package.}
+\begin{thm}
+For all expressions $e$ and environments $\Gamma$,
 \begin{enumerate}
 \item $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a continuous function. 
 \item for all $\Gamma$-environments $\eta$, $\llbracket \Gamma \vdash e : \tau \rrbracket\eta \in \llbracket \tau \rrbracket$ 
 \end{enumerate}
- \underline{Proof:} by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a sequence of $
+\end{thm}
+\begin{proof}
+ By induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a sequence of $
  \Gamma$-environments, and suppose $ \eta = \bigvee \ \{ \eta_i \}^{\infty}_{i=1}$. Note that 2 is trivial in all but the abstraction
  and $\texttt{fix}$ cases.\\
  \emph{Base Cases: } 
@@ -284,6 +298,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{align*}
  \end{enumerate}
  \end{itemize}
+ \end{proof}
  % Lemmas
  \underline{Lemma 1:} $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1}= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}
  _{j=1}\}^{\infty}_{i=1}$\\
