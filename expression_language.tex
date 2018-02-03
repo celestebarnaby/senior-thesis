@@ -1,5 +1,14 @@
 \documentclass{westhesis}
 
+\usepackage{amsthm}
+	% Some theorem-like environments, all of which share the same numbering.
+	\theoremstyle{plain}
+	\newtheorem{thm}{Theorem}
+	\newtheorem{lemma}[thm]{Lemma}
+	\newtheorem{prop}[thm]{Proposition}
+
+	\theoremstyle{definition}
+	\newtheorem{defn}{Definition}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -144,10 +153,13 @@ that for $\forall x \in R$, $x<+\infty$. (Need more explanation of this here).
  \text{, where } \underline{fix} \text{ assigns the least fixed point} \\ 
  &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
  \end{align*}
-\underline{Claim 1:} For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
+\begin{thm}
+For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
 set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
 upper bound in $\llbracket \tau \rrbracket$. \\
-\underline{Proof:} by induction on the structure of $\tau$. \\
+\end{thm}
+\begin{proof}
+by induction on the structure of $\tau$. \\
 \emph{Base Cases: }
 \begin{itemize}
 \item $\tau = \texttt{real}$ \\ \\
@@ -187,16 +199,18 @@ and note that $\bigvee F_x$ exists. We define a function $g: \llbracket \tau_1 \
 such that $\forall x \in \llbracket \tau_1 \rrbracket, \ g(x) = \bigvee F_x$. See, then, that $g = \bigvee C$. Therefore, $\llbracket
 \tau \rrbracket$ is a CPO. \\
 \end{itemize} 
+\end{proof}
 %
- \underline{Claim 2:} (Need to update these proofs)
+\begin{thm} 
+(Need to update these proofs)
+For all expressions $e$ and environments $\Gamma$,
 \begin{enumerate}
-\item For all $\Gamma\vdash e : \tau$ and all $\Gamma$-environments~$\eta$,
-$\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
-\item For all chains $a_0\leq a_1\leq\dots$,
-$\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
-\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$.
+\item $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a continuous function. 
+\item for all $\Gamma$-environments $\eta$, $\llbracket \Gamma \vdash e : \tau \rrbracket\eta \in \llbracket \tau \rrbracket$ 
 \end{enumerate}
- \underline{Proof:} by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a sequence of $
+\end{thm}
+\begin{proof}
+by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a sequence of $
  \Gamma$-environments, and suppose $ \eta = \bigvee \ \{ \eta_i \}^{\infty}_{i=1}$. Note that 2 is trivial in all but the abstraction
  and $\texttt{fix}$ cases.\\
  \emph{Base Cases: } 
@@ -335,10 +349,13 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{align*}
  \end{enumerate}
  \end{itemize}
+ \end{proof}
  % Lemmas
- \underline{Lemma 1:} $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1}= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}
+ \begin{lemma} $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1}= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}
  _{j=1}\}^{\infty}_{i=1}$\\
- \underline{Proof: } $\Rightarrow$ We want to show that\\ \\ \centerline{$\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}
+ \end{lemma}
+ \begin{proof}
+ $\Rightarrow$ We want to show that\\ \\ \centerline{$\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}
  _{j=1} \geq  \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1}$} \\ \\ First, notice that $\forall i, j \bigvee\{\bigvee
  \{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \geq (F_i)^j$. \\
  Suppose, now, that 
@@ -355,10 +372,15 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1}$ \\ \\
  Therefore, $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} = \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}
  ^{\infty}_{i=1}$ \\ \\
+ \end{proof}
  %
- \underline{Lemma 2:} $\bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1} = \bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}
+ \begin{lemma}
+ $\bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1} = \bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}
  _{j=1}\}^{\infty}_{i=1}$\\ 
- \underline{Proof:} By reasoning similar to Lemma 1. \\ \\
+ \end{lemma}
+ \begin{proof} 
+ By reasoning similar to Lemma 1. \\ \\
+ \end{proof}
  
 \section{Examples}
 \subsection{Example 1}
