@@ -60,6 +60,39 @@ shorter lines so that it is easy to navigate the source code by
 jumping to the next blank line, etc.  It also makes section breaks stand
 out in the \LaTeX\ source, just like using blank lines helps code blocks
 stand apart from each other.
+
+Also, let's reorganize the document to use a galley file.  A galley file
+consists of your preamble and \verb!\include! statements, each of which
+includes a file.  Then write each chapter in its own file.  So the 
+overall organization looks something like:
+\begin{itemize}
+\item \verb!thesis.tex! (the galley file):
+\begin{verbatim}
+\documentclass{westhesis}
+\title{...}
+
+<LaTeX preamble>
+
+\begin{document}
+% Front matter
+\begin{abstract}
+...
+\end{abstract}
+...
+
+% Chapters
+\include{intro}
+\include{deterministic_recs}
+...
+\end{document}
+\end{verbatim}
+
+\item \verb!intro.tex!:  your introduction.
+\item \verb!deterministic_recs.tex!:  the contents of this file.
+\item Etc.
+\end{itemize}
+You then run \verb!latex! on \verb!thesis.tex!.  Of course, you can name
+your chapter files however you want.
 \end{ndBlockComment}
 
 \section{Expression Language}
