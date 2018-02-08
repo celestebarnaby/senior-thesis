@@ -1,49 +1,14 @@
-\documentclass{westhesis}
-
-\usepackage{amsthm}
-	% Some theorem-like environments, all of which share the same numbering.
-	\theoremstyle{plain}
-	\newtheorem{thm}{Theorem}
-	\newtheorem{lemma}[thm]{Lemma}
-	\newtheorem{prop}[thm]{Proposition}
-
-	\theoremstyle{definition}
-	\newtheorem{defn}{Definition}
-
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{stmaryrd}
-\usepackage{enumerate}
-\usepackage{wasysym}
-\usepackage{slashed}
-\let\wasysymLightning\lightning
-
-\newcommand{\R}{\mathbb{R}}
-
-\newcommand{\Ctxt}       {\mathcal{E}}
-\newcommand{\InCtxt} [1] {\Ctxt[#1]}
-\newcommand{\ssosredex}        {\rightarrow}
-\newcommand{\ctxtreduce}       {\mapsto}
-\newcommand{\sstep}     [3] [] {#2 &\ssosredex&  #3 &\textsc{#1}}
-\newcommand{\ctxtstep}  [3] [] {#2 &\ctxtreduce& #3 &\textsc{#1}}
-\newcommand{\tmden}[2]{\llbracket{#1}\rrbracket{#2}}
-\newcommand{\tyden}[1]{\llbracket{#1}\rrbracket}
-\newcommand{\typing}[3]{{#1}\vdash{#2}:{#3}}
-\newcommand{\extend}[3]{#1\{{#2}\mapsto{#3}\}}
-\newcommand{\sfix}{\mathtt{fix}}
-\newcommand{\smfix}{\underline{\mathit{fix}}}
-\newcommand{\set}[1]{\{#1\}}
-\let\bottom\bot
-\newcommand{\env}[1]{\{#1\}}
-\newcommand{\bind}[2]{{#1}\mapsto{#2}}
-
-\begin{document}
-
 \section{Expression Language}
-We define an expression language which will allow us to write and type-check recurrences on random variables such as those described by Karp. The syntax of this language is mostly analogous to PCF, with one key exception: instead of a $\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses. \\ \\
+We define an expression language which will allow us to write and type-check recurrences on random variables such as 
+those described by Karp. The syntax of this language is mostly analogous to PCF, with one key exception: instead of a 
+$\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses. \\ \\
+
 $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \tau \rightarrow \tau$ \\ \\
- $e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ e / e \ | \ \texttt{true} \ | \ \texttt{false} \ | \\$\-\hspace{.8cm}$\ e  =  e \ | \ e < e \ | \ e > e \ | e \leq e \ | \ e \geq e \ | 
+
+$e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ e / e \ | \ 
+\texttt{true} \ | \ \texttt{false} \ | \\$\-\hspace{.8cm}$\ e  =  e \ | \ e < e \ | \ e > e \ | e \leq e \ | \ e \geq e \ | 
  \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
+ 
  $v \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ \texttt{true} \ |  \ \texttt{false} \ 
  | \ \texttt{fix} (\lambda f.\lambda x.e)$
 
@@ -54,7 +19,7 @@ $\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau }$ \\ \\ \\
 $\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda (x : \sigma).e : \sigma \rightarrow \tau }$ \\ \\ \\ 
 $\dfrac{\Gamma \vdash e_1: \sigma \rightarrow \tau \ \ \ \Gamma \vdash e_2 : \sigma}{\Gamma \vdash e_1 \ e_2 : \tau}$ \\ \\ \\
 $\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
-, \circ \in \{+,-,*\}$ \\ \\ \\
+, \circ \in \{+,-,*,/\}$ \\ \\ \\
 $\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
 , \circ \in \{=, <, >, \geq, \leq\}$ \\ \\ \\
 $\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
@@ -65,7 +30,7 @@ $\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarr
 \section{Equational Semantics}
 $e = e$ \\ \\
 $\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots$  \\
-equivalent rules for $-$ and $*$ operations.
+equivalent rules for $-, \ *$, and $/$ operations.
 \\ \\
 $(n =n) = \texttt{true}$ \\ $(n=m) = \texttt{false}$, provided $n, m$ distinct numerals \\ \\ 
 $if \texttt{ true } then \ e_1 \ else \ e_2 = e_1$ \\
@@ -73,17 +38,6 @@ $if \texttt{ false } then \ e_1 \ else \ e_2 = e_2$ \\ \\
 $\lambda x.e = \lambda y.e\{x \mapsto y \}$, provided $y$ not free in $e$. \\ \\ \\
 $\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\}$ \\
 $\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}$
-\section{Operational Semantics} 
-$\dfrac{e_1 \downarrow \lambda x.e \ \ e_2 \downarrow v \ \ e\{x \mapsto v\} \downarrow v'}{e_1 \ e_2 \downarrow v'}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 + e_2 \downarrow v_1 + v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 - e_2 \downarrow v_1 - v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 * e_2 \downarrow v_1 * v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v}{e_1 = e_2 \downarrow \texttt{true}}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v' \neq v}{e_1 = e_2 \downarrow \texttt{false}}$ \\ \\ \\
-$\dfrac{e_1 \downarrow \texttt{true} \ \ e_2 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
-$\dfrac{e_1 \downarrow \texttt{false} \ \ e_3 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
-$\dfrac{\lambda x.e\{ f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\} \downarrow v}{\texttt{fix} (\lambda f.\lambda x.e) \downarrow 
-v}$
 
 \section{Denotational Semantics}
 The denotational semantics of our expression language is mostly standard, with types interpreting to flat-ordered sets. Again, 
@@ -516,5 +470,3 @@ Therefore,
  d 
  \end{align*}
  See, then, that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described above.
-\end{document}
-

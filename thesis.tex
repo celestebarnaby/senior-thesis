@@ -1,0 +1,50 @@
+\documentclass{westhesis}
+\title{A Syntax and Denotational Semantics for Probabilistic Recurrence Relations}
+
+\usepackage{amsthm}
+	% Some theorem-like environments, all of which share the same numbering.
+	\theoremstyle{plain}
+	\newtheorem{thm}{Theorem}
+	\newtheorem{lemma}[thm]{Lemma}
+	\newtheorem{prop}[thm]{Proposition}
+
+	\theoremstyle{definition}
+	\newtheorem{defn}{Definition}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
+\usepackage{wasysym}
+\usepackage{slashed}
+\let\wasysymLightning\lightning
+
+\newcommand{\R}{\mathbb{R}}
+
+\newcommand{\Ctxt}       {\mathcal{E}}
+\newcommand{\InCtxt} [1] {\Ctxt[#1]}
+\newcommand{\ssosredex}        {\rightarrow}
+\newcommand{\ctxtreduce}       {\mapsto}
+\newcommand{\sstep}     [3] [] {#2 &\ssosredex&  #3 &\textsc{#1}}
+\newcommand{\ctxtstep}  [3] [] {#2 &\ctxtreduce& #3 &\textsc{#1}}
+\newcommand{\tmden}[2]{\llbracket{#1}\rrbracket{#2}}
+\newcommand{\tyden}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\typing}[3]{{#1}\vdash{#2}:{#3}}
+\newcommand{\extend}[3]{#1\{{#2}\mapsto{#3}\}}
+\newcommand{\sfix}{\mathtt{fix}}
+\newcommand{\smfix}{\underline{\mathit{fix}}}
+\newcommand{\set}[1]{\{#1\}}
+\let\bottom\bot
+\newcommand{\env}[1]{\{#1\}}
+\newcommand{\bind}[2]{{#1}\mapsto{#2}}
+
+\begin{document}
+\begin{abstract}
+abstract goes here:)
+\end{abstract}
+
+%Chapters
+\include{introduction}
+\include{expression_language}
+
+\end{document}
