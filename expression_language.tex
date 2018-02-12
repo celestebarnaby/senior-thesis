@@ -1,43 +1,52 @@
 \section{Expression Language}
-We define an expression language which will allow us to write and type-check recurrences on random variables such as 
+We define an expression language which will allow us to write and type-check recurrence relations such as 
 those described by Karp. The syntax of this language is mostly analogous to PCF, with one key exception: instead of a 
-$\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses. \\ \\
-
-$\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \tau \rightarrow \tau$ \\ \\
-
-$e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ e / e \ | \ 
-\texttt{true} \ | \ \texttt{false} \ | \\$\-\hspace{.8cm}$\ e  =  e \ | \ e < e \ | \ e > e \ | e \leq e \ | \ e \geq e \ | 
- \ \ifelse{e}{e}{e} \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
- 
- $v \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ \texttt{true} \ |  \ \texttt{false} \ 
- | \ \texttt{fix} (\lambda f.\lambda x.e)$
+$\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses. \\ 
+\[
+\begin{array}{rcl}
+\tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
+e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
+  && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
+     if \ e \ then \ e \ else \ e \mid \texttt{fix} (\lambda f.\lambda x.e) \\
+v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid \texttt{true} \mid \texttt{false} \mid \texttt{fix} (\lambda f.\lambda x.e)
+\end{array}
+\]
 
 \section{Type System}
-$\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots$ \\ \\ \\
-$\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}}$ \\ \\ \\
-$\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau }$ \\ \\ \\
-$\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda (x : \sigma).e : \sigma \rightarrow \tau }$ \\ \\ \\ 
-$\dfrac{\Gamma \vdash e_1: \sigma \rightarrow \tau \ \ \ \Gamma \vdash e_2 : \sigma}{\Gamma \vdash e_1 \ e_2 : \tau}$ \\ \\ \\
-$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
-, \circ \in \{+,-,*,/\}$ \\ \\ \\
-$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
-, \circ \in \{=, <, >, \geq, \leq\}$ \\ \\ \\
-$\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
-{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} $ \\ \\ \\
-$\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
-{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau}$ \\ \\ \\ 
+
+\[
+\begin{array}{lr}
+\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\
+\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}} \\ \\ \\
+\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau } \\ \\ \\
+\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda (x : \sigma).e : \sigma \rightarrow \tau } \\ \\ \\ 
+\dfrac{\Gamma \vdash e_1: \sigma \rightarrow \tau \ \ \ \Gamma \vdash e_2 : \sigma}{\Gamma \vdash e_1 \ e_2 : \tau} \\ \\ \\
+\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
+, \circ \in \{+,-,*,/\} \\ \\ \\
+\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
+, \circ \in \{=, <, >, \geq, \leq\} \\ \\ \\
+\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
+{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ \\
+\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
+{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau} \\ \\ \\ 
+\end{array}
+\]
 
 \section{Equational Semantics}
-$e = e$ \\ \\
-$\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots$  \\
-equivalent rules for $-, \ *$, and $/$ operations.
+\[
+\begin{array}{lr}
+e = e \\ \\
+\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots  \\
+\text{equivalent rules for } -, \ * \text{, and } /\text{ operations.}
 \\ \\
-$(n =n) = \texttt{true}$ \\ $(n=m) = \texttt{false}$, provided $n, m$ distinct numerals \\ \\ 
-$\ifelse{\texttt{ true }}{e_1}{e_2} = e_1$ \\
-$\ifelse{\texttt{ false }}{e_1}{e_2} = e_2$ \\ \\ 
-$\lambda x.e = \lambda y.e\{x \mapsto y \}$, provided $y$ not free in $e$. \\ \\ \\
-$\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\}$ \\
-$\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}$
+(n =n) = \texttt{true} \\ (n=m) = \texttt{false}\text{, provided } n, \ m \text{ distinct numerals.}\\ \\ 
+\ifelse{\texttt{ true }}{e_1}{e_2} = e_1 \\
+\ifelse{\texttt{ false }}{e_1}{e_2} = e_2 \\ \\ 
+\lambda x.e = \lambda y.e\{x \mapsto y \}, \text{provided } y \text{ not free in } e. \\ \\ \\
+\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\} \\
+\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}
+\end{array}
+\]
 
 \section{Denotational Semantics}
 The denotational semantics of our expression language is mostly standard, with types interpreting to flat-ordered sets. Again, 
