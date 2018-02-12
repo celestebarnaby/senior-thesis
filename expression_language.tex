@@ -175,14 +175,16 @@ See, then, that by definition $\llbracket \tau \rrbracket$ is a CPO. \\
 (Need to update these proofs)
 For all expressions $e$ and environments $\Gamma$,
 \begin{enumerate}
-\item $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a continuous function. 
-\item for all $\Gamma$-environments $\eta$, $\llbracket \Gamma \vdash e : \tau \rrbracket\eta \in \llbracket \tau \rrbracket$ 
+\item For all $\Gamma\vdash e : \tau$ and all $\Gamma$-environments~$\eta$,
+$\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
+\item For all chains $a_0\leq a_1\leq\dotsb$,
+$\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
+\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$.
 \end{enumerate}
 \end{thm}
 \begin{proof}
-by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a sequence of $
- \Gamma$-environments, and suppose $ \eta = \bigvee \ \{ \eta_i \}^{\infty}_{i=1}$. Note that 2 is trivial in all but the abstraction
- and $\texttt{fix}$ cases.\\
+by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a chain, and suppose $ a = \bigvee_i a_i$. 
+Note that 1 is trivial in all but the abstraction and $\texttt{fix}$ cases.\\
  \emph{Base Cases: } 
  \begin{itemize}
  % real number constants
@@ -191,27 +193,44 @@ by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_
  \item $e \in \{ \texttt{true}, \ \texttt{false} \}$\\ \\
  %
   In both of these cases, $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a constant function from a $\Gamma$-environment
- $\eta$ to an element of $\llbracket \tau \rrbracket$, so clearly it is continuous. 
+ $\eta$ to an element of $\llbracket \tau \rrbracket$, so clearly $\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
+\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$.
+
 % variable
  \item $e = x : \tau$ \\ \\
- In order to show that $\llbracket \Gamma \vdash x : \tau \rrbracket$ is continuous, we 
- must show that $\llbracket \Gamma \vdash x : \tau \rrbracket\eta = \bigvee \{ \llbracket \Gamma \vdash x : \tau \rrbracket
-  \eta_i \}^{\infty}_{i=1}$. See that
+ We want to show that $\tmden{\typing\Gamma x\tau}{\extend\eta y {\bigvee_i a_i}} =
+\bigvee_i\tmden{\typing\Gamma x\tau}{\extend\eta y {a_i}}$.
+
+In the case that $ y \neq x$, note that
+\begin{align*}
+\tmden{\typing\Gamma x\tau}{\extend\eta y {\bigvee_i a_i}} &= \eta\{y\mapsto \bigvee_i a_i\}(x) \\
+&= \eta (x) \\
+&= \bigvee_i\tmden{\typing\Gamma x\tau}{\extend\eta y {a_i}}
+\end{align*}
+
+ In the case that $y = x$, note that
   \begin{align*}
-  \llbracket \Gamma \vdash x : \tau \rrbracket\eta &= \eta(x) \\
-  &= \bigvee\{\eta_i\}^{\infty}_{i=1}(x) \\
-  &= \bigvee\{\eta_i(x)\}^{\infty}_{i=1} \\
-  &= \bigvee\{\llbracket \Gamma \vdash x : \tau \rrbracket\eta_i \}^{\infty}_{i=1}
+  \llbracket \Gamma \vdash x : \tau \rrbracket\eta\{y\mapsto\bigvee_i a_i\} &= \eta\{y\mapsto \bigvee_i a_i\}(x) \\
+  &= \bigvee_i a_i \\
+  &=\bigvee_i \eta\{y \mapsto a_i\}(x)  \\
+  &= \bigvee_i\tmden{\typing\Gamma x\tau}{\extend\eta y {a_i}} \\
   \end{align*}
  \end{itemize}
  \emph{Inductive Cases: }
  \begin{itemize}
  % arithmetic operations
  \item $e = e_1 \circ e_2, \ \circ \in \{+, -, *, / \}$ \\ \\
- Then $\llbracket \Gamma \vdash e : \tau \rrbracket = \llbracket \Gamma e_1 : \tau \rrbracket \circ \llbracket \Gamma e_2 : \tau 
- \rrbracket$, and by inductive hypothesis $\llbracket \Gamma e_1 : \tau \rrbracket$ and $\llbracket \Gamma e_2 : \tau 
- \rrbracket$ are both continuous functions. Thus $\llbracket \Gamma \vdash e : \tau \rrbracket$ is the sum, difference, or 
- product of two continuous functions, so it is continuous as well. 
+ Then 
+ \begin{align*}
+ \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\} &= \llbracket \Gamma\vdash e_1 : \tau 
+ \rrbracket\eta\ \{x \mapsto \bigvee_i a_i\} \circ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}\\
+  \text{(by inductive hypothesis)} &=  \bigvee_i\llbracket \Gamma \vdash e_1: \tau \rrbracket\eta\{x\mapsto a_i\} \circ
+  \bigvee_i\llbracket \Gamma \vdash e_2: \tau \rrbracket\eta\{x\mapsto a_i\}  \\
+  &= \bigvee_i(\llbracket \Gamma \vdash e_1: \tau \rrbracket\eta\{x\mapsto a_i\} \circ 
+  \llbracket \Gamma \vdash e_2: \tau \rrbracket\eta\{x\mapsto a_i\}) \\
+  &= \bigvee_i \llbracket \Gamma \vdash e: \tau \rrbracket\eta\{x\mapsto a_i\}
+ \end{align*}
+
   % equality operation
   \item $e = e_1 \circ e_2, \ \circ \in \{=,<,>,\leq,\geq\}$\\ \\
   In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta = \perp$ or $\llbracket \Gamma \vdash e_2 : \tau 
@@ -292,13 +311,13 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \begin{enumerate}
 \item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta_i$, and consider that 
  \begin{align*}
- \llbracket \texttt{fix} (\lambda f.\lambda x.e)\rrbracket\eta &= \underline{\text{fix}}(\llbracket \lambda f. \lambda x.e 
+ \llbracket \texttt{fix} (\lambda f.\lambda x.e)\rrbracket\eta &= fix(\llbracket \lambda f. \lambda x.e 
  \rrbracket\eta)\\
- \text{(by inductive hypothesis)} &= \underline{\text{fix}}(\bigvee\{F_i\}^{\infty}_{i=1}) \\
+ \text{(by inductive hypothesis)} &= fix(\bigvee\{F_i\}^{\infty}_{i=1}) \\
  &= \bigvee\{\bigvee\{(F_i)^j \}^{\infty}_{i=1}\perp\}^{\infty}_{j=1} \\
  &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \\ 
 \text{(by Lemma 1)} &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1} \\ 
-&= \bigvee\{\underline{\text{fix}}(F_i)\}^{\infty}_{i=1}\\
+&= \bigvee\{fix(F_i)\}^{\infty}_{i=1}\\
 &= \bigvee\{\llbracket \Gamma \vdash \texttt{fix}(\lambda f \lambda x.e)\rrbracket\eta_i\}^{\infty}_{i=1}
  \end{align*}
  Therefore, $\llbracket \Gamma \vdash e \rrbracket$ is a continuous function.
@@ -309,12 +328,12 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
   and see that 
  \begin{align*}
  \llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta \bigvee\{x_i\}^{\infty}_{i=1}&= 
- \underline{\text{fix}}(F)\bigvee\{x_i\}^{\infty}_{i=1}\\
+ fix(F)\bigvee\{x_i\}^{\infty}_{i=1}\\
  &=\bigvee\{F^j \perp\}^{\infty}_{j=1}\bigvee\{x_i\}^{\infty}_{i=1}\\
  &= \bigvee\{F^j \perp(\bigvee\{x_i\}^{\infty}_{i=1})\}^{\infty}_{j=1}\\ 
  \text{(by continuity of $F^j \perp$) }&= \bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1}\\ 
  \text{(by Lemma 2)} &=\bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{j=1}\}^{\infty}_{i=1}\\
- &= \bigvee\{\underline{\text{fix}}(F)(x_i)\}^{\infty}_{i=1}\\
+ &= \bigvee\{fix(F)(x_i)\}^{\infty}_{i=1}\\
  &= \bigvee\{\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta(x_i)\}^{\infty}_{i=1}\\
  \end{align*}
  \end{enumerate}
@@ -353,20 +372,20 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{proof}
  
 \section{Examples}
-Consider that we may express the general equation T(x) = a(x) + T(m(x)) in our expression language as follows:
+Consider that we may express the general equation $T(x) = a(x) + T(m(x))$ in our expression language as follows:
  \begin{align*}
  \texttt{T} = \texttt{fix}(\lambda f. \lambda x.\texttt{a}(x) + f (\texttt{m}(x)))
  \end{align*}
  We want to show that the denotation of this expression has the same behavior as this deterministic function. First, let 
  $\texttt{F} = \lambda f. \lambda x.\texttt{a}(x) + f (\texttt{m}(x)$, and note the following:
  \begin{align*}
- \llbracket \texttt{T} \rrbracket &= \underline{\text{fix}}(\llbracket \texttt{F} \rrbracket) \\
+ \llbracket \texttt{T} \rrbracket &= fix(\llbracket \texttt{F} \rrbracket) \\
  \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow 
  \texttt{real}\rrbracket \\ &\text{ \ \ \ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real}
  \rrbracket, \ 
  F(\alpha) = \llbracket \lambda x.a + f (p * x)\rrbracket\{f \mapsto \alpha\} \\
  \llbracket \texttt{real}\rrbracket &= \R_{[0, +\infty]}  
- \\\text{By the CPO fixpoint theorem, } \underline{\text{fix}}(\llbracket \texttt{F} \rrbracket) &= \underline{\text{fix}}(F) \\
+ \\\text{By the CPO fixpoint theorem, } fix(\llbracket \texttt{F} \rrbracket) &= fix(F) \\
 &= \bigvee\{F^n (\perp)\}^{\infty}_{n=1} \\
 &= \lim_{n \to \infty}\{F^n (\perp)\}
  \end{align*}
