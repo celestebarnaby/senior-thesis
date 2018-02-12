@@ -7,7 +7,7 @@ $\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \ta
 
 $e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ e / e \ | \ 
 \texttt{true} \ | \ \texttt{false} \ | \\$\-\hspace{.8cm}$\ e  =  e \ | \ e < e \ | \ e > e \ | e \leq e \ | \ e \geq e \ | 
- \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
+ \ \ifelse{e}{e}{e} \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
  
  $v \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ \texttt{true} \ |  \ \texttt{false} \ 
  | \ \texttt{fix} (\lambda f.\lambda x.e)$
@@ -23,7 +23,7 @@ $\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real
 $\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
 , \circ \in \{=, <, >, \geq, \leq\}$ \\ \\ \\
 $\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
-{\Gamma \vdash \emph{if } e_1 \emph{ then } e_2 \emph{ else } e_3 : \tau} $ \\ \\ \\
+{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} $ \\ \\ \\
 $\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
 {\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau}$ \\ \\ \\ 
 
@@ -33,8 +33,8 @@ $\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ 
 equivalent rules for $-, \ *$, and $/$ operations.
 \\ \\
 $(n =n) = \texttt{true}$ \\ $(n=m) = \texttt{false}$, provided $n, m$ distinct numerals \\ \\ 
-$if \texttt{ true } then \ e_1 \ else \ e_2 = e_1$ \\
-$if \texttt{ false } then \ e_1 \ else \ e_2 = e_2$ \\ \\ 
+$\ifelse{\texttt{ true }}{e_1}{e_2} = e_1$ \\
+$\ifelse{\texttt{ false }}{e_1}{e_2} = e_2$ \\ \\ 
 $\lambda x.e = \lambda y.e\{x \mapsto y \}$, provided $y$ not free in $e$. \\ \\ \\
 $\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\}$ \\
 $\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}$
@@ -96,15 +96,15 @@ that for $\forall x \in R$, $x<+\infty$. (Need more explanation of this here).
       \perp \text{ otherwise}
    \end{cases}
  \\
-  \llbracket \ if \ e_1 \ then \ e_2 \ else \ e_3 \ \rrbracket \eta &= 
+  \llbracket \ifelse{e_1}{e_2}{e_3} \rrbracket \eta &= 
  \begin{cases} 
       \llbracket e_2 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = true \\
       \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\
       \perp \text{      otherwise} \\
    \end{cases}
   \\
-   \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= \underline{fix}\llbracket \lambda f.\lambda x.e \rrbracket\eta \
- \text{, where } \underline{fix} \text{ assigns the least fixed point} \\ 
+   \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= fix\llbracket \lambda f.\lambda x.e \rrbracket\eta \
+ \text{, where } fix \text{ assigns the least fixed point} \\ 
  &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
  \end{align*}
 \begin{thm}
@@ -249,7 +249,7 @@ In the case that $ y \neq x$, note that
   %
  In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \ \slashed{\circ} \ \llbracket \Gamma \vdash e_2 : \tau\rrbracket\eta, \ \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \neq \perp, \\ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta \neq \perp$, by reasoning similar to the previous case see that $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous.
   % conditional
- \item $e = \ if \ e_1 : \texttt{bool} \ then \ e_2 : \tau \ else \ e_3 : \tau$ \\ \\
+ \item $e = \ \ifelse{e_1}{e_2}{e_3} : \tau$ \\ \\
 In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = \perp$, note that $\llbracket \Gamma \vdash e : 
 \tau \rrbracket\eta =  \perp$. By inductive hypothesis, $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket$ is a 
 continuous function, so $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = \bigvee\{\llbracket \Gamma \vdash e_1 : 
@@ -436,9 +436,9 @@ T(x) &=
  \end{cases}
  \end{align*}
 We may express this function in our expression language using the expression $\texttt{T}$ defined above, with 
-$\texttt{a}(x) = \emph{if } x<1 \emph{ then } 0 \emph{ else } 1$ and $\texttt{m}(x) = p*x$:
+$\texttt{a}(x) = \ifelse{x<1}{0}{1}$ and $\texttt{m}(x) = p*x$:
  \begin{align*}
- \texttt{fix}(\lambda f. \lambda x. (\emph{if } x<1 \emph{ then } 0 \emph{ else } 1) + f (p * x))
+ \texttt{fix}(\lambda f. \lambda x. (\ifelse{x<1}{0}{1}) + f (p * x))
  \end{align*}
  Then, by theorem 6,
  \begin{align*}
