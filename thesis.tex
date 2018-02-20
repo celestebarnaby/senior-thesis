@@ -1,0 +1,67 @@
+\documentclass{westhesis}
+\title{A Syntax and Denotational Semantics for Probabilistic Recurrence Relations}
+
+\usepackage{amsthm}
+	% Some theorem-like environments, all of which share the same numbering.
+	\theoremstyle{plain}
+	\newtheorem{thm}{Theorem}
+	\newtheorem{lemma}[thm]{Lemma}
+	\newtheorem{prop}[thm]{Proposition}
+
+	\theoremstyle{definition}
+	\newtheorem{defn}{Definition}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
+\usepackage{wasysym}
+\usepackage{slashed}
+\let\wasysymLightning\lightning
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\extR}{\R_{[0,+\infty]}}
+\newcommand{\N}{\mathbb{N}}
+
+\newcommand{\Ctxt}       {\mathcal{E}}
+\newcommand{\InCtxt} [1] {\Ctxt[#1]}
+\newcommand{\ssosredex}        {\rightarrow}
+\newcommand{\ctxtreduce}       {\mapsto}
+\newcommand{\sstep}     [3] [] {#2 &\ssosredex&  #3 &\textsc{#1}}
+\newcommand{\ctxtstep}  [3] [] {#2 &\ctxtreduce& #3 &\textsc{#1}}
+\newcommand{\tmden}[2]{\llbracket{#1}\rrbracket{#2}}
+\newcommand{\tyden}[1]{\llbracket{#1}\rrbracket}
+\newcommand{\typing}[3]{{#1}\vdash{#2}:{#3}}
+\newcommand{\extend}[3]{#1\{{#2}\mapsto{#3}\}}
+\newcommand{\sfix}{\mathtt{fix}}
+\newcommand{\smfix}{\underline{\mathit{fix}}}
+\newcommand{\set}[1]{\{#1\}}
+\let\bottom\bot
+\newcommand{\env}[1]{\{#1\}}
+\newcommand{\bind}[2]{{#1}\mapsto{#2}}
+\newcommand{\ifelse}[3]{\texttt{if } #1 \texttt{ then } #2 \texttt{ else } #3}
+
+% ND comments.
+\usepackage{cprotect}
+\usepackage{framed}
+\usepackage[normalem]{ulem}
+\usepackage{versions}
+	\markversion{ndcomments}
+	\markversion{master}
+\setlength{\marginparwidth}{1.25in}
+\reversemarginpar
+\newcommand{\ndComment}[2][\relax]{\ifx#1\relax\else\uline{#1}\fi\marginpar{\renewcommand{\baselinestretch}{1.0}\tiny ND \ifx#1\relax\else(#1)\fi: {#2}}}
+\newenvironment{ndBlockComment}{\begin{oframed}\noindent ND:\\}{\end{oframed}}
+\newcommand{\ndTypo}[1]{\ndComment[#1]{$\longrightarrow$}}
+\newcommand{\ndDel}[1]{\sout{#1}\ndComment{$\longrightarrow$}}
+
+\begin{document}
+\begin{abstract}
+abstract goes here:)
+\end{abstract}
+
+%Chapters
+\include{introduction}
+\include{expression_language}
+
+\end{document}

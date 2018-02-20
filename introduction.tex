@@ -1,0 +1,70 @@
+\section{Introduction}
+Analyzing the complexity and performance of an algorithm is an important problem in computer science. We want our programs to run as quickly and as efficiently as possible; thus, it is crucial that we have a thorough understanding of how much time and space it takes to execute a program, with respect to its input size. Prior work has been done on the development of tools
+for automating the analysis of program complexity, which would allow us to make these judgements more quickly and accurately. 
+
+However, such work has so far only offered a method for obtaining an upper bound on the worst-case runtime of an algorithm---which in certain cases does not reflect the actual runtime of an algorithm. In particular, this method does not
+provide useful bounds on algorithms with stochastic processes, where the runtime may be quite slow in the worst case but
+is, on average, much more efficient. Developing methods for extracting a tighter upper-bound on the cost of probabilistic algorithms would allow us to analyze a wider array of programs.
+
+\subsection{Automated Complexity Analysis}
+
+\subsection{Probabilistic Recurrence Relations}
+
+Some algorithms have probabilistic elements which affect the way we analyze them. A prime example of this is randomized 
+quicksort---the standard quicksort algorithm wherein the pivot is chosen to be a random element in the list. In the worst case,
+this algorithm is $O(n^2)$, making it no more efficient than other sorting algorithms such as bubble sort or insertion sort. 
+However, in the average case it is $O(nlogn)$, making it one of the most efficient sorting algorithms. Hence, analyses of probabilistic algorithms must consider the \emph{expected} runtime rather than the worst-case runtime. 
+
+While there are proofs that the expected runtime of randomized quicksort is $O(nlogn)$, they commonly use
+imprecise, ad hoc arguments: that is, they cannot be applied to other algorithms with similar randomized elements. 
+Previous work has offered a method for analyzing stochastic divide-and-conquer processes by describing them as recurrence relations of the form
+\begin{align*}
+T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x))
+\end{align*}
+Where $x$ is a non-negative real number describing the size of the input, $h_1(x) \dots h_n(x)$ are random variables 
+describing the sizes of the subproblems (e.g. in the case of quicksort $h_1(x)$ and $h_2(x)$ describe the sizes of the two 
+sublists), $a$ is a function describing the work necessary to generate these subproblems, and $T(x)$ is a random variable 
+describing the total running time of the algorithm. Karp then offers several methods for obtaining tight bounds on the upper tails 
+of the probability distribution of $T(x)$. 
+
+Note, however, that the recurrence relation $T(x) = a(x) + T(h(x))$ has some clear flaws that 
+emerge when we attempt to assign types to its expressions. Since $T(x)$ is supposed to be random
+variable over inputs of size $x$, $T(x)$ is a function of type 
+$\Omega_x \rightarrow \R$, where $\Omega_x$ is the sample space of an input of size $x$. Then $T$ is a 
+function of type $\R \rightarrow (\Omega_x \rightarrow \R)$. However, we see that $T$ recursively takes 
+$h(x)$ as an argument, even though $h(x)$ is a random variable of type $\Omega_x \rightarrow \R$, 
+rather than a real number. This type-checking error is likely a result of the informality of the recurrence description, 
+and we are meant to understand that $T$ takes not the 
+random variable $h(x)$ as an argument, but the result of plugging an input $l \in \Omega_x$ into $h(x)$. Using this 
+interpretation, we then have $T(x)(l) = a(x) + T(h(x)(l))$. But this is also problematic, since $T(x)(l)$, the result 
+of plugging an input $l$ into $T(x)$, is a real number, while $T(h(x)(l))$ is a random variable. 
+
+Taking this a step further, we could interpret this to mean $T(x)(l) = a(x) + T(h(x)(l))(l^\prime)$, where $l^\prime \in 
+\Omega_{h(x)(l)}$ is the derived subproblem. But acquiring such an $l^\prime$ requires us to define an 
+additional function $\hat{h}(x)$ that takes an input $l$ and returns the derived subproblem $l'$. 
+Even worse, this function is of type $\Omega_x \rightarrow \Omega_{h(x)(l)}$ --- that is, its type is dependent 
+upon the random variable $h(x)$. Thus, we find that Karp's seemingly straightforward recurrence relation quickly becomes 
+increasingly complicated when we attempt to type-check it. Other researchers [Tassarotti and Harper 2017] have corroborated 
+these observations. 
+
+
+\subsection{Contributions of This Thesis}
+
+This thesis defines a syntax that allows us to write and type-check recurrences on
+random variables such as those described by Karp. This syntax comprises a simple expression language including natural number constants, identifiers, basic arithmetic operations, booleans, application, and a fixpoint operator. We also define a 
+denotational semantics for this expression language, wherein all types interpret to a complete partial order---that is, an ordered
+set which has a bottom element and where every subset has a least upper bound. For instance, the type {\tt bool}, assigned
+to boolean constants, interprets to $\{\text{true, false}\}_{\perp}$---the flat partial order of the set  $\{true, 
+\ false\}$ where
+both elements are comparable to only a bottom element $\perp$. In addition each arrow type $\sigma 
+\rightarrow \tau$ interprets to the set of all continuous functions of type $\llbracket \sigma \rrbracket \rightarrow 
+\llbracket \tau \rrbracket$. 
+ 
+ While imposing these restrictions limits the programs we can interpret to some extent, it ensures 
+that every type interprets to a CPO, and every arrow type expression interprets to a continuous function. These two 
+criteria allow us to use the CPO fixpoint theorem to define a function $fix$ which assigns the least fixpoint to continuous functions with type $\tau \rightarrow \tau$. This in turn allows us to interpret recurrence relations by defining a $\texttt{fix}$ operation and letting all $\texttt{fix}(\lambda f.\lambda x.e)$ expressions interpret to $fix(\llbracket\lambda f.\lambda x.e\rrbracket$, .
+
+Karp offers the equation $\tau(x) = a(x) + \tau(m(x))$ as a deterministic counterpart of a recurrence relation $T(x) = a(x) + 
+T(h(x))$, where, for all $x$, $m(x)$ is equal to the upper bound of $h(x)$. He then defines its least nonnegative solution 
+$u(x)$ using Tarski fixpoint construction. We prove that our interpretation of a recurrence is equal to this solution, thus 
+verifying that our relations are equivalent to Karp's. 
