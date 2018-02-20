@@ -371,7 +371,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \text{(by inductive hypothesis)} &= fix(\bigvee\{F_i\}^{\infty}_{i=1}) \\
  &= \bigvee\{\bigvee\{(F_i)^j \}^{\infty}_{i=1}\perp\}^{\infty}_{j=1} \\
  &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \\ 
-\text{(by Lemma 1)} &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1} \\ 
+\text{(by Lemma 3)} &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1} \\ 
 &= \bigvee\{fix(F_i)\}^{\infty}_{i=1}\\
 &= \bigvee_i \llbracket \Gamma \vdash \texttt{fix}(\lambda f \lambda x.e)\rrbracket\eta\{x\mapsto a_i\}
  \end{align*}
@@ -387,7 +387,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  &=\bigvee\{F^j \perp\}^{\infty}_{j=1}\bigvee_i a_i\\
  &= \bigvee\{F^j \perp(\bigvee_i a_i)\}^{\infty}_{j=1}\\ 
  \text{(by continuity of $F^j \perp$) }&= \bigvee\{\bigvee\{F^j \perp(a_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1}\\ 
- \text{(by Lemma 2)} &=\bigvee\{\bigvee\{F^j \perp(a_i)\}^{\infty}_{j=1}\}^{\infty}_{i=1}\\
+ \text{(by Lemma 4)} &=\bigvee\{\bigvee\{F^j \perp(a_i)\}^{\infty}_{j=1}\}^{\infty}_{i=1}\\
  &= \bigvee\{fix(F)(a_i)\}^{\infty}_{i=1}\\
  &= \bigvee\{\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta(a_i)\}^{\infty}_{i=1}\\
  \end{align*}
@@ -423,7 +423,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  _{j=1}\}^{\infty}_{i=1}$\\ 
  \end{lemma}
  \begin{proof} 
- By reasoning similar to Lemma 1. \\ \\
+ By reasoning similar to Lemma 3. \\ \\
  \end{proof}
  
 \section{Examples}
