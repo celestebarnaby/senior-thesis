@@ -1,4 +1,28 @@
 \section{Introduction}
+\begin{ndBlockComment}
+Some general \LaTeX\ stuff:
+\begin{itemize}
+\item Use \verb!\chapter! for each chapter.
+
+\item
+Please double-space.  It is easier for commenting, and I think
+the final submission must be double-spaced anyway.  I think
+\textsf{westhesis} has a \verb!double! option for this.
+
+\item Use \verb!\log! or \verb!\lg!.
+
+\item
+\LaTeX\ has a cross-referencing
+mechanism for referring to theorems, etc.\ by number.  
+Use \verb!\label{blah}! in the environment
+(e.g., lemma, theorem, section) to make \verb!blah! a label for the
+environment number.  Then use \verb!\ref{blah}! to refer to that number.
+
+\item Capitalize Theorem, Lemma, etc. when refering to them.
+
+\end{itemize}
+\end{ndBlockComment}
+
 Analyzing the complexity and performance of an algorithm is an important problem in computer science. We want our programs to run as quickly and as efficiently as possible; thus, it is crucial that we have a thorough understanding of how much time and space it takes to execute a program, with respect to its input size. Prior work has been done on the development of tools
 for automating the analysis of program complexity, which would allow us to make these judgements more quickly and accurately. 
 
@@ -17,10 +41,14 @@ However, in the average case it is $O(nlogn)$, making it one of the most efficie
 
 While there are proofs that the expected runtime of randomized quicksort is $O(nlogn)$, they commonly use
 imprecise, ad hoc arguments: that is, they cannot be applied to other algorithms with similar randomized elements. 
-Previous work has offered a method for analyzing stochastic divide-and-conquer processes by describing them as recurrence relations of the form
+\ndComment[Previous work]{Cite Karp here}
+has offered a method for analyzing stochastic divide-and-conquer processes by describing them as recurrence relations of the form
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x))
 \end{align*}
+\ndComment{Since ``where $x\ldots$'' is the continuation of a sentence
+(that just happens to be formatted with a displayed equation in the middle),
+``Where'' should not be capitalized.}
 Where $x$ is a non-negative real number describing the size of the input, $h_1(x) \dots h_n(x)$ are random variables 
 describing the sizes of the subproblems (e.g. in the case of quicksort $h_1(x)$ and $h_2(x)$ describe the sizes of the two 
 sublists), $a$ is a function describing the work necessary to generate these subproblems, and $T(x)$ is a random variable 
@@ -50,6 +78,9 @@ these observations.
 
 \subsection{Contributions of This Thesis}
 
+\ndComment{This needs a bit of work.  You don't want to get into the
+implementation details, but instead just give the big picture.
+But let's see what you get done first before rewriting this section.}
 This thesis defines a syntax that allows us to write and type-check recurrences on
 random variables such as those described by Karp. This syntax comprises a simple expression language including natural number constants, identifiers, basic arithmetic operations, booleans, application, and a fixpoint operator. We also define a 
 denotational semantics for this expression language, wherein all types interpret to a complete partial order---that is, an ordered

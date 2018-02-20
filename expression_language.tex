@@ -1,80 +1,36 @@
-
-\begin{ndcomments}
+\section{Expression Language}
 \begin{ndBlockComment}
-Just as with code, format your \LaTeX\ source well.  Use blank lines and
-shorter lines so that it is easy to navigate the source code by
-jumping to the next blank line, etc.  It also makes section breaks stand
-out in the \LaTeX\ source, just like using blank lines helps code blocks
-stand apart from each other.
-
-Also, let's reorganize the document to use a galley file.  A galley file
-consists of your preamble and \verb!\include! statements, each of which
-includes a file.  Then write each chapter in its own file.  So the 
-overall organization looks something like:
-\begin{itemize}
-\item \verb!thesis.tex! (the galley file):
-\begin{verbatim}
-\documentclass{westhesis}
-\title{...}
-
-<LaTeX preamble>
-
-\begin{document}
-% Front matter
-\begin{abstract}
-...
-\end{abstract}
-...
-
-% Chapters
-\include{intro}
-\include{deterministic_recs}
-...
-\end{document}
-\end{verbatim}
-
-\item \verb!intro.tex!:  your introduction.
-\item \verb!deterministic_recs.tex!:  the contents of this file.
-\item Etc.
-\end{itemize}
-You then run \verb!latex! on \verb!thesis.tex!.  Of course, you can name
-your chapter files however you want.
+You need to do a bit more scene-setting here.  You are starting
+with a PCF-like language that is designed to easily express deterministic
+recurrences over the reals, along with defining a semantics for it.  The
+main difference with PCF is that we use non-negative reals instead of
+nats.  And an interesting aspect of this is that we use $0.0$ for the
+bottom element.  This requires a bit of discussion, maybe in the introduction
+to this chapter, maybe after defining the syntax, maybe when defining the
+semantics.  The reason is that a reader who is expecting a more-or-less
+standard PCF-like semantics expects $\bot$ to represent minimum information.
+But for us, we think of real numbers as being upper bounds (on sizes, on
+costs), so $0.0$ is maximal information.  The ``minimum information''
+element for us is $+\infty$, which is the top of the order, not the bottom.
+This doesn't affect the theorems, but it is an interesting point about 
+CPO semantics:  it need not be the case that $\bot$ means minimum information.
 \end{ndBlockComment}
 
-\section{Expression Language}
-\ndComment{You are talking about deterministic recurrences in this section.}
-We define an expression language which will allow us to write and type-check recurrences on random variables such as those described by Karp. The syntax of this language is mostly analogous to PCF, with one key exception: instead of a $\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses. \\ \\
-\cprotect\ndComment{Use display math such as \verb!\[...\]!
-or the \texttt{align*} environment for displayed mathematics.  Don't use in-line
-math mode like \verb!$...$! and explicit linebreaks.  As an example, I've
-rewritten your syntactic category definitions with an \verb!array!, which
-lets me align the $::=$ symbol, as well as align the right-hand sides for
-multi-line definitions.  Also, \verb!\mid! is the binary relation symbol
-that is a vertical bar; using it ensures the appropriate spacing.  Use
-macros for constructs like $if\dots then\dots else$.  Also use consistent fonts,
-like typewriter font for all expressions.}
-$\tau \ ::= \ \texttt{real} \ | \ \texttt{bool} \ | \ \tau \times \tau \ | \ \tau \rightarrow \tau$ \\ \\
- $e \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ e \ e \ | \ e + e \ | \ e - e \ | \  e  *  e \ | \ e / e \ | \ \texttt{true} \ | \ \texttt{false} \ | \\$\-\hspace{.8cm}$\ e  =  e \ | \ e < e \ | \ e > e \ | e \leq e \ | \ e \geq e \ | 
- \ if \ e \ then \ e \ else \ e \ | \ \texttt{fix} (\lambda f.\lambda x.e)$ \\ \\
- $v \ ::= x  \ | \ \texttt{0} \ | \ \texttt{1} \ | \ \texttt{2} \ | \ ... \ | \ \lambda x.e \ | \ \texttt{true} \ |  \ \texttt{false} \ 
- | \ \texttt{fix} (\lambda f.\lambda x.e)$
-\end{ndcomments}
-\begin{master}
-\section{Expression Language}
+\ndComment{Subtraction and division are not continuous.  Try to find other
+operations that are sufficient for defining typical recurrences.  
+Also check the numeric relations.}
+
+\ndComment{What about term constructors for product types?}
+
+\ndComment{Do we need values at all, since we are interested in the
+equational calculus?}
+
+\ndComment{It is probably best to put the syntax, type system, and
+semantics into figures.  That makes the formatting a bit cleaner.}
+
 We define an expression language which will allow us to write and type-check recurrence relations such as 
 those described by Karp. The syntax of this language is mostly analogous to PCF, with one key exception: instead of a 
-$\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses. \\ 
-\[
-\begin{array}{rcl}
-\tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
-e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
-  && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
-     if \ e \ then \ e \ else \ e \mid \texttt{fix} (\lambda f.\lambda x.e) \\
-v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid \texttt{true} \mid \texttt{false} \mid \texttt{fix} (\lambda f.\lambda x.e)
-\end{array}
-\]
-\end{master}
-
+$\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses. 
 \[
 \begin{array}{rcl}
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
@@ -86,25 +42,6 @@ v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 \]
 
 \section{Type System}
-\begin{ndcomments}
-
-\ndComment{Make sure to tell the reader what a $\Gamma$ is.  You are missing 
-division as an arithmetic operation.}
-$\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots$ \\ \\ \\
-$\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}}$ \\ \\ \\
-$\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau }$ \\ \\ \\
-$\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda (x : \sigma).e : \sigma \rightarrow \tau }$ \\ \\ \\ 
-$\dfrac{\Gamma \vdash e_1: \sigma \rightarrow \tau \ \ \ \Gamma \vdash e_2 : \sigma}{\Gamma \vdash e_1 \ e_2 : \tau}$ \\ \\ \\
-$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
-, \circ \in \{+,-,*\}$ \\ \\ \\
-$\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
-, \circ \in \{=, <, >, \geq, \leq\}$ \\ \\ \\
-$\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
-{\Gamma \vdash \emph{if } e_1 \emph{ then } e_2 \emph{ else } e_3 : \tau} $ \\ \\ \\
-$\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
-{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau}$ \\ \\ \\ 
-\end{ndcomments}
-\begin{master}
 \[
 \begin{array}{lr}
 \dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\
@@ -122,39 +59,9 @@ $\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarr
 {\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau} \\ \\ \\ 
 \end{array}
 \]
-\end{master}
 
 \section{Equational Semantics}
 
-\begin{ndcomments}
-
-e = e \\ \\
-\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots  \\
-\text{equivalent rules for } -, \ * \text{, and } /\text{ operations.}
-\\ \\
-$(n =n) = \texttt{true}$ \\ $(n=m) = \texttt{false}$, provided $n, m$ distinct numerals \\ \\ 
-$if \texttt{ true } then \ e_1 \ else \ e_2 = e_1$ \\
-$if \texttt{ false } then \ e_1 \ else \ e_2 = e_2$ \\ \\ 
-$\lambda x.e = \lambda y.e\{x \mapsto y \}$, provided $y$ not free in $e$. \\ \\ \\
-$\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\}$ \\
-$\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}$
-\section{Operational Semantics} 
-\ndComment{We don't need an operational semantics.}
-$\dfrac{e_1 \downarrow \lambda x.e \ \ e_2 \downarrow v \ \ e\{x \mapsto v\} \downarrow v'}{e_1 \ e_2 \downarrow v'}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 + e_2 \downarrow v_1 + v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 - e_2 \downarrow v_1 - v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v_1 \ \ e_2 \downarrow v_2}{e_1 * e_2 \downarrow v_1 * v_2}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v}{e_1 = e_2 \downarrow \texttt{true}}$ \\ \\ \\
-$\dfrac{e_1 \downarrow v \ \ e_2 \downarrow v' \neq v}{e_1 = e_2 \downarrow \texttt{false}}$ \\ \\ \\
-$\dfrac{e_1 \downarrow \texttt{true} \ \ e_2 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
-$\dfrac{e_1 \downarrow \texttt{false} \ \ e_3 \downarrow v}{\ if \ e_1 \ then \ e_2 \ else \ e_3 \ \downarrow v}$ \\ \\ \\
-$\dfrac{\lambda x.e\{ f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\} \downarrow v}{\texttt{fix} (\lambda f.\lambda x.e) \downarrow 
-v}$
-
-\hspace{0in}
-\end{ndcomments}
-
-\begin{master}
 \[
 \begin{array}{lr}
 e = e \\ \\
@@ -169,7 +76,10 @@ e = e \\ \\
 \texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}
 \end{array}
 \]
-\end{master}
+
+\ndComment{Maybe an example here would be useful.  Show how we would informally
+write a recurrence, and how that recurrence would be expressed in this
+language.}
 
 
 \section{Denotational Semantics}
@@ -179,7 +89,10 @@ The denotational semantics of our expression language is mostly standard, with t
 the exception is the $\texttt{real}$ type, which interprets to the non-negative reals, with an additional element $+\infty$ such 
 that for $\forall x \in R$, $x<+\infty$. (Need more explanation of this here).
 \ndComment{Tell the reader what kind of thing $\eta$ is.}
-\ndComment{Probably drop the underline on the semantic fix function.}
+\ndComment{You should make sure to define the arithmetic operations on
+$+\infty$.}
+\ndComment{Should $\bot$ in the semantics of relational operators be
+$+\infty$?}
  \begin{align*}
 \llbracket \texttt{real} \rrbracket &= \R_{[0, +\infty]} = \{x \in \R \ | \ x \geq 0\} \cup \{+\infty\} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
@@ -542,39 +455,17 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{lemma}
 
  \begin{proof} 
-\cprotect\ndComment{There is no longer any Lemma~1.  
-\LaTeX\ has a cross-referencing
-mechanism for this situation.  Use \verb!\label{blah}! in the environment
-(e.g., lemma, theorem, section) to make \verb!blah! a label for the
-environment number.  Then use \verb!\ref{blah}! to refer to that number.
-I've used \verb!\label! and \verb!\ref! here as an example.}
  By reasoning similar to Lemma 1 (i.e., Lemma~\ref{lem:join-interchange-1}).
  \end{proof}
  
 \section{Examples}
-\begin{ndcomments}
-\subsection{Example 1}
-Consider the simple example Karp offers, wherein $m(x) = px$, with $p$ a
-positive constant less than 1, and $a(x) = 0, \ x < 1, \ a(x) = 1, \ x \geq 1$.
-Then $T(x) = a(x) + T(px)$, so by a simple inductive argument we can show that 
-
-\begin{align*}
-T(x) &= 
- \begin{cases}
- 0 \text{ if } x < 1 \\
- k \text{ if }  \dfrac{1}{p^{k-1}} \leq x < \dfrac{1}{p^k} \\
- \end{cases}
- \end{align*}
- We express this function in our expression language as follows: 
-\end{ndcomments}
-\begin{master}
 Consider that we may express the general equation $T(x) = a(x) + T(m(x))$ in our expression language as follows:
-\end{master}
  \begin{align*}
  \texttt{T} = \texttt{fix}(\lambda f. \lambda x.\texttt{a}(x) + f (\texttt{m}(x)))
  \end{align*}
  We want to show that the denotation of this expression has the same behavior as this deterministic function. First, let 
  $\texttt{F} = \lambda f. \lambda x.\texttt{a}(x) + f (\texttt{m}(x)$, and note the following:
+\ndComment{You have $p*x$ instead of $m(x)$ in the second equation.}
  \begin{align*}
  \llbracket \texttt{T} \rrbracket &= fix(\llbracket \texttt{F} \rrbracket) \\
  \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow 
@@ -587,31 +478,15 @@ Consider that we may express the general equation $T(x) = a(x) + T(m(x))$ in our
 &= \lim_{n \to \infty}\{F^n (\perp)\}
  \end{align*}
 
- \ndComment{Is it obvious that $\tmden{T}{}(x) = T(x)$, where $T$ is defined
- by the clauses above?}
- \ndComment{As you mentioned when we met, you can probably prove a more
- general result, which is the one stated by Karp:  if
- $T(x) = a(x) + T(m(x))$, then 
- $\tmden{T}{}(x) = \sum_{i=1}^\infty\tmden{a}(m^{i-1}(x))$.  Then you can
- show what this means for various choices of~$m$.}
  Recall that the bottom element of $\llbracket \texttt{real} \rrbracket$ is $0$, so the bottom element of $\llbracket \texttt{real} 
  \rightarrow \texttt{real}\rrbracket$ is the function $\perp$ that maps every element in $\llbracket \texttt{real} \rrbracket$ to 
  $0$.  \\
-\begin{ndcomments}
-
- \underline{Claim:}
- \begin{align*}
- \forall d \in \R_{[0, +\infty]}, \ F^n(\perp)(d) = \sum_{i = 0}^{n-1}a(m^{i}(d))
- \end{align*}
-\end{ndcomments}
-\begin{master}
  %
  \begin{lemma}
  \begin{align*}
  \forall d \in \R_{[0, +\infty]}, \ F^n(\perp)(d) = \sum_{i = 0}^{n-1}a(m^{i}(d))
  \end{align*}
  \end{lemma}
-\end{master}
  %
  \begin{proof} by induction on n. \\
  \emph{Base case:} n = 1
@@ -621,7 +496,8 @@ Consider that we may express the general equation $T(x) = a(x) + T(m(x))$ in our
  &= a(d)  \\
  \end{align*}
  \emph{Inductive case:} Suppose the claim hold for $\forall k < n$.
-\ndComment{You've got some minor indexing errors here.}
+\ndComment{%
+$F^n(\bot)(d) = \llbracket\texttt{a}(x) + f(\texttt{m}(x))\rrbracket\{\dotsc\}$.}
  \begin{align*}
  \forall d \in \extR, \ F^n(\perp)(d) &= \llbracket \lambda x.\texttt{a}(x) + f (\texttt{m}(x))\rrbracket
  \{f \mapsto F^{n-1}(\perp),x\mapsto d\} \\
@@ -633,6 +509,9 @@ Consider that we may express the general equation $T(x) = a(x) + T(m(x))$ in our
 \end{align*}
 \end{proof}
 Therefore, 
+\ndComment{%
+Remember, $\tmden T{}$ is a semantic function, so you are
+describing $\tmden T{}(d)$.}
 \begin{thm}
 \begin{align*}
 \forall d \in \extR, \ \llbracket \texttt{T} \rrbracket\{x \mapsto d\} &= \lim_{n \to \infty}\{F^n (\perp)\}(d) \\
