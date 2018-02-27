@@ -199,7 +199,7 @@ $(c_1, c_2) \leq (\bigvee C_1, \bigvee C_2)$, so $(\bigvee C_1, \bigvee C_2)$ is
 
 Now let $(x,y) \in \llbracket \tau \rrbracket$ be an upper bound of C. Then $\forall c_1 \in C_1, \ c_1 \leq x$, so $x$ is an upper 
 bound of $C_1$. Similarly, $y$ is an upper bound of $C_2$. Thus, it must be that $\bigvee C_1 \leq x$ and 
-$\bigvee C_2 \leq y$, so $(\bigvee C_1, \bigvee C_2) \leq (x,y)$. Therefore, $((\bigvee C_1, \bigvee C_2)$ is the least upper
+$\bigvee C_2 \leq y$, so $(\bigvee C_1, \bigvee C_2) \leq (x,y)$. Therefore, $(\bigvee C_1, \bigvee C_2)$ is the least upper
 bound of $C$.
  
 See, then, that by definition $\llbracket \tau \rrbracket$ is a CPO.
@@ -315,108 +315,154 @@ In the case that $ y \neq x$, note that
 
   % equality operation
   \item $e = e_1 \circ e_2, \ \circ \in \{=,<,>,\leq,\geq\}$\\ \\
-  In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta = \perp$ or $\llbracket \Gamma \vdash e_2 : \tau 
-  \rrbracket\eta = \perp$, note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = \perp$. By inductive hypothesis, 
-  $\llbracket \Gamma \vdash e_1 : \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau \rrbracket$ are continuous, so 
-  assuming WLOG that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta = \perp$, it must be that for $\forall i, \llbracket 
-  \Gamma \vdash e_1 : \tau \rrbracket\eta_i = \perp$. Thus, $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}
-  ^{\infty}_{i=1} = \perp$, so $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}
-  ^{\infty}_{i=1} = \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta$.\\ \\
+  In the case that 
+ \begin{align*}
+  \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} &= \perp \\ 
+  \text{or }  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} &= \perp,
+  \end{align*} 
+  note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = \perp$. 
+  By inductive hypothesis, 
+  \begin{align*}
+  \llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto  \bigvee_i a_i\} &= \bigvee_i\llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto a_i\} \\
+ \text{and } \llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto  \bigvee_i a_i\} &= \bigvee_i\llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto a_i\}, 
+  \end{align*}
+  so assuming WLOG that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = \perp$, 
+  it must be that for \\
+  $\forall i, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$. 
+  Thus, $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$, so \\
+  $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\} = 
+  \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$.\\ \\
   %
-  In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \circ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta, \ 
-  \llbracket \Gamma \vdash e_1:\tau \rrbracket\eta \neq \perp, \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta \neq \perp$, 
-  note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = true$. By inductive hypothesis, $\llbracket 
-  \Gamma \vdash e_1 : \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau \rrbracket$ are continuous, so $\bigvee\{\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta_i\}^{\infty}_{i=1} \circ \bigvee\{\llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta_i\}^{\infty}_{i=1}$, with neither supremum equal to bottom. Thus there must $\exists n \in \mathbb{N} \text{ s.t. } \forall i \geq n, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta_i \circ
-  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta_i$. Therefore, $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\} = true$, so $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta = \bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1}$. \\ \\
+  In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} 
+  \circ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}, \ 
+  \llbracket \Gamma \vdash e_1:\tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \neq \perp, 
+  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \neq \perp$, 
+  note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = true$. 
+ By inductive hypothesis, 
+  \begin{align*}
+  \llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto  \bigvee_i a_i\} &= \bigvee_i\llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto a_i\} \\
+ \text{and } \llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto  \bigvee_i a_i\} &= \bigvee_i\llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto a_i\}, 
+  \end{align*}
+  so $\bigvee_i\llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto a_i\} 
+  \circ \bigvee_i\llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto a_i\}$, with neither supremum equal to bottom. Thus there must $\exists n \in \mathbb{N} \text{ s.t. } \forall i \geq n, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto   a_i\} \circ
+  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto   a_i\}$. Therefore, $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  a_i\}\} = true$, so $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta\{x\mapsto \bigvee_i a_i\} 
+  = \bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  a_i\}$. \\ \\
   %
- In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \ \slashed{\circ} \ \llbracket \Gamma \vdash e_2 : \tau\rrbracket\eta, \ \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta \neq \perp, \\ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta \neq \perp$, by reasoning similar to the previous case see that $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous.
+ In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \ \slashed{\circ} \ \llbracket \Gamma \vdash e_2 : \tau\rrbracket\eta\{x\mapsto  \bigvee_i a_i\}, \ \\
+ \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \neq \perp, 
+ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \neq \perp$, by reasoning similar to the previous case see that $\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
+ \bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  a_i\}$.
   % conditional
  \item $e = \ \ifelse{e_1}{e_2}{e_3} : \tau$ \\ \\
-In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = \perp$, note that $\llbracket \Gamma \vdash e : 
-\tau \rrbracket\eta =  \perp$. By inductive hypothesis, $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket$ is a 
-continuous function, so $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = \bigvee\{\llbracket \Gamma \vdash e_1 : 
-\tau \rrbracket\eta_i\}^{\infty}_{i=1} = \perp$. Then it must be that for $\forall i, \llbracket \Gamma \vdash e_1 : \tau 
-\rrbracket\eta_i = \perp$. Thus, $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1} = \perp$, so $
-\llbracket \Gamma \vdash e : \tau \rrbracket\eta = \bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1}$. \\ \\
-In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = true$, note that $\llbracket \Gamma \vdash e : 
-\tau \rrbracket\eta =  \llbracket \Gamma \vdash e_2 \rrbracket\eta$. By inductive hypothesis, $\llbracket \Gamma \vdash e_1 : 
-\texttt{bool} \rrbracket$ is a continuous function, so $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = \bigvee
-\{\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta_i\}^{\infty}_{i=1} = true$. Since $\{ \eta_i\}^{\infty}_{i=1}$ is a chain 
-and $\llbracket\texttt{bool}\rrbracket$ is a flat CPO, there must exist $n \in \mathbb{N}$ such that $\forall i > n, \llbracket \Gamma \vdash e_1 : 
-\texttt{bool}
-\rrbracket\eta_i = true$ and $\forall i \leq n, \llbracket \Gamma \vdash e_1 : \texttt{bool}\rrbracket\eta_i = \perp$. Thus, it must 
-be that $\bigvee\{\llbracket \Gamma \vdash e : \tau \rrbracket\eta_i\}^{\infty}_{i=1} = \llbracket \Gamma \vdash e_2 
-\rrbracket\eta$, and $\llbracket \Gamma \vdash e : \tau \rrbracket$ is therefore continuous. \\ \\
-In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta = false$, by reasoning parallel to the previous 
-case $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous.
+In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = \perp$, note that $\llbracket \Gamma \vdash e : 
+\tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} =  \perp$. By inductive hypothesis, 
+$\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
+\bigvee_i\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$. 
+Then it must be that for 
+$\forall i, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$. 
+Thus, $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  a_i\} = \perp$, so 
+$\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
+\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$. \\ \\
+%
+In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = true$, 
+note that $\llbracket \Gamma \vdash e : 
+\tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} =  \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$. 
+By inductive hypothesis, 
+$\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
+\bigvee_i\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto a_i\} = true$. 
+Since $\{a_i\}^{\infty}_{i=1}$ is a chain 
+and $\llbracket\texttt{bool}\rrbracket$ is a flat CPO, there must exist $n \in \mathbb{N}$ such that 
+$\forall i > n, \llbracket \Gamma \vdash e_1 : \texttt{bool}
+\rrbracket\eta\{x\mapsto a_i\} = true$ and 
+$\forall i \leq n, \llbracket \Gamma \vdash e_1 : \texttt{bool}\rrbracket\eta\{x\mapsto  a_i\} = \perp$. Thus, it must 
+be that $\bigvee_i \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\} = 
+\llbracket \Gamma \vdash e_2 \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
+\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$. \\ \\
+%
+In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = false$, by reasoning parallel to the previous case $\bigvee_i \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\}  = 
+\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$.
 % application
  \item $ e = e_1 \ e_2$ \\ \\
- Then $\llbracket \Gamma \vdash e : \tau \rrbracket$ is the composition of $\llbracket \Gamma \vdash e_1 : \tau' \rightarrow
- \tau \rrbracket$ and $\llbracket \Gamma \vdash e_2 : \tau' \rrbracket$. By inductive hypothesis, these are both continuous 
- functions. Thus, $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous as well. 
+Then
+\begin{align*}
+\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\} &=
+\llbracket \Gamma \vdash e_1 : \sigma \rightarrow \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}
+(\llbracket \Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto \bigvee_i a_i\}) \\
+&= \llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}
+(\llbracket \Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto \bigvee_i a_i\}) \\
+\text{(by inductive hypothesis)} &= 
+\llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}
+(\bigvee_i \llbracket \Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto a_i\}) \\
+&= \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto \bigvee_i a_i\}\{y \mapsto (\bigvee_i \llbracket 
+\Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto a_i\})\} \\
+\text{(by inductive hypothesis)}&= \bigvee_i \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto 
+a_i\}\{y \mapsto (\llbracket \Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto a_i\})\} \\
+&=\bigvee_i \llbracket \Gamma \vdash e_1: \sigma \rightarrow \tau\rrbracket\eta\{x\mapsto a_i\}
+(\llbracket\Gamma\vdash e_2 : \sigma\rrbracket\eta\{x\mapsto a_i\}) \\
+&= \bigvee_i \llbracket \Gamma \vdash e:\tau\rrbracket\eta\{ x \mapsto a_i\} \\
+\end{align*}
  % abstraction
- \item $e = \lambda (x : \tau) . (e' : \tau')$
+ \item $e = \lambda (y : \tau) . (e' : \tau')$
  \begin{enumerate}
- \item Then $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta$ is a function $f: \llbracket \tau \rrbracket 
- \rightarrow 
- \llbracket \tau'  \rrbracket$ such that for $\forall d \in \llbracket \tau \rrbracket, \ f(d) = \llbracket \Gamma \vdash e' : \tau 
- \rrbracket\eta\{x \mapsto d\}$. In order to show that $\llbracket \Gamma \vdash e : \tau \rrbracket$ is continuous, we 
- must show that $\llbracket \Gamma \vdash e : \tau \rrbracket\eta = \bigvee \{ \llbracket \Gamma \vdash e : \tau \rrbracket
-  \eta_i \}^{\infty}_{i=1}$. 
+ \item Then $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$ i
+ s a function $f: \llbracket \tau \rrbracket \rightarrow \llbracket \tau'  \rrbracket$ such that for 
+ $\forall d \in \llbracket \tau \rrbracket, \ f(d) = \llbracket \Gamma y : \tau \vdash e' : \tau 
+ \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}\{y \mapsto d\}$. We want to show that
+ $\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
+\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$
  
 Let $d \in \llbracket \tau \rrbracket$, and consider that
 \begin{align*}
-\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(d) &= \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\eta
-\{x \mapsto d\} \\
-&= \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket(\bigvee \{\eta_i\})\{x \mapsto d\} \\
-&= \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket(\bigvee \{\eta_i\{x \mapsto d\}\}) \\
-\text{(by inductive hypothesis)}&=\bigvee\{\llbracket \Gamma.x:\tau\vdash e':\tau'\rrbracket\eta_i\{x\mapsto d\}\}^{\infty}_{i=1} \\
-&= \bigvee \{\llbracket \Gamma \vdash \lambda x : \tau.e' : \tau' \rrbracket \eta_i(d)\}^{\infty}_{i=1} \\
-&= \bigvee \{\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket \eta_i(d)\}^{\infty}_{i=1} \\ 
-&= \bigvee \{\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket \eta_i\}^{\infty}_{i=1}(d) 
+\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}(d) 
+&= \llbracket \Gamma.y : \tau \vdash e' : \tau'\rrbracket\eta\{x\mapsto  \bigvee_i a_i\}
+\{y \mapsto d\} \\
+&= \llbracket \Gamma.y : \tau \vdash e' : \tau'\rrbracket(\eta\{y \mapsto d\})\{x\mapsto  \bigvee_i a_i\} \\
+\text{(by inductive hypothesis)}&=\bigvee_i\llbracket \Gamma.y:\tau\vdash e':\tau'\rrbracket(\eta\{y\mapsto d\})
+\{x\mapsto a_i\} \\
+&=\bigvee_i\llbracket \Gamma.y:\tau\vdash e':\tau'\rrbracket(\eta\{x\mapsto a_i\})\{y\mapsto d\} \\
+&= \bigvee_i \llbracket \Gamma \vdash \lambda y : \tau.e' : \tau' \rrbracket \eta\{x\mapsto a_i\}(d) \\
+&= \bigvee_i \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket \eta\{x\mapsto a_i\}(d) \\ 
 \end{align*}
- Therefore, $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket$ is a continuous function.
+%
  \item We want to show that $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta \in \llbracket \tau \rightarrow 
- \tau'\rrbracket$---that is, it is a continuous function from $\llbracket \tau \rrbracket$ to $\llbracket \tau' \rrbracket$. Let $\{d_i\}
- ^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$, and see that
+ \tau'\rrbracket$---that is, it is a continuous function from $\llbracket \tau \rrbracket$ to $\llbracket \tau' \rrbracket$. Let 
+ $\{a_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$, and see that
  \begin{align*}
- \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(\bigvee\{d_i\}^{\infty}_{i=1}) &= \llbracket \Gamma.x : \tau 
- \vdash e' : \tau'\rrbracket\eta \{x \mapsto \bigvee\{d_i\}^{\infty}_{i=1}\} \\
- &= \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\bigvee\{\eta \{x \mapsto d_i\}\}^{\infty}_{i=1} \\
- \text{(by inductive hypothesis)} &= \bigvee\{ \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\eta\{x\mapsto d_i\}\}
- ^{\infty}_{i=1}\\
- &= \bigvee\{ \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(d_i) \}^{\infty}_{i=1}
+ \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(\bigvee_i a_i) &= \llbracket \Gamma.x : \tau 
+ \vdash e' : \tau'\rrbracket\eta \{x \mapsto \bigvee_i a_i\} \\
+ \text{(by 1)} &= \bigvee_i \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\eta\{x\mapsto a_i\}\\
+ &= \bigvee_i \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(a_i) 
  \end{align*}
  \end{enumerate} 
  % fix operation
  \item $e = \texttt{fix} (\lambda f.\lambda x.e)$ \\
  \begin{enumerate}
-\item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta_i$, and consider that 
+\item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta\{x\mapsto a_i\}$, and consider that 
  \begin{align*}
- \llbracket \texttt{fix} (\lambda f.\lambda x.e)\rrbracket\eta &= fix(\llbracket \lambda f. \lambda x.e 
- \rrbracket\eta)\\
+ \llbracket \texttt{fix} (\lambda f.\lambda x.e)\rrbracket\eta\{x\mapsto \bigvee_i a_i\} &= 
+ fix(\llbracket \lambda f. \lambda x.e \rrbracket\eta\{x\mapsto \bigvee_i a_i\})\\
  \text{(by inductive hypothesis)} &= fix(\bigvee\{F_i\}^{\infty}_{i=1}) \\
  &= \bigvee\{\bigvee\{(F_i)^j \}^{\infty}_{i=1}\perp\}^{\infty}_{j=1} \\
  &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \\ 
-\text{(by Lemma 1)} &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1} \\ 
+\text{(by Lemma 3)} &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1} \\ 
 &= \bigvee\{fix(F_i)\}^{\infty}_{i=1}\\
-&= \bigvee\{\llbracket \Gamma \vdash \texttt{fix}(\lambda f \lambda x.e)\rrbracket\eta_i\}^{\infty}_{i=1}
+&= \bigvee_i \llbracket \Gamma \vdash \texttt{fix}(\lambda f \lambda x.e)\rrbracket\eta\{x\mapsto a_i\}
  \end{align*}
- Therefore, $\llbracket \Gamma \vdash e \rrbracket$ is a continuous function.
- \item Let $F = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta$ and $F_i = \llbracket \Gamma \vdash \lambda 
- f. \lambda x.e\rrbracket\eta_i$. We want to show that $\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau 
- \rightarrow\tau\rrbracket\eta \in \llbracket \tau \rightarrow \tau \rrbracket$---that is, it is a continuous function from $\llbracket 
- \tau \rrbracket$ to $\llbracket \tau \rrbracket$. Let $\{x_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$,
+ %
+ \item Let $F = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta$. We want to show that 
+ $\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau 
+ \rightarrow\tau\rrbracket\eta \in \llbracket \tau \rightarrow \tau \rrbracket$---that is, it is a continuous function from 
+ $\llbracket \tau \rrbracket$ to $\llbracket \tau \rrbracket$. Let $\{a_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$,
   and see that 
  \begin{align*}
- \llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta \bigvee\{x_i\}^{\infty}_{i=1}&= 
- fix(F)\bigvee\{x_i\}^{\infty}_{i=1}\\
- &=\bigvee\{F^j \perp\}^{\infty}_{j=1}\bigvee\{x_i\}^{\infty}_{i=1}\\
- &= \bigvee\{F^j \perp(\bigvee\{x_i\}^{\infty}_{i=1})\}^{\infty}_{j=1}\\ 
- \text{(by continuity of $F^j \perp$) }&= \bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1}\\ 
- \text{(by Lemma 2)} &=\bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{j=1}\}^{\infty}_{i=1}\\
- &= \bigvee\{fix(F)(x_i)\}^{\infty}_{i=1}\\
- &= \bigvee\{\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta(x_i)\}^{\infty}_{i=1}\\
+ \llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta \bigvee_i a_i &= 
+ fix(F)\bigvee_i a_i\\
+ &=\bigvee\{F^j \perp\}^{\infty}_{j=1}\bigvee_i a_i\\
+ &= \bigvee\{F^j \perp(\bigvee_i a_i)\}^{\infty}_{j=1}\\ 
+ \text{(by continuity of $F^j \perp$) }&= \bigvee\{\bigvee\{F^j \perp(a_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1}\\ 
+ \text{(by Lemma 4)} &=\bigvee\{\bigvee\{F^j \perp(a_i)\}^{\infty}_{j=1}\}^{\infty}_{i=1}\\
+ &= \bigvee\{fix(F)(a_i)\}^{\infty}_{i=1}\\
+ &= \bigvee\{\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta(a_i)\}^{\infty}_{i=1}\\
  \end{align*}
  \end{enumerate}
  \end{itemize}
@@ -455,7 +501,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{lemma}
 
  \begin{proof} 
- By reasoning similar to Lemma 1 (i.e., Lemma~\ref{lem:join-interchange-1}).
+ By reasoning similar to Lemma 3. \\ \\
  \end{proof}
  
 \section{Examples}

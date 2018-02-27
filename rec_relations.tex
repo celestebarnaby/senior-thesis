@@ -1,0 +1,28 @@
+\section{Well-Typed Recurrence Relations}
+Karp's paper is premised on the notion that algorithms with stochastic processes may be described as 
+recurrence relations of the form
+\begin{align*}
+T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x)).
+\end{align*}
+But what does this equation actually mean? To unpack this, let us assign types to each of the expressions,
+based on the descriptions offered by Karp. 
+\begin{align*}
+T(x) &: \Omega_x \rightarrow \R \text{, where } \Omega_x \text{ is the sample space of all problem instances of size } x \\
+T &: \R \rightarrow (\Omega_x \rightarrow \R) \\ 
+a &: \R \rightarrow \R
+\end{align*}
+
+Karp alternates between saying that $h$ is a random variable and $h(x)$ is a random variable, so it is not immediately obvious 
+what the meaning of this function is. However, since $h$ takes $x \in R$ as an input, it would not make sense for $h$ to be a 
+random variable from $\R \rightarrow \R$. This would make $h$ a function that takes an input size and returns the 
+size of the derived subproblem---thus sidestepping the stochastic part of the algorithm. Thus, it must be that $h(x)$ is a random
+variable that takes a \emph{specific input} of size $x$ and returns the size of the derived subproblem.
+\begin{align*}
+h_i(x) &: \Omega_x \rightarrow \R \\
+h_i &: \R \rightarrow (\Omega_x \rightarrow \R) 
+\end{align*} 
+
+There are some inconsistencies in these type assignments. To start, $T$ is a function that takes a real number and 
+returns a random variable. But on the right-hand side of the relation, $T$ takes $h_i(x)$ as an argument; $h_1(x)$ is
+not a real number, but a random variable. Also, what does it mean to add $a(x)$, a real number, to $T(h_i(x))$, 
+a random variable? 
