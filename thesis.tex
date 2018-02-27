@@ -19,6 +19,9 @@
 \usepackage{slashed}
 \let\wasysymLightning\lightning
 
+\usepackage{setspace}
+	\doublespacing
+
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\extR}{\R_{[0,+\infty]}}
 \newcommand{\N}{\mathbb{N}}
@@ -51,7 +54,7 @@
 \setlength{\marginparwidth}{1.25in}
 \reversemarginpar
 \newcommand{\ndComment}[2][\relax]{\ifx#1\relax\else\uline{#1}\fi\marginpar{\renewcommand{\baselinestretch}{1.0}\tiny ND \ifx#1\relax\else(#1)\fi: {#2}}}
-\newenvironment{ndBlockComment}{\begin{oframed}\noindent ND:\\}{\end{oframed}}
+\newenvironment{ndBlockComment}{\begin{oframed}\singlespacing\noindent ND:\\}{\end{oframed}}
 \newcommand{\ndTypo}[1]{\ndComment[#1]{$\longrightarrow$}}
 \newcommand{\ndDel}[1]{\sout{#1}\ndComment{$\longrightarrow$}}
 
