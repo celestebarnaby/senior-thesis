@@ -1,4 +1,3 @@
-\section{Introduction}
 Analyzing the complexity and performance of an algorithm is an important problem in computer science. We want our programs to run as quickly and as efficiently as possible; thus, it is crucial that we understand how much time and space it takes to execute a program, with respect to its input size. Prior work has been done on the development of tools
 for automating the analysis of program complexity, which would allow us to make these judgements more quickly and accurately. 
 
@@ -13,15 +12,15 @@ is, on average, much more efficient. Developing methods for extracting a tighter
 Some algorithms have probabilistic elements which affect the way we analyze them. A prime example of this is randomized 
 quicksort---the standard quicksort algorithm wherein the pivot is chosen to be a random element in the list. In the worst case,
 this algorithm is $O(n^2)$, making it no more efficient than other sorting algorithms such as bubble sort or insertion sort. 
-However, in the average case it is $O(nlogn)$, making it one of the most efficient sorting algorithms. Hence, analyses of probabilistic algorithms must consider the \emph{expected} runtime rather than the worst-case runtime. 
+However, in the average case it is $O(n\log n)$, making it one of the most efficient sorting algorithms. Hence, analyses of probabilistic algorithms must consider the \emph{expected} runtime rather than the worst-case runtime. 
 
-While there are proofs that the expected runtime of randomized quicksort is $O(nlogn)$, they commonly use
+While there are proofs that the expected runtime of randomized quicksort is $O(n\log n)$, they commonly use
 imprecise, ad hoc arguments: that is, they cannot be applied to other algorithms with similar randomized elements. 
 Previous work has offered a method for analyzing stochastic divide-and-conquer processes by describing them as recurrence relations of the form
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x))
 \end{align*}
-Where $x$ is a non-negative real number describing the size of the input, $h_1(x) \dots h_n(x)$ are random variables 
+where $x$ is a non-negative real number describing the size of the input, $h_1(x) \dots h_n(x)$ are random variables 
 describing the sizes of the subproblems (e.g. in the case of quicksort $h_1(x)$ and $h_2(x)$ describe the sizes of the two 
 sublists), $a$ is a function describing the work necessary to generate these subproblems, and $T(x)$ is a random variable 
 describing the total running time of the algorithm. Karp then offers several methods for obtaining tight bounds on the upper tails 
