@@ -1,6 +1,16 @@
-We define an expression language which will allow us to write and type-check recurrence relations such as 
-those described by Karp. The syntax of this language is mostly analogous to PCF, with one key exception: instead of a 
-$\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses. \\ 
+In section 1, Karp defines recurrences of the form $T(x) = a(x) + T(m(x))$. In section 2, however, he offers example
+applications of his theorems, using recurrences with initial conditions. For example, a recurrence for a randomized list ranking 
+algorithmvis written as
+\begin{align*}
+T(1) &= 1 \\
+T(n) &= 1 + T(\frac{3}{4}n)
+\end{align*}
+These examples seem to be in conflict with section 1, where Karp never discusses initial conditions to recurrences. Indeed, 
+there is no clear way to write the above equations as one equation of the form $T(x) = a(x) + T(m(x))$.
+
+We define an expression language which will allow us to write and type-check the recurrence relations offered in section 2. 
+The syntax of this language is mostly analogous to PCF, with one key exception: instead of a 
+$\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses in this section. \\ 
 \[
 \begin{array}{rcl}
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
@@ -48,15 +58,18 @@ e = e \\ \\
 \]
 
 \section{Denotational Semantics}
-The denotational semantics of our expression language is mostly standard, with types interpreting to flat-ordered sets. Again, 
-the exception is the $\texttt{real}$ type, which interprets to the non-negative reals, with an additional element $+\infty$ such 
-that for $\forall x \in R$, $x<+\infty$. (Need more explanation of this here).
+The denotational semantics of our expression language is  standard, with types interpreting to flat-ordered sets. 
+That is, each type interprets to a set with a bottom element, $\perp$, where each element of the set is comparable
+only to $\perp$. 
  \begin{align*}
-\llbracket \texttt{real} \rrbracket &= \R_{[0, +\infty]} = \{x \in \R \ | \ x \geq 0\} \cup \{+\infty\} \\
+\llbracket \texttt{real} \rrbracket &= \R_{\perp} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
  \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
+ \text{For } \forall (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a<c \text{ and } b<d. \\ 
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
- \ f \text{ is continuous}\}
+ \ f \text{ is continuous}\} \\
+ \text{ For } \forall f, \ g \in \llbracket \tau \rightarrow \sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
+ \llbracket \tau \rrbracket, \ f(x) \leq g(x)
  \end{align*}
 \begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
@@ -97,6 +110,8 @@ that for $\forall x \in R$, $x<+\infty$. (Need more explanation of this here).
       \perp \text{ otherwise}
    \end{cases}
  \\
+ \end{align*}
+ \begin{align*}
   \llbracket e_1 \geq e_2 \rrbracket\eta &= 
  \begin{cases} 
       true \text{ if } (\llbracket e_1 \rrbracket\eta \geq \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp) \\
@@ -124,16 +139,13 @@ upper bound in $\llbracket \tau \rrbracket$. \\
 by induction on the structure of $\tau$. \\
 \emph{Base Cases: }
 \begin{itemize}
-\item $\tau = \texttt{real}$ \\ \\
-In this case, $\llbracket \tau \rrbracket = \extR$. Then $0$ is a bottom element of $\llbracket \tau \rrbracket$, and for 
-any chain $C \subset \R, \ C$ is bounded by $+\infty$, so by the least upper bound property $C$ has a least upper bound in 
-$\llbracket \tau \rrbracket$.
-\item $\tau = \texttt{bool}$ \\ \\
-In this case, $\llbracket \tau \rrbracket$ is set with flat ordering, and is thus a CPO. \\ 
+\item $\tau = \texttt{real}$
+\item $\tau = \texttt{bool}$ \\
+In this case, $\llbracket \tau \rrbracket$ is set with flat ordering, and is thus a CPO. 
 \end{itemize}
 \emph{Inductive Cases: }
 \begin{itemize}
-\item $\tau = \tau_1 \times \tau_2$ \\ \\
+\item $\tau = \tau_1 \times \tau_2$ 
 Note $\llbracket \tau \rrbracket = \llbracket \tau_1 \rrbracket \times \llbracket \tau_2 \rrbracket$. By inductive hypothesis,
 $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom elements $\perp_1$ and $
 \perp_2$, respectively. Thus $(\perp_1, \perp_2)$ is a bottom element of $\tau$. 
@@ -180,7 +192,6 @@ See, then, that by definition $\llbracket \tau \rrbracket$ is a CPO. \\
 \end{proof}
 %
 \begin{thm} 
-(Need to update these proofs)
 For all expressions $e$ and environments $\Gamma$,
 \begin{enumerate}
 \item For all $\Gamma\vdash e : \tau$ and all $\Gamma$-environments~$\eta$,
@@ -428,131 +439,105 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{proof}
  
 \section{Examples}
-Consider that we may express the general equation $T(x) = a(x) + T(m(x))$ in our expression language as follows:
- \begin{align*}
- \texttt{T} = \texttt{fix}(\lambda f. \lambda x.\texttt{a}(x) + f (\texttt{m}(x)))
+We may use this syntax to express the algorithms discussed in section 2, where Karp offers both a general recurrence and an
+initial condition. For instance, consider the following recurrence:
+\begin{align*}
+T(1) &= 1 \\
+T(n) &= 1 + T(pn), \ 0 < p < 1
+\end{align*} 
+For $\forall n > 1, \ \exists k \in \N$ such that $p^kn \leq1, p^{k-1}n > 1$. See, then, that $T(n) = 1 + \left \lfloor{\log_{p}1/n}\right \rfloor$.
+
+We may express this recurrence in our expression language as the follows:
+\begin{align*}
+\texttt{T} = \texttt{fix}(\ifelse{x<1}{1}{1 + f(p*x)})
  \end{align*}
- We want to show that the denotation of this expression has the same behavior as this deterministic function. First, let 
- $\texttt{F} = \lambda f. \lambda x.\texttt{a}(x) + f (\texttt{m}(x)$, and note the following:
+ We want to show that the denotation of this expression has the same behavior as the recurrence described above. 
+ First, let $\texttt{F} =\ifelse{x<1}{1}{1 + f(p*x)}$, and note the following: 
  \begin{align*}
  \llbracket \texttt{T} \rrbracket &= fix(\llbracket \texttt{F} \rrbracket) \\
  \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow 
  \texttt{real}\rrbracket \\ &\text{ \ \ \ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real}
  \rrbracket, \ 
  F(\alpha) = \llbracket \lambda x.a + f (p * x)\rrbracket\{f \mapsto \alpha\} \\
- \llbracket \texttt{real}\rrbracket &= \R_{[0, +\infty]}  
+ \llbracket \texttt{real}\rrbracket &= \R_{\perp}  
  \\\text{By the CPO fixpoint theorem, } fix(\llbracket \texttt{F} \rrbracket) &= fix(F) \\
 &= \bigvee\{F^n (\perp)\}^{\infty}_{n=1} \\
 &= \lim_{n \to \infty}\{F^n (\perp)\}
  \end{align*}
- Recall that the bottom element of $\llbracket \texttt{real} \rrbracket$ is $0$, so the bottom element of $\llbracket \texttt{real} 
- \rightarrow \texttt{real}\rrbracket$ is the function $\perp$ that maps every element in $\llbracket \texttt{real} \rrbracket$ to 
- $0$.  \\
- %
  \begin{lemma}
- \label{lem2}
- \begin{align*}
- \forall d \in \R_{[0, +\infty]}, \ F^n(\perp)(d) = \sum_{i = 0}^{n-1}a(m^{i}(d))
- \end{align*}
- \end{lemma}
- %
- \begin{proof} by induction on n. \\
- \emph{Base case:} n = 1
- \begin{align*}
- \forall d \in \extR, \ F(\perp)(d) &= \llbracket \lambda x.\texttt{a}(x) + f (\texttt{m}(x))\rrbracket\{f \mapsto \perp, x \mapsto d\} \\
- &= a(d) + \perp(m(d)) \\
- &= a(d)  \\
- \end{align*}
- \emph{Inductive case:} Suppose the claim hold for $\forall k < n$.
- \begin{align*}
- \forall d \in \extR, \ F^n(\perp)(d) &= \llbracket \lambda x.\texttt{a}(x) + f (\texttt{m}(x))\rrbracket
- \{f \mapsto F^{n-1}(\perp),x\mapsto d\} \\
- &= a(d) + F^{n-1}(\perp)(m(d)) \\
-\text{(by inductive hypothesis)} &= a(d) 
-					    + \sum_{i = 0}^{n-2}a(m^{i}(m(d))) \\
-&= a(d) + \sum_{i = 0}^{n-2} a( m^{i+1}d) \\
-&= \sum_{i=0}^{n-1} a(m^{i}d) \\
-\end{align*}
-\end{proof}
-Therefore, 
-\begin{thm}
-\begin{align*}
-\forall d \in \extR, \ \llbracket \texttt{T} \rrbracket\{x \mapsto d\} &= \lim_{n \to \infty}\{F^n (\perp)\}(d) \\
-&= \sum_{i=0}^{\infty}a(m^{i}(d)) \\
- \end{align*}
- \end{thm}
- 
-\subsection{Example 1}
-Consider the simple example Karp offers, wherein $m(x) = px$, with $p$ a positive constant less than 1, and $a(x) = 0, \ x < 1, 
-\ a(x) = 1, \ x \geq 1$. Then $T(x) = a(x) + T(px)$, so by a simple inductive argument we can show that 
-\begin{align*}
-T(x) &= 
+ $\forall x \in \R_{\perp}, \ F^{n+1}(\perp)(x) =  
  \begin{cases}
  0 \text{ if } x < 1 \\
- k \text{ if }  \dfrac{1}{p^{k-1}} \leq x < \dfrac{1}{p^k} \\
+ 1 \text{ if } px < 1 \leq x \\
+ \dots \\
+ n - 1 \text{ if } \ p^{n}x < 1 \leq p^{n-1} \\
+ \perp \text{ otherwise}
+ \end{cases}$
+ \end{lemma}
+\begin{proof}
+
+\emph{Base Cases: } n = 0
+\begin{align*}
+F^{n+1}(\perp)(x) &= F(\perp) \\
+&= 
+\begin{cases}
+0 \text{ if } x<1 \\
+1 + \perp(px) \text{ otherwise}
+\end{cases} \\
+&=
+\begin{cases}
+0 \text{ if } x<1 \\
+\perp \text{ otherwise}
+\end{cases} \\
+\end{align*}
+Note $p^{n}x = p^0x = x$, so trivially the claim holds. \\
+\emph{Inductive Case: } Suppose the claim holds for $\forall k < n$.
+\begin{align*}
+F^{n+1}(\perp)(x) &=  
+\begin{cases}
+0 \text{ if } x<1 \\
+1 + F^{n}(\perp)(px) \text{ otherwise}
+\end{cases} \\
+\end{align*}
+By inductive hypothesis,
+\begin{align*}
+F^{n}(\perp)(px) &= F^{(n-1) + 1}(\perp)(px) \\
+&=  
+ \begin{cases}
+ 0 \text{ if } px < 1 \\
+ 1 \text{ if } p^2x < 1 \leq x \\
+ \dots \\
+ n - 1 \text{ if }  p^{n}x < 1 \leq p^{n-1}x \\
+ \perp \text{ otherwise}
  \end{cases}
  \end{align*}
-We may express this function in our expression language using the expression $\texttt{T}$ defined above, with 
-$\texttt{a}(x) = \ifelse{x<1}{0}{1}$ and $\texttt{m}(x) = p*x$:
- \begin{align*}
- \texttt{fix}(\lambda f. \lambda x. (\ifelse{x<1}{0}{1}) + f (p * x))
- \end{align*}
- Then, by theorem 6,
- \begin{align*}
- \forall d \in \extR, \llbracket \texttt{T} \rrbracket\{x \mapsto d\} = \sum_{i=0}^{\infty}a(p^{i}d)
- \end{align*}
-We must verify that $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described by Karp.
-Note that for $\forall d \in \extR, \ \exists k \in \N$  s.t. $\dfrac{1}{p^{k-1}} \leq d < \dfrac{1}{p^k}$, so $T(d) = k$. Also, 
-for $\forall i < k, \ p^id \geq 1$, and for $\forall i \geq k, p^id < 1$. Note, then, that
+\end{proof}
+See, then, that
 \begin{align*}
-\llbracket \texttt{T} \rrbracket\{x\mapsto d\} &= \sum_{i=0}^{k} a(p^{i}d) + \sum_{i=k+1}^{\infty} a(p^{i}d) \\
-&= \sum_{i=0}^{k} 1 + \sum_{i=k+1}^{\infty} 0\\
-&= k \\
-&= T(d) \\
+F^{n+1}(\perp)(x) &=  
+\begin{cases}
+0 \text{ if } x<1 \\
+1 \text{ if } px < 1 \\
+2 \text{ if } p^2x < 1 \leq x \\
+\dots \\
+n-1 \text{ if } p^{n}x < 1 \leq p^{n-1}x \\
+\perp \text{ otherwise } 
+\end{cases}
 \end{align*}
-Thus, $\llbracket \texttt{T} \rrbracket = T$.
+Therefore, the claim holds for $\forall n$.
 
-\subsection{Example 2}
-Let $m(x) = px$, where $p$ is a positive constant less than 1, and $a(x) = x$. Then $T(x) = x + T(px)$, so, for instance,
+Consider that since $p<1, \ \lim_{n \to \infty}\{(1/p)^n\} = \infty$. Then for $\forall x \in \R, \exists n \in \N$ such that 
 \begin{align*}
-T(1) = 1 + p + p^2 + p^3 + \ldots
+(1/p)^{n-1} < \ &1/x \leq (1/p)^n \\
+x/p^{n-1} < \ &1 \leq x/p^n \\
+p^nx < \ &1 \leq p^{n-1}x \\
 \end{align*}
-See, then, that this function describes the following geometric series:
+Then $\llbracket \texttt{T} \rrbracket = lim_{n \to \infty}\{F^n (\perp)\}$ is defined for $\forall x \in \R$ as
 \begin{align*}
-T(x) &= \sum_{i=0}^{\infty} p^ix \\ 
-&= \frac{x}{1 - p} \ (\text{since } 0 \leq p \leq 1)
+\lim_{n \to \infty}\{F^n (\perp)\}(x) = n - 1
 \end{align*}
-We may express this function in our expression language using the expression $\texttt{T}$ defined above, with 
-$\texttt{a}(x) = x$ and $\texttt{m}(x) = p*x$:
-\begin{align*}
- \texttt{T} = \texttt{fix}(\lambda f. \lambda x.x + f (p * x))
- \end{align*}
-Then, by theorem 6,
- \begin{align*}
- \forall d \in \extR, \llbracket \texttt{T} \rrbracket\{x \mapsto d\} = \sum_{i=0}^{\infty}p^{i}d
- \end{align*}
-See, then, that for $\forall d \in \extR, \ T(d) = \sum_{i=0}^{\infty}p^{i}d = \llbracket \texttt{T} \rrbracket \{x \mapsto d\}$.
-Thus, $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described by Karp.
+Where $n \in \N$ is the minimum number such that $p^nx<1$. Then $\llbracket \texttt{T} \rrbracket(x) = 1 + \left \lfloor{\log_{p}1/n}\right \rfloor = T(x)$. Therefore, $\llbracket \text{T} \rrbracket = T$.
  
- \subsection{Example 3} Let $m(x) = x$ and $a(x) = x$. Then $m(x), a(x)$, and $m(x)/x$ are all non-decreasing functions and 
- thus meet the assumptions specified by Karp. Note that $T(x) = x + T(x)$, so, for instance,
-\begin{align*}
-T(1) = 1 + 1 + 1 + \ldots
-\end{align*}
-See, then, that this function describes the following series:
-\begin{align*}
-T(x) &= \sum_{i=0}^{\infty} x 
-\end{align*}
-Clearly this series diverges for $\forall x \in \R$. We may express this function in our expression language using the 
-expression $\texttt{T}$ defined above, with $\texttt{a}(x) = x$ and $\texttt{m}(x) = x$:
-\begin{align*}
- \texttt{T} = \texttt{fix}(\lambda f. \lambda x.x + f (x))
- \end{align*}
-Then, by theorem 6,
- \begin{align*}
- \forall d \in \extR, \llbracket \texttt{T} \rrbracket\{x \mapsto d\} = \sum_{i=0}^{\infty}d
- \end{align*}
-See, then, that for $\forall d \in \extR, \ T(d) = \sum_{i=0}^{\infty}d = \llbracket \texttt{T} \rrbracket\{x \mapsto d\}$.
-Thus, $\llbracket \texttt{T} \rrbracket$ has the same behavior as the function $T$ described by Karp.
+
 
 
