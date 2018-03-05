@@ -1,9 +1,9 @@
 In section 1, Karp defines recurrences of the form $T(x) = a(x) + T(m(x))$. In section 2, however, he offers example
 applications of his theorems, using recurrences with initial conditions. For example, a recurrence for a randomized list ranking 
-algorithmvis written as
+algorithms written as
 \begin{align*}
 T(1) &= 1 \\
-T(n) &= 1 + T(\frac{3}{4}n)
+T(n) &= 1 + T(3/4n)
 \end{align*}
 These examples seem to be in conflict with section 1, where Karp never discusses initial conditions to recurrences. Indeed, 
 there is no clear way to write the above equations as one equation of the form $T(x) = a(x) + T(m(x))$.
@@ -442,24 +442,23 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
 We may use this syntax to express the algorithms discussed in section 2, where Karp offers both a general recurrence and an
 initial condition. For instance, consider the following recurrence:
 \begin{align*}
-T(1) &= 1 \\
+T(1) &= 0 \\
 T(n) &= 1 + T(pn), \ 0 < p < 1
 \end{align*} 
 For $\forall n > 1, \ \exists k \in \N$ such that $p^kn \leq1, p^{k-1}n > 1$. See, then, that $T(n) = 1 + \left \lfloor{\log_{p}1/n}\right \rfloor$.
 
 We may express this recurrence in our expression language as the follows:
 \begin{align*}
-\texttt{T} = \texttt{fix}(\ifelse{x<1}{1}{1 + f(p*x)})
+\texttt{T} = \texttt{fix}(\lambda f. \lambda x.\ifelse{x<1}{0}{1 + f(p*x)})
  \end{align*}
  We want to show that the denotation of this expression has the same behavior as the recurrence described above. 
- First, let $\texttt{F} =\ifelse{x<1}{1}{1 + f(p*x)}$, and note the following: 
+ First, let $\texttt{F} =\lambda f. \lambda x.\ifelse{x<1}{0}{1 + f(p*x)}$, and note the following: 
  \begin{align*}
  \llbracket \texttt{T} \rrbracket &= fix(\llbracket \texttt{F} \rrbracket) \\
- \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow 
- \texttt{real}\rrbracket \\ &\text{ \ \ \ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real}
- \rrbracket, \ 
- F(\alpha) = \llbracket \lambda x.a + f (p * x)\rrbracket\{f \mapsto \alpha\} \\
- \llbracket \texttt{real}\rrbracket &= \R_{\perp}  
+ \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ 
+ &\text{ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rrbracket, \\   
+ &F(\alpha) = \llbracket\lambda x.\ifelse{x<1}{0}{1 + f(p*x)}\rrbracket\{f \mapsto \alpha\} \\
+ \llbracket \texttt{real}\rrbracket &= \R_{\perp}  \\
  \\\text{By the CPO fixpoint theorem, } fix(\llbracket \texttt{F} \rrbracket) &= fix(F) \\
 &= \bigvee\{F^n (\perp)\}^{\infty}_{n=1} \\
 &= \lim_{n \to \infty}\{F^n (\perp)\}

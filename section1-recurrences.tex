@@ -1,8 +1,52 @@
-We define an expression language that will allow us to write and type-check recurrences on random variables such as those described by Karp. Consider that, in order to describe deterministic recurrences, we must
+In section 1, Karp states that stochastic processes that appear in divide-and-conquer algorithms may be described by
+recurrence relations of the form $T(x) = a(x) + T(h(x))$, where $x$ is a non-negative real number, $h(x)$ and $T(x)$ are random variables, and $a$ is a non-negative, real-valued function. He then offers a deterministic counterpart to this
+probabilistic recurrence, $T'(x) = a(x) + T'(m(x))$, where $m$ is a real-valued function such that for 
+$\forall x \in \R, \ E(h(x)) \leq m(x) , 0 \leq m(x) \leq m(x)$, and $m(x), m(x)/x$ are nondecreasing. This recurrence then
+has a least nonnegative solution $u$ given by the Tarski fixed-point theorem, $u(x) = \sum_{i=1}^{\infty}a(m^i(x))$, where 
+$m^i$ is the $i^{th}$ iterate of $m$. The solution $u$ and the function $m$ are used in theorems 1.1 and 1.2 to obtain a 
+bound on the upper tail of $T(x)$.
 
-This expression language includes a $\texttt{rec}$ operator, which allows us to write recurrences of the form 
-$T(x) = a(x) + T(m(x))$, where $T$, $a$, and $m$ are real-valued functions. While this is a very restrictive subset
-of recursive functions, it allows us to express the recurrences described by Karp in section 1. 
+In this chapter, we will define an expression language that allows us to write and type-check recurrences such as those described by Karp. Further, we will define a denotational semantics for this language, 
+such that the interpretation of our recurrences exhibit the same behavior as Karp's recurrences. 
+
+Consider that, in order to describe recurrence relations, our language must have some way of defining recursive functions.
+A first attempt at this involved defining a PCF-like language with a $\texttt{real}$ type and a $\texttt{fix}$ operator
+that assigns the least fixed-point to continuous functions using the CPO fixpoint theorem. Our denotational semantics would
+then interpret all base types as flat-ordered CPOs---that is, $\texttt{real}$ would interpret to $R_{\perp}$, the reals with a 
+bottom element $\perp$, with each real number comparable only to $\perp$. Following standard PCF, arrow types
+$\tau \rightarrow \sigma$ would interpret to a CPO whose bottom element is a function $\perp: \tau \rightarrow \sigma$ such
+that $\perp(x) = \perp_{\sigma}, \forall x \in \tau$.
+
+However, this approach proved problematic: if we consider a function $F: (\R_{\perp} \rightarrow \R_{\perp}) 
+\rightarrow (\R_{\perp} \rightarrow \R_{\perp})$ such that $F(g) = a(x) + g(px)$, then by CPO fixpoint, the least fixed
+point of F is $\bigvee\{F^n(\perp)\}^{\infty}_{n=1}$. However, 
+\begin{align*}
+F(\perp)(x) &= a(x) + \perp(px)\\
+&= a(x) + \perp \\
+&= \perp \\
+\end{align*}
+so by induction we may show that for $\forall n, \ F^n(\perp)(x) = \perp \implies \bigvee\{F^n(\perp)\}^{\infty}_{n=1}  = \perp$. 
+This result, is, clearly, not a solution to the recurrence $T(x) + a(x) + T(px)$, making this denotational semantics
+unusable to us. 
+
+A second approach involved altering the interpretation of the $\texttt{real}$ type to 
+$R_{[0,+\infty]}$---that is, the non-negative, extended reals. See that $R_{[0,+\infty]}$ is a CPO: $0$ is a bottom element,
+and any directed subset of $R_{[0,+\infty]}$ must have a least upper bound. Such an interpretation
+resolves the issue of all recursive functions interpreting to $\perp$. In the above example, for instance, we would have
+\begin{align*}
+F(\perp)(x) &= a(x) + \perp(px)\\
+&= a(x) + 0 \\
+&= a(x) \\
+F(F(\perp))(x) &= a(x) + F(\perp)(px) \\
+&= a(x) + a(px)
+\end{align*}
+so, by induction, 
+$\forall n, \ F^n(\perp)(x) = \sum_{i=1}^{n}a(p^{i-1}x) \ \implies \bigvee\{F^n(\perp)\}^{\infty}_{n=1}(x) = \sum_{i=1}^{\infty}
+a(p^{i-1}x)$. This $\emph{is}$ the solution to the recurrence $T(x) = a(x) + T(px)$, suggesting that this is the 
+appropriate denotational semantics to use. However, it meant that our interpretation of addition was not strict, 
+i.e. it was not the case that $\perp + x = \perp$. This cause unexpected problems. MORE HERE. 
+
+In light of this, we define the following expression language. 
 
 \[
 \begin{array}{rcl}
@@ -13,6 +57,12 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid \texttt{true} \mid \texttt{false} \mid \texttt{rec}(\lambda x.e, \lambda x.e)
 \end{array}
 \]
+
+Note that there is no $\texttt{fix}$ operator---instead, we have a more $\texttt{rec}$ operator, which allows us to write 
+recurrences of the form $T(x) = a(x) + T(m(x))$, where $T$, $a$, and $m$ are real-valued functions. While this is a very 
+restrictive subset of recursive functions, it allows us to express the recurrences described by Karp in section 1, without
+running into any of the problems of the previous approaches. 
+
 \section{Type System}
 \[
 \begin{array}{lr}
@@ -45,7 +95,8 @@ e = e \\ \\
 \ifelse{\texttt{ false }}{e_1}{e_2} = e_2 \\ \\ 
 \lambda x.e = \lambda y.e\{x \mapsto y \}, \text{provided } y \text{ not free in } e. \\ \\ \\
 \lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\} \\
-\text{FIGURE OUT WHAT TO PUT HERE}
+\texttt{rec}(\lambda x.e_1, \lambda x.e_2) = (\lambda x.(e_1 + f(e_2)))
+\{f \mapsto \texttt{rec}(\lambda x.e_1, \lambda x.e_2\} \\
 \end{array}
 \]
 
@@ -127,7 +178,7 @@ T(x) &=
  \end{align*}
  We express this function in our expression language as follows: 
  \begin{align*}
- \texttt{T} = \texttt{rec}(\lambda x.(\ifelse{x<\texttt{1}}{\texttt{0}}{texttt{1}}), \lambda x. \texttt{p}*x)
+ \texttt{T} = \texttt{rec}(\lambda x.(\ifelse{x<\texttt{1}}{\texttt{0}}{\texttt{1}}), \lambda x. \texttt{p}*x)
  \end{align*}
  We want to show that the interpretation of this expression has the same behavior as the function described by Karp.
  Let $\texttt{a} = \lambda x.\ifelse{x<1}{0}{1}$, and see that
@@ -135,7 +186,7 @@ T(x) &=
   \llbracket \texttt{a} \rrbracket &= \underline{a} : \R \rightarrow \R \text{ s.t. } \underline{a}(d) = 0, 
   \ d<1, \underline{a}(d) = 1, \ d \geq 1  \\
  \llbracket \texttt{p} * x \rrbracket &= px \\
- \llbracket \texttt{T} \rrbracket &= \llbracket \texttt{rec}(\lambda x.\texttt{a}, \lambda x.\texttt{p}*x) \\
+ \llbracket \texttt{T} \rrbracket &= \llbracket \texttt{rec}(\lambda x.\texttt{a}, \lambda x.\texttt{p}*x) \rrbracket \\
  &= rec: \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
  &rec(d) = \llbracket \texttt{a} \rrbracket(d) + rec(\llbracket \texttt{p}*x \rrbracket\{x \mapsto d\}) \\
  &\ \ \  \ \ \ \ \ = \underline{a}(d) + pd
