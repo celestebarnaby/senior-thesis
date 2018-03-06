@@ -1,27 +1,56 @@
+\chapter{Well-Typed Recurrence Relations}
 Karp's paper is premised on the notion that algorithms with stochastic processes may be described as 
 recurrence relations of the form
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x)).
 \end{align*}
-But what does this equation actually mean? To unpack this, let us assign types to each of the expressions,
-based on the descriptions offered by Karp. 
+But what does this equation actually mean? To unpack this, we will attempt to assign types to this recurrence
+
+ Following Karp's definitions, we can immediately assign types to some of these terms:
 \begin{align*}
 T(x) &: \Omega_x \rightarrow \R \text{, where } \Omega_x \text{ is the sample space of all problem instances of size } x \\
-T &: \R \rightarrow (\Omega_x \rightarrow \R) \\ 
+T &: \prod_{x \in \R} (\Omega_x \rightarrow \R) \\ 
 a &: \R \rightarrow \R
 \end{align*}
 
-Karp alternates between saying that $h$ is a random variable and $h(x)$ is a random variable, so it is not immediately obvious 
-what the meaning of this function is. However, since $h$ takes $x \in R$ as an input, it would not make sense for $h$ to be a 
+However, for other terms it is less clear what the type should should be .Karp alternates between saying that $h$ is a random 
+variable and $h(x)$ is a random variable, so it is not immediately obvious 
+what the meaning of this function is. However, since $h$ takes $x \in \R$ as an input, it would not make sense for $h$ to be a 
 random variable from $\R \rightarrow \R$. This would make $h$ a function that takes an input size and returns the 
-size of the derived subproblem---thus sidestepping the stochastic part of the algorithm. Thus, it must be that $h(x)$ is a random
+size of the derived subproblem---thus sidestepping the stochastic part of the algorithm. Then it must be that $h(x)$ is a random
 variable that takes a \emph{specific input} of size $x$ and returns the size of the derived subproblem.
 \begin{align*}
 h_i(x) &: \Omega_x \rightarrow \R \\
-h_i &: \R \rightarrow (\Omega_x \rightarrow \R) 
+h_i &: \prod_{x \in \R}(\Omega_x \rightarrow \R) 
 \end{align*} 
 
 There are some inconsistencies in these type assignments. To start, $T$ is a function that takes a real number and 
-returns a random variable. But on the right-hand side of the relation, $T$ takes $h_i(x)$ as an argument; $h_1(x)$ is
-not a real number, but a random variable. Also, what does it mean to add $a(x)$, a real number, to $T(h_i(x))$, 
-a random variable? 
+returns a random variable. But on the right-hand side of the relation, $T$ takes $h_i(x)$ as an argument; $h_i(x)$ is
+not a real number, but a random variable. 
+
+Thinking in terms of what we \emph{want} this recurrence to express, the arguments to the $T$'s on the righthand side of
+the equation should be the sizes of the derived subproblems---that is, the result of applying $h_i(x)$ to the original input.
+Then, given an input $l \in \Omega_x$, we should have
+\begin{align*}
+T(x)(l) &= a(x) + T(h_1(x)(l)) \dots + T(h_n(x)(l)) \\
+&\text{where } h(x)(l) : \R 
+\end{align*}
+ Thus, the term $T(h_i(x)(l))$ typechecks. However, we now run into another problem: $T(x)(l)$ and $a(x)$ are real numbers,
+but $T(h_i(x)(l))$ is a random variable of type $\Omega_{h_i(x)(l)} \rightarrow \R$. Then $T(h_i(x)(l))$ needs an argument.
+Consider that $T(h_i(x)(l))$ is a random variable describing the running time of the algorithm with an input of size 
+$h_i(x)(l)$. For instance, given a recurrence for randomized quicksort, $T(h_1(x)(l))$ and $T(h_2(x)(l))$ describe how long it 
+takes to quicksort the left and right sublists of an input list $l$, which themselves have length $h_1(x)(l)$ and
+$h_2(x)(l)$. The arguments to these random variables, then, should be the left and right sublists themselves. 
+
+ In order for us to obtain these sublists, it will be necessary for us to define a random variable 
+ \begin{align*}
+ \hat{h_i}(x) &: \prod_{l \in \Omega_x} \Omega_x \rightarrow \Omega_{h_i(x)(l)} \\
+ \hat{h_i} &: \prod_{x \in R} \ ( \prod_{l \in \Omega_x} \Omega_x \rightarrow \Omega_{h_i(x)(l)})
+ \end{align*}
+ such that $\hat{h_i}(x)$ takes an input of size $x$ and returns the derived subproblem of size $h_i(x)(l)$. See, then, that
+ $T(h_i(x)(l))(\hat{h_i}(x)(l))$ has type $\R$. So, this leaves us with the equation
+ \begin{align*}
+ T(x)(l) &= a(x) + T(h_1(x)(l))(\hat{h_1}(x)(l)) \dots + T(h_n(x)(l))(\hat{h_n}(x)(l))
+ \end{align*}
+ which, finally, typechecks.
+ 

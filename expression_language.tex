@@ -1,28 +1,37 @@
-In section 1, Karp defines recurrences of the form $T(x) = a(x) + T(m(x))$. In section 2, however, he offers example
-applications of his theorems, using recurrences with initial conditions. For example, a recurrence for a randomized list ranking 
-algorithms written as
+\chapter{Expression Language}
+In section 2, Karp offers several example applications of his cost-bounding theorems. However, the recurrences
+he offers here do not follow the definition he set forth in the prior section. For example, a recurrence for a randomized list 
+ranking algorithms written as
 \begin{align*}
 T(1) &= 1 \\
 T(n) &= 1 + T(3/4n)
 \end{align*}
-These examples seem to be in conflict with section 1, where Karp never discusses initial conditions to recurrences. Indeed, 
-there is no clear way to write the above equations as one equation of the form $T(x) = a(x) + T(m(x))$.
+The presence of an initial condition here is puzzling: Karp has made no mention of initial conditions up to this point, and 
+there is no clear way to write the above equations as one equation of the form $T(x) = a(x) + T(m(x))$. Simply put, 
+this recurrence does not seem to be within the domain of recurrences Karp describes in section 1. Thus, we have no way
+of writing this recurrence using the expression language defined in the previous chapter. 
 
-We define an expression language which will allow us to write and type-check the recurrence relations offered in section 2. 
-The syntax of this language is mostly analogous to PCF, with one key exception: instead of a 
-$\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses in this section. \\ 
+In this chapter, we define an expression language which will allow us to write and type-check the recurrence relations offered 
+in section 2 of Karp's paper. The syntax of this language is mostly analogous to PCF, with one key exception: instead of a 
+$\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses in this section. 
+We will circumvent the issues we had with this approach in the previous chapter by writing these recurrences
+using conditional statements $\ifelse{e_1}{e_2}{e_3}$, with $e_2$ corresponding to the initial condition and $e_3$
+to the general condition. We will see that this approach will allow us to have strict evaluation of addition, while
+still obtaining correct solutions to recurrences.\\ 
 \[
 \begin{array}{rcl}
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
-e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
+e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e 
+\mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
      if \ e \ then \ e \ else \ e \mid \texttt{fix} (\lambda f.\lambda x.e) \\
-v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid \texttt{true} \mid \texttt{false} \mid \texttt{fix} (\lambda f.\lambda x.e)
+v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid \texttt{true} \mid \texttt{false} \mid 
+\texttt{fix} (\lambda f.\lambda x.e)
 \end{array}
 \]
 
 \section{Type System}
-
+\begin{figure}[H]
 \[
 \begin{array}{lr}
 \dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\
@@ -40,8 +49,10 @@ v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 {\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau} \\ \\ \\ 
 \end{array}
 \]
+\end{figure}
 
 \section{Equational Semantics}
+\begin{figure}[H]
 \[
 \begin{array}{lr}
 e = e \\ \\
@@ -56,6 +67,7 @@ e = e \\ \\
 \texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}
 \end{array}
 \]
+\end{figure}
 
 \section{Denotational Semantics}
 The denotational semantics of our expression language is  standard, with types interpreting to flat-ordered sets. 
@@ -69,9 +81,7 @@ only to $\perp$.
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
  \ f \text{ is continuous}\} \\
  \text{ For } \forall f, \ g \in \llbracket \tau \rightarrow \sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
- \llbracket \tau \rrbracket, \ f(x) \leq g(x)
- \end{align*}
-\begin{align*}
+ \llbracket \tau \rrbracket, \ f(x) \leq g(x) \\
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
   \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
   \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket
@@ -80,45 +90,19 @@ only to $\perp$.
  \llbracket e_1 + e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta + \llbracket e_2 \rrbracket\eta \\
  \llbracket e_1 - e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta - \llbracket e_2 \rrbracket\eta \\
  \llbracket e_1 * e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta * \llbracket e_2 \rrbracket\eta \\
-  \llbracket e_1 / e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta / \llbracket e_2 \rrbracket\eta \\
+  \llbracket e_1 / e_2 \rrbracket\eta &=
+  \begin{cases}
+  \perp \text{ if }  \llbracket e_2 \rrbracket\eta = 0 \\
+   \llbracket e_1 \rrbracket\eta / \llbracket e_2 \rrbracket\eta \text{ otherwise}
+   \end{cases} \\
   \llbracket \texttt{true} \rrbracket\eta &= true, \ \llbracket \texttt{false} \rrbracket\eta = false \\
  \llbracket e_1 = e_2 \rrbracket\eta &= 
  \begin{cases} 
       true \text{ if } (\llbracket e_1 \rrbracket\eta = \llbracket e_2 \rrbracket\eta \neq \perp) \\
       false \text{  if } (\llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
       \perp \text{ otherwise}
-   \end{cases}
- \\
-  \llbracket e_1 < e_2 \rrbracket\eta &= 
- \begin{cases} 
-      true \text{ if } (\llbracket e_1 \rrbracket\eta < \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp) \\
-      false \text{  if } (\llbracket e_1 \rrbracket\eta \geq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
-      \perp \text{ otherwise}
-   \end{cases}
- \\
-  \llbracket e_1 > e_2 \rrbracket\eta &= 
- \begin{cases} 
-      true \text{ if } (\llbracket e_1 \rrbracket\eta > \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp) \\
-      false \text{  if } (\llbracket e_1 \rrbracket\eta \leq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
-      \perp \text{ otherwise}
-   \end{cases}
- \\
-  \llbracket e_1 \leq e_2 \rrbracket\eta &= 
- \begin{cases} 
-      true \text{ if } (\llbracket e_1 \rrbracket\eta \leq \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp) \\
-      false \text{  if } (\llbracket e_1 \rrbracket\eta > \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
-      \perp \text{ otherwise}
-   \end{cases}
- \\
- \end{align*}
- \begin{align*}
-  \llbracket e_1 \geq e_2 \rrbracket\eta &= 
- \begin{cases} 
-      true \text{ if } (\llbracket e_1 \rrbracket\eta \geq \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp) \\
-      false \text{  if } (\llbracket e_1 \rrbracket\eta < \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
-      \perp \text{ otherwise}
-   \end{cases}
- \\
+   \end{cases} \\
+\text{Similar rules for $<, \ \leq, >, \geq$} \\
   \llbracket \ifelse{e_1}{e_2}{e_3} \rrbracket \eta &= 
  \begin{cases} 
       \llbracket e_2 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = true \\
@@ -130,6 +114,7 @@ only to $\perp$.
  \text{, where } fix \text{ assigns the least fixed point} \\ 
  &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
  \end{align*}
+In order to use the CPO fixpoint theorem, we first must prove that all types in our syntax interpret to CPOs. 
 \begin{thm}
 For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
 set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
@@ -439,8 +424,8 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{proof}
  
 \section{Examples}
-We may use this syntax to express the algorithms discussed in section 2, where Karp offers both a general recurrence and an
-initial condition. For instance, consider the following recurrence:
+We will look at some of the example recurrences Karp offers in this section, to check whether recurrences in our expression
+language exhibit the same behavior. First, consider the following recurrence:
 \begin{align*}
 T(1) &= 0 \\
 T(n) &= 1 + T(pn), \ 0 < p < 1

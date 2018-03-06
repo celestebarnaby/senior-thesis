@@ -1,3 +1,4 @@
+\chapter{Section 1 Recurrences}
 In section 1, Karp states that stochastic processes that appear in divide-and-conquer algorithms may be described by
 recurrence relations of the form $T(x) = a(x) + T(h(x))$, where $x$ is a non-negative real number, $h(x)$ and $T(x)$ are random variables, and $a$ is a non-negative, real-valued function. He then offers a deterministic counterpart to this
 probabilistic recurrence, $T'(x) = a(x) + T'(m(x))$, where $m$ is a real-valued function such that for 
@@ -10,14 +11,14 @@ In this chapter, we will define an expression language that allows us to write a
 such that the interpretation of our recurrences exhibit the same behavior as Karp's recurrences. 
 
 Consider that, in order to describe recurrence relations, our language must have some way of defining recursive functions.
-A first attempt at this involved defining a PCF-like language with a $\texttt{real}$ type and a $\texttt{fix}$ operator
-that assigns the least fixed-point to continuous functions using the CPO fixpoint theorem. Our denotational semantics would
-then interpret all base types as flat-ordered CPOs---that is, $\texttt{real}$ would interpret to $R_{\perp}$, the reals with a 
+A first attempt at this involves defining a PCF-like language with a $\texttt{real}$ type and a $\texttt{fix}$ operator
+that assigns the least fixed-point to continuous functions using the CPO fixpoint theorem. Our denotational semantics 
+then interprets all base types as flat-ordered CPOs---for instance, $\texttt{real}$  interprets to $R_{\perp}$, the reals with a 
 bottom element $\perp$, with each real number comparable only to $\perp$. Following standard PCF, arrow types
-$\tau \rightarrow \sigma$ would interpret to a CPO whose bottom element is a function $\perp: \tau \rightarrow \sigma$ such
+$\tau \rightarrow \sigma$, interpret to a CPO whose bottom element is a function $\perp: \tau \rightarrow \sigma$ such
 that $\perp(x) = \perp_{\sigma}, \forall x \in \tau$.
 
-However, this approach proved problematic: if we consider a function $F: (\R_{\perp} \rightarrow \R_{\perp}) 
+However, this approach proves problematic: if we consider a function $F: (\R_{\perp} \rightarrow \R_{\perp}) 
 \rightarrow (\R_{\perp} \rightarrow \R_{\perp})$ such that $F(g) = a(x) + g(px)$, then by CPO fixpoint, the least fixed
 point of F is $\bigvee\{F^n(\perp)\}^{\infty}_{n=1}$. However, 
 \begin{align*}
@@ -29,7 +30,7 @@ so by induction we may show that for $\forall n, \ F^n(\perp)(x) = \perp \implie
 This result, is, clearly, not a solution to the recurrence $T(x) + a(x) + T(px)$, making this denotational semantics
 unusable to us. 
 
-A second approach involved altering the interpretation of the $\texttt{real}$ type to 
+A second approach involves altering the interpretation of the $\texttt{real}$ type to 
 $R_{[0,+\infty]}$---that is, the non-negative, extended reals. See that $R_{[0,+\infty]}$ is a CPO: $0$ is a bottom element,
 and any directed subset of $R_{[0,+\infty]}$ must have a least upper bound. Such an interpretation
 resolves the issue of all recursive functions interpreting to $\perp$. In the above example, for instance, we would have
@@ -44,7 +45,7 @@ so, by induction,
 $\forall n, \ F^n(\perp)(x) = \sum_{i=1}^{n}a(p^{i-1}x) \ \implies \bigvee\{F^n(\perp)\}^{\infty}_{n=1}(x) = \sum_{i=1}^{\infty}
 a(p^{i-1}x)$. This $\emph{is}$ the solution to the recurrence $T(x) = a(x) + T(px)$, suggesting that this is the 
 appropriate denotational semantics to use. However, it meant that our interpretation of addition was not strict, 
-i.e. it was not the case that $\perp + x = \perp$. This cause unexpected problems. MORE HERE. 
+i.e. it was not the case that $\perp + x = \perp$. This causes unexpected problems. MORE HERE. 
 
 In light of this, we define the following expression language. 
 
@@ -61,9 +62,10 @@ v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 Note that there is no $\texttt{fix}$ operator---instead, we have a more $\texttt{rec}$ operator, which allows us to write 
 recurrences of the form $T(x) = a(x) + T(m(x))$, where $T$, $a$, and $m$ are real-valued functions. While this is a very 
 restrictive subset of recursive functions, it allows us to express the recurrences described by Karp in section 1, without
-running into any of the problems of the previous approaches. 
+running into the problems of the previous approaches. 
 
 \section{Type System}
+\begin{figure}[h]
 \[
 \begin{array}{lr}
 \dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\ \\
@@ -82,8 +84,10 @@ running into any of the problems of the previous approaches.
 {\Gamma \vdash \texttt{rec}(\lambda x.e_1, \lambda x.e_2) : \texttt{real} \rightarrow \texttt{real}} \\ \\ 
 \end{array}
 \]
+\end{figure}
 
 \section{Equational Semantics}
+\begin{figure}[H]
 \[
 \begin{array}{lr}
 e = e \\ \\
@@ -99,17 +103,16 @@ e = e \\ \\
 \{f \mapsto \texttt{rec}(\lambda x.e_1, \lambda x.e_2\} \\
 \end{array}
 \]
+\end{figure}
 
 \section{Denotational Semantics}
+\begin{figure}[H]
  \begin{align*}
 \llbracket \texttt{real} \rrbracket &= \R \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}} \\
  \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
- \text{For } \forall (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a<c \text{ and } b<d. \\ 
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
  \ f \text{ is continuous}\} \\
- \text{ For } \forall f, \ g \in \llbracket \tau \rightarrow \sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
- \llbracket \tau \rrbracket, \ f(x) \leq g(x)
  \end{align*}
 \begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
@@ -128,30 +131,7 @@ e = e \\ \\
       false \text{  if } \llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta \\
    \end{cases}
  \\
-  \llbracket e_1 < e_2 \rrbracket\eta &= 
- \begin{cases} 
-      true \text{ if } \llbracket e_1 \rrbracket\eta < \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \\
-      false \text{  if } \llbracket e_1 \rrbracket\eta \geq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \\
-   \end{cases}
- \\
-  \llbracket e_1 > e_2 \rrbracket\eta &= 
- \begin{cases} 
-      true \text{ if } \llbracket e_1 \rrbracket\eta > \llbracket e_2 \rrbracket\eta, \llbracket e_1 \rrbracket\eta \\
-      false \text{  if } \llbracket e_1 \rrbracket\eta \leq \llbracket e_2\rrbracket\eta \\
-   \end{cases}
- \\
-  \llbracket e_1 \leq e_2 \rrbracket\eta &= 
- \begin{cases} 
-      true \text{ if } \llbracket e_1 \rrbracket\eta \leq \llbracket e_2 \rrbracket\eta \\
-      false \text{  if } \llbracket e_1 \rrbracket\eta > \llbracket e_2\rrbracket\eta \\
-   \end{cases}
-   \\
-  \llbracket e_1 \geq e_2 \rrbracket\eta &= 
- \begin{cases} 
-      true \text{ if } (\llbracket e_1 \rrbracket\eta \geq \llbracket e_2 \rrbracket\eta) \\
-      false \text{  if } (\llbracket e_1 \rrbracket\eta < \llbracket e_2\rrbracket\eta)\\
-   \end{cases}
- \\
+\text{Similar rules for $<, \ \leq , >$\, and $\geq$} \\
   \llbracket \ifelse{e_1}{e_2}{e_3} \rrbracket \eta &= 
  \begin{cases} 
       \llbracket e_2 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = true \\
@@ -162,6 +142,7 @@ e = e \\ \\
    \llbracket  \texttt{rec} (\lambda x.e_1, \lambda x.e_2) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in R, \\
    rec(d) &= \llbracket e_1 \rrbracket\eta\{x \mapsto d\} + rec(\llbracket e_2 \rrbracket\eta\{x \mapsto d\}) \\
  \end{align*}
+ \end{figure}
 
 \section{Examples}
 \subsection{Example 1}
