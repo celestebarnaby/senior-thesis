@@ -59,7 +59,7 @@ v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 \end{array}
 \]
 
-Note that there is no $\texttt{fix}$ operator---instead, we have a more $\texttt{rec}$ operator, which allows us to write 
+Note that there is no $\texttt{fix}$ operator---instead, we have a $\texttt{rec}$ operator, which allows us to write 
 recurrences of the form $T(x) = a(x) + T(m(x))$, where $T$, $a$, and $m$ are real-valued functions. While this is a very 
 restrictive subset of recursive functions, it allows us to express the recurrences described by Karp in section 1, without
 running into the problems of the previous approaches. 
@@ -100,7 +100,7 @@ e = e \\ \\
 \lambda x.e = \lambda y.e\{x \mapsto y \}, \text{provided } y \text{ not free in } e. \\ \\ \\
 \lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\} \\
 \texttt{rec}(\lambda x.e_1, \lambda x.e_2) = (\lambda x.(e_1 + f(e_2)))
-\{f \mapsto \texttt{rec}(\lambda x.e_1, \lambda x.e_2\} \\
+\{f \mapsto \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \\
 \end{array}
 \]
 \end{figure}
@@ -139,8 +139,8 @@ e = e \\ \\
       \perp \text{      otherwise} \\
    \end{cases}
   \\
-   \llbracket  \texttt{rec} (\lambda x.e_1, \lambda x.e_2) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in R, \\
-   rec(d) &= \llbracket e_1 \rrbracket\eta\{x \mapsto d\} + rec(\llbracket e_2 \rrbracket\eta\{x \mapsto d\}) \\
+   \llbracket  \texttt{rec} (e_1 : \texttt{real} \rightarrow \texttt{real}, e_2 : \texttt{real} \rightarrow \texttt{real}) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in R, \\
+   rec(d) &= \sum_{i=0}^{\infty}\llbracket e_1 \rrbracket\eta (\llbracket e_2 \rrbracket\eta^i(d)) \\
  \end{align*}
  \end{figure}
 
@@ -162,16 +162,29 @@ T(x) &=
  \texttt{T} = \texttt{rec}(\lambda x.(\ifelse{x<\texttt{1}}{\texttt{0}}{\texttt{1}}), \lambda x. \texttt{p}*x)
  \end{align*}
  We want to show that the interpretation of this expression has the same behavior as the function described by Karp.
- Let $\texttt{a} = \lambda x.\ifelse{x<1}{0}{1}$, and see that
+ Let $\texttt{a} = \lambda x.\ifelse{x<1}{0}{1}, \ \texttt{m} = \lambda x.\texttt{p}*x$, and see that
  \begin{align*}
   \llbracket \texttt{a} \rrbracket &= \underline{a} : \R \rightarrow \R \text{ s.t. } \underline{a}(d) = 0, 
   \ d<1, \underline{a}(d) = 1, \ d \geq 1  \\
- \llbracket \texttt{p} * x \rrbracket &= px \\
- \llbracket \texttt{T} \rrbracket &= \llbracket \texttt{rec}(\lambda x.\texttt{a}, \lambda x.\texttt{p}*x) \rrbracket \\
+ \llbracket \texttt{m} \rrbracket &= \underline{m} : \R \rightarrow \R \text{ s.t } \forall d \in \R, \
+ \underline{m}(d) = pd \\
+ \llbracket \texttt{T} \rrbracket&= \llbracket \texttt{rec}(\texttt{a}, \texttt{m}) \rrbracket \\
  &= rec: \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
- &rec(d) = \llbracket \texttt{a} \rrbracket(d) + rec(\llbracket \texttt{p}*x \rrbracket\{x \mapsto d\}) \\
- &\ \ \  \ \ \ \ \ = \underline{a}(d) + pd
+ &rec(d) = \sum_{i=0}^{\infty}\llbracket \texttt{a} \rrbracket (\llbracket \texttt{m} \rrbracket^i(d)) \\
+ &= \sum_{i=0}^{\infty}\underline{a} (\underline{m}^i(d)) \\
+ &= \sum_{i=0}^{\infty}\underline{a} (p^i(d))
  \end{align*}
-Thus, since $\underline{a} = a, \ \llbracket \texttt{T} \rrbracket = T$.
+Note that, for $\forall d<1 \in \R$,
+\begin{align*}
+\llbracket \texttt{T} \rrbracket(d) = 0
+\end{align*}
+and for $\forall d \geq 1 \in R$, since $p < 1, \ \exists k \in \N \text{ s.t } \dfrac{1}{p^{k-1}} \leq d < \dfrac{1}{p^k}$. Then
+\begin{align*}
+\llbracket \texttt{T} \rrbracket(d)&= \sum_{i=0}^{\infty}\underline{a} (p^i(d)) \\
+&= \sum_{i=0}^{k-1}\underline{a} (p^i(d)) + \sum_{i=k}^{\infty}\underline{a} (p^i(d)) \\
+&= k + 0 \\
+&= k
+\end{align*}
+Therefore, $\llbracket \texttt{T} \rrbracket = T$
  
 

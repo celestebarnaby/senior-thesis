@@ -130,7 +130,7 @@ In this case, $\llbracket \tau \rrbracket$ is set with flat ordering, and is thu
 \end{itemize}
 \emph{Inductive Cases: }
 \begin{itemize}
-\item $\tau = \tau_1 \times \tau_2$ 
+\item $\tau = \tau_1 \times \tau_2$  \\
 Note $\llbracket \tau \rrbracket = \llbracket \tau_1 \rrbracket \times \llbracket \tau_2 \rrbracket$. By inductive hypothesis,
 $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom elements $\perp_1$ and $
 \perp_2$, respectively. Thus $(\perp_1, \perp_2)$ is a bottom element of $\tau$. 
@@ -179,16 +179,16 @@ See, then, that by definition $\llbracket \tau \rrbracket$ is a CPO. \\
 \begin{thm} 
 For all expressions $e$ and environments $\Gamma$,
 \begin{enumerate}
-\item For all $\Gamma\vdash e : \tau$ and all $\Gamma$-environments~$\eta$,
-$\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
 \item For all chains $a_0\leq a_1\leq\dotsb$,
 $\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
 \bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$.
+\item For all $\Gamma\vdash e : \tau$ and all $\Gamma$-environments~$\eta$,
+$\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
 \end{enumerate}
 \end{thm}
 \begin{proof}
 by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a chain, and suppose $ a = \bigvee_i a_i$. 
-Note that 1 is trivial in all but the abstraction and $\texttt{fix}$ cases.\\
+Note that 2 is trivial in all but the abstraction and $\texttt{fix}$ cases.\\
  \emph{Base Cases: } 
  \begin{itemize}
  % real number constants
@@ -388,6 +388,8 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{align*}
  \end{enumerate}
  \end{itemize}
+ Thus, by definition, $\llbracket \Gamma \vdash \texttt{fix}(\lambda f \lambda x.e) \rrbracket\eta$ is a continuous function
+ from $\llbracket \tau \rrbracket$ to $\llbracket \tau \rrbracket$.
  \end{proof}
  % Lemmas
  \begin{lemma} $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1}= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}
