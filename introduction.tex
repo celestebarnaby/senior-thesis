@@ -8,6 +8,50 @@ is, on average, much more efficient. Developing methods for extracting a tighter
 
 \subsection{Automated Complexity Analysis}
 
+The cost of an algorithm is a function from the input of the algorithm to the number of steps necessary to evaluate 
+that input. As an example, consider the following $\texttt{add}$ function, which adds an integer $x$ to every element 
+in a list $ys$ of integers:
+\begin{verbatim}
+let rec add x ys =
+	match ys with
+	| [] -> []
+	| (y::ys') -> (y+x):: add x ys'
+\end{verbatim}
+In a traditional cost analysis of this function, we assume that integer addition requires some constant number of steps $c$. The cost of this function is dependent upon the length of the list---that is, the more integers in the list, the more adding we need to
+do, and the longer the function will take to run. We may write a recurrence $T$ describing its cost, based on the length
+$n$ of the input list:
+\begin{align*}
+T(0) &= 0 \\
+T(n) &= c + T(n-1)
+\end{align*}
+To determine the cost of $\texttt{add}$, we need only solve this recurrence. We find that $T(n) = cn$, meaning this function
+is linear in the length of the list. 
+
+However, this approach has several problems. To start, this is an ad hoc way to analyze cost. We cannot generalize
+this result for use in other functions; thus, all traditional cost analyses involve writing recurrences by hand. Further, there is 
+no formal connection between an algorithm and its recurrence, meaning we must also manually verify that the recurrence
+we wrote down accurately describes the function we are analyzing. The combination of these issues creates a lot of potential
+for human error.
+
+Another problem is that we assume that the work done to each element of the list requites a constant number of steps. 
+This assumption is fine in the case of $\texttt{add}$, where all we are doing is adding integers; however, if we consider
+the more general $\texttt{map}$ function, we run into some complications. 
+\begin{verbatim}
+let rec map f ys =
+	match ys with
+	| [] -> []
+	| (y::ys') -> f(y):: map f ys'
+\end{verbatim}
+Suppose $ys$ is a list of lists of integers, and $f$ is a function that performs selection sort on a single list. Then $f(y)$ does
+not take a constant amount of work; rather, its cost is quadratic in the length of $y$. In order to correctly write a recurrence
+for $\texttt{map}$, we need some information about the cost of $f(m)$, where $m$ is the length of a list. This issue
+becomes even thornier, if the function $f$ is a composition of functions $g \circ h$. In this case, we need information about the cost of $g(h(m))$, meaning we in turn need information about the \emph{size} of $h(m)$--- the list output by applying a list of length $m$ to $h$. 
+
+Danner et al. [CITE HERE] aims to resolve these issues by developing a formal method for extracting
+recurrences that bound the complexity of higher-order programs. This work offers a translation function that maps programs written in a language with structural list recursion--- referred to as a source language--- to a complexity. A complexity is a pair
+consisting of a cost---a bound on the steps required to evaluate the program---and a potential---a bound on the size of the 
+output of this program. 
+
 \subsection{Probabilistic Recurrence Relations}
 
 Some algorithms have probabilistic elements which affect the way we analyze them. A prime example of this is randomized 
