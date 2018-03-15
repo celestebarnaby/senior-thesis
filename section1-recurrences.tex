@@ -44,8 +44,29 @@ F(F(\perp))(x) &= a(x) + F(\perp)(px) \\
 so, by induction, 
 $\forall n, \ F^n(\perp)(x) = \sum_{i=1}^{n}a(p^{i-1}x) \ \implies \bigvee\{F^n(\perp)\}^{\infty}_{n=1}(x) = \sum_{i=1}^{\infty}
 a(p^{i-1}x)$. This $\emph{is}$ the solution to the recurrence $T(x) = a(x) + T(px)$, suggesting that this is the 
-appropriate denotational semantics to use. However, it meant that our interpretation of addition was not strict, 
-i.e. it was not the case that $\perp + x = \perp$. This causes unexpected problems. MORE HERE. 
+appropriate denotational semantics to use. However, this causes unexpected problems. The standard interpretation of
+the equality operator is as follows:
+\begin{align*}
+ \llbracket e_1 = e_2 \rrbracket\eta &= 
+ \begin{cases} 
+      true \text{ if } (\llbracket e_1 \rrbracket\eta = \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      false \text{  if } (\llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
+      \perp \text{ otherwise}
+   \end{cases} \\
+\end{align*}
+with similar rules for $<, >, \leq, \geq$. But if our bottom element of $\llbracket \texttt{real} \rrbracket$ is $0$, this 
+prohibits us from writing a program where we compare a number to $0$. This is too restrictive, as there are many 
+divide-and-conquer algorithms where we continue a process on the condition that an integer is non-negative, or a 
+list is non-empty. Then we must rewrite our interpretation of such expressions as
+\begin{align*}
+ \llbracket e_1 = e_2 \rrbracket\eta &= 
+ \begin{cases} 
+      true \text{ if } \llbracket e_1 \rrbracket\eta = \llbracket e_2 \rrbracket\eta \\
+      false \text{  if } \llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta\\
+   \end{cases} \\
+\end{align*}
+
+MORE HERE. 
 
 In light of this, we define the following expression language. 
 

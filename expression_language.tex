@@ -23,7 +23,7 @@ still obtaining correct solutions to recurrences.\\
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e 
 \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
-  && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
+  && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
      if \ e \ then \ e \ else \ e \mid \texttt{fix} (\lambda f.\lambda x.e) \\
 v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid \texttt{true} \mid \texttt{false} \mid 
 \texttt{fix} (\lambda f.\lambda x.e)
@@ -114,7 +114,11 @@ only to $\perp$.
  \text{, where } fix \text{ assigns the least fixed point} \\ 
  &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
  \end{align*}
-In order to use the CPO fixpoint theorem, we first must prove that all types in our syntax interpret to CPOs. 
+ 
+ We will interpret $\texttt{fix}$ expressions using the CPO fixpoint theorem. This theorem states that, for a CPO $P$ and a continuous, order-preserving map $\Phi : P \rightarrow P$, the least fixpoint of $\Phi$ exists and is equal to $\bigvee_i \Phi^n(\perp)$.
+
+In order to use this theorem on the interpretation of $\texttt{fix}(\lambda f. \lambda x.e): \tau \rightarrow \tau$ expressions, 
+we must first show that for all types $\tau$, $\llbracket \tau \rrbracket$ is a CPO.
 \begin{thm}
 For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
 set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
@@ -176,7 +180,12 @@ See, then, that by definition $\llbracket \tau \rrbracket$ is a CPO. \\
 \end{itemize} 
 \end{proof}
 %
-MORE HERE
+
+Further, we must show that all $\texttt{fix}$ expressions interpret to continuous functions. It will suffice to prove type
+soundness of our denotational semantics: $\text{fix}$ expressions have type $\tau \rightarrow \tau$, and 
+$\llbracket \tau \rightarrow \tau \rrbracket$ is the set of continuous functions from $\llbracket \tau \rrbracket$ to
+$\llbracket \tau \rrbracket$. 
+
 \begin{thm} 
 For all expressions $e$ and environments $\Gamma$,
 \begin{enumerate}
@@ -187,6 +196,8 @@ $\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
 $\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
 \end{enumerate}
 \end{thm}
+We will see, that in order to prove type soundness for $\lambda x.e$ expressions, we will need to show that 
+$\llbracket \lambda x.e \rrbracket$ is a continuous function. Thus, it will be necessary to have $1$.
 \begin{proof}
 by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a chain, and suppose $ a = \bigvee_i a_i$. 
 Note that 2 is trivial in all but the abstraction and $\texttt{fix}$ cases.\\
