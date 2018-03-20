@@ -1,0 +1,54 @@
+\chapter{Attempts at Translation}
+In this chapter, we look at several attempts to connect the recurrences described in the introduction to the 
+recurrences described in the application section.
+
+As a first attempt, we consider a simple recurrence with an initial condition
+\begin{align*}
+T(0) &= 0 \\
+T(n) &= 1 + T(n/2) 
+\end{align*}
+In order to make this fit the definition of an recurrence of the form $T(n) = a(n) + T(m(n))$, we may interpret $a$ as a 
+piecewise function with two sub-functions: one for the general recurrence and one for the initial condition.
+We can instead write this as a single recurrence
+\begin{align*}
+T(n) &= a(n) + T(m(n)) \\
+m(n) &= n/2, \ \forall n \\ 
+a(n) &=
+\begin{cases} 
+0, \ n = 0 \\
+1, \ n \neq 0
+\end{cases}
+\end{align*} 
+This recurrence can then by expressed in our chapter 2 syntax as 
+\begin{align*}
+\texttt{T} &= \texttt{rec}(\texttt{a},\texttt{m}) \\
+\texttt{m} &= \lambda x.x/\texttt{2} \\
+\texttt{a} &= \lambda x.\ifelse{x=\texttt{0}}{\texttt{0}}{\texttt{1}} \\
+\llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(\texttt{a},\texttt{m}) \rrbracket(d) \\
+&= \sum_{i=0}^{\infty}\llbracket \texttt{a} \rrbracket(\llbracket \texttt{m}\rrbracket^i(d)) \\
+&= \log n
+\end{align*}
+
+However, this approach will not work in every case. Let us try to use the same process on the following recurrence
+\begin{align*}
+T(1) &= 1 \\
+T(n) &= 1 + T(n/2) 
+\end{align*}
+We first write this as a single recurrence. See that, unlike the previous example, $a$ is not a piecewise function---rather,
+$a(n)$ always maps to $1$.
+\begin{align*}
+T(n) &= a(n) + T(m(n)) \\
+m(n) &= n/2, \ \forall n \\ 
+a(n) &= 1, \ \forall n
+\end{align*}
+We then express this recurrence using our chapter 2 syntax as
+\begin{align*}
+\texttt{T} &= \texttt{rec}(\texttt{a},\texttt{m}) \\
+\texttt{m} &= \lambda x.x/\texttt{2} \\
+\texttt{a} &= \texttt{1} \\
+\llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(\texttt{a},\texttt{m}) \rrbracket(d) \\
+&= \sum_{i=0}^{\infty}\llbracket \texttt{a} \rrbracket(\llbracket \texttt{m}\rrbracket^i(d)) \\
+&= \sum_{i=0}^{\infty}1 \\
+&= \infty
+\end{align*}
+Which, clearly, is not a correct solution to this recurrence.
