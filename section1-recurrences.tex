@@ -91,8 +91,7 @@ Thus, this approach will not work. In light of this, we define the following exp
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \mid \texttt{rec}(\lambda x.e, \lambda x.e) \\
-v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid \texttt{true} \mid \texttt{false} \mid \texttt{rec}(\lambda x.e, \lambda x.e)
+     \ifelse{e}{e}{e} \mid \texttt{rec}(\lambda x.e, \lambda x.e) 
 \end{array}
 \]
 
@@ -102,7 +101,7 @@ restrictive subset of recursive functions, it allows us to express the recurrenc
 running into the problems of the previous approaches. 
 
 \section{Type System}
-\begin{figure}[h]
+\begin{figure}[H]
 \[
 \begin{array}{lr}
 \dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\ \\
@@ -134,7 +133,7 @@ e = e \\ \\
 (n =n) = \texttt{true} \\ (n=m) = \texttt{false}\text{, provided } n, \ m \text{ distinct numerals.}\\ \\ 
 \ifelse{\texttt{ true }}{e_1}{e_2} = e_1 \\
 \ifelse{\texttt{ false }}{e_1}{e_2} = e_2 \\ \\ 
-\lambda x.e = \lambda y.e\{x \mapsto y \}, \text{provided } y \text{ not free in } e. \\ \\ \\
+\lambda x.e = \lambda y.e\{x \mapsto y \}, \text{provided } y \text{ not free in } e. \\ \\ 
 \lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\} \\
 \texttt{rec}(\lambda x.e_1, \lambda x.e_2) = (\lambda x.(e_1 + f(e_2)))
 \{f \mapsto \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \\
@@ -151,6 +150,8 @@ e = e \\ \\
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
  \ f \text{ is continuous}\} \\
  \end{align*}
+ \end{figure}
+ \begin{figure}[H]
 \begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
   \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
@@ -177,7 +178,7 @@ e = e \\ \\
    \end{cases}
   \\
    \llbracket  \texttt{rec} (e_1 : \texttt{real} \rightarrow \texttt{real}, e_2 : \texttt{real} \rightarrow \texttt{real}) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in R, \\
-   rec(d) &= \sum_{i=0}^{\infty}\llbracket e_1 \rrbracket\eta (\llbracket e_2 \rrbracket\eta^i(d)) \\
+   rec(d) &= \sum_{i=0}^{\infty}\llbracket e_1 \rrbracket\eta (\llbracket e_2 \rrbracket\eta^i(d))
  \end{align*}
  \end{figure}
 

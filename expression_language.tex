@@ -25,8 +25,6 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
      if \ e \ then \ e \ else \ e \mid \texttt{fix} (\lambda f.\lambda x.e) \\
-v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid \texttt{true} \mid \texttt{false} \mid 
-\texttt{fix} (\lambda f.\lambda x.e)
 \end{array}
 \]
 
@@ -73,6 +71,7 @@ e = e \\ \\
 The denotational semantics of our expression language is  standard, with types interpreting to flat-ordered sets. 
 That is, each type interprets to a set with a bottom element, $\perp$, where each element of the set is comparable
 only to $\perp$. 
+\begin{figure}[H]
  \begin{align*}
 \llbracket \texttt{real} \rrbracket &= \R_{\perp} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
@@ -82,6 +81,10 @@ only to $\perp$.
  \ f \text{ is continuous}\} \\
  \text{ For } \forall f, \ g \in \llbracket \tau \rightarrow \sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
  \llbracket \tau \rrbracket, \ f(x) \leq g(x) \\
+ %\end{align*}
+ %\end{figure}
+ %\begin{figure}[H]
+ %\begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
   \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
   \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket
@@ -114,6 +117,7 @@ only to $\perp$.
  \text{, where } fix \text{ assigns the least fixed point} \\ 
  &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
  \end{align*}
+ \end{figure}
  
  We will interpret $\texttt{fix}$ expressions using the CPO fixpoint theorem. This theorem states that, for a CPO $P$ and a continuous, order-preserving map $\Phi : P \rightarrow P$, the least fixpoint of $\Phi$ exists and is equal to $\bigvee_i \Phi^n(\perp)$.
 
@@ -425,7 +429,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  $\Leftarrow$ By parallel reasoning, $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \leq  \bigvee\{\bigvee\{(F_i)^j 
  \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1}$ \\ \\
  Therefore, $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} = \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}
- ^{\infty}_{i=1}$ \\ \\
+ ^{\infty}_{i=1}$ 
  \end{proof}
  %
  \begin{lemma}
@@ -434,9 +438,9 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  _{j=1}\}^{\infty}_{i=1}$\\ 
  \end{lemma}
  \begin{proof} 
- By reasoning similar to \ref{lem1}. \\ \\
+ By reasoning similar to \ref{lem1}. 
  \end{proof}
- 
+ %
 \section{Examples}
 We will look at some of the example recurrences Karp offers in this section, to check whether recurrences in our expression
 language exhibit the same behavior. First, consider the following recurrence:

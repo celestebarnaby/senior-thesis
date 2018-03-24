@@ -44,8 +44,8 @@ $h_2(x)(l)$. The arguments to these random variables, then, should be the left a
 
  In order for us to obtain these sublists, it will be necessary for us to define a function 
  \begin{align*}
- \hat{h_i}(x) &: \prod_{l \in \Omega_x} \Omega_x \rightarrow \Omega_{h_i(x)(l)} \\
- \hat{h_i} &: \prod_{x \in R} \ ( \prod_{l \in \Omega_x} \Omega_x \rightarrow \Omega_{h_i(x)(l)})
+ \hat{h_i}(x) &: \prod_{l \in \Omega_x} \Omega_{h_i(x)(l)} \\
+ \hat{h_i} &: \prod_{x \in R} \ ( \prod_{l \in \Omega_x} \Omega_{h_i(x)(l)})
  \end{align*}
  such that $\hat{h_i}(x)$ takes an input of size $x$ and returns the derived subproblem of size $h_i(x)(l)$. See, then, that
  $T(h_i(x)(l))(\hat{h_i}(x)(l))$ has type $\R$. So, this leaves us with the equation
@@ -56,16 +56,15 @@ $h_2(x)(l)$. The arguments to these random variables, then, should be the left a
  
  Thus, we find that attempting to formally assigns types to Karp's probabilistic recurrences reveals a lot of hidden 
  complications and ambiguities, which Karp never addresses directly. We define the following expression language
- to write and type-check such recurrences.
+ to write and type-check these recurrences.
  
  \[
 \begin{array}{rcl}
-\tau &::=& \texttt{real} \mid \texttt{bool} \mid \texttt{list?} \mid \tau \times \tau \mid \tau \rightarrow \tau \mid \Pi x:\tau.\tau
+\tau &::=& \texttt{real} \mid \texttt{nat} \mid \texttt{bool} \mid \texttt{list(n)} \mid \tau \times \tau \mid \tau \rightarrow \tau \mid \Pi x:\tau.\tau
 \mid \tau \ e \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
      \ifelse{e}{e}{e} \\
-v &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid \texttt{true} \mid \texttt{false}
 \end{array}
 \]
  
