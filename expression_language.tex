@@ -24,7 +24,7 @@ still obtaining correct solutions to recurrences.\\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e 
 \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
-     if \ e \ then \ e \ else \ e \mid \texttt{fix} (\lambda f.\lambda x.e) \\
+     \ifelse{e}{e}{e} \mid \texttt{fix} (\lambda f.\lambda x.e) \\
 \end{array}
 \]
 

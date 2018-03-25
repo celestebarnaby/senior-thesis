@@ -55,16 +55,69 @@ $h_2(x)(l)$. The arguments to these random variables, then, should be the left a
  which, finally, typechecks.
  
  Thus, we find that attempting to formally assigns types to Karp's probabilistic recurrences reveals a lot of hidden 
- complications and ambiguities, which Karp never addresses directly. We define the following expression language
- to write and type-check these recurrences.
+ complications and ambiguities, which Karp never addresses directly. We define the following syntax
+ to write and type-check these recurrences. This syntax is based on $\lambda$LF---it contains terms, types and kinds,
+ which allow us to distinguish between proper types and type families.
  
  \[
 \begin{array}{rcl}
-\tau &::=& \texttt{real} \mid \texttt{nat} \mid \texttt{bool} \mid \texttt{list(n)} \mid \tau \times \tau \mid \tau \rightarrow \tau \mid \Pi x:\tau.\tau
+\tau &::=& X \mid \texttt{real} \mid \texttt{nat} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \mid \Pi x:\tau.\tau
 \mid \tau \ e \\
+k &::=& * \mid \Pi x : \tau.k \mid \texttt{list(n)}  \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \\
+     \ifelse{e}{e}{e} \mid \texttt{rec}(e, e, e) \\
 \end{array}
 \]
+
+\section{Well-formed Kinds}
+\[
+\begin{array}{c}
+\Gamma \vdash * \\ \\
+\dfrac{\Gamma \vdash \tau :: * \ \ \ \Gamma,x:\tau \vdash k}{\Gamma \vdash \Pi x:\tau.k} \\
+\end{array}
+\]
+
+\section{Kinding}
+\begin{figure}[H]
+\[
+\begin{array}{c}
+\dfrac{X :: k \in \Gamma \ \ \ \Gamma \vdash k}{\Gamma \vdash X :: k} \\ \\
+\dfrac{\Gamma \vdash \tau_1 :: * \ \ \ \Gamma, x:\tau_1 \vdash \tau_2 :: *}{\Gamma \vdash \Pi x:\tau_1.\tau_2 :: *} \\ \\
+\dfrac{\Gamma \vdash S :: \Pi x:\tau.k \ \ \ \Gamma \vdash e : \tau}{\Gamma \vdash S \ e : [x \mapsto t]k} \\ \\
+\end{array}
+\]
+\end{figure}
+
+\section{Kind/Type equivalence?}
+
+\section{Typing}
+\begin{figure}[H]
+\[
+\begin{array}{lr}
+\Gamma \vdash \texttt{real} :: * \\ \\
+\Gamma \vdash \texttt{bool} :: * \\ \\
+\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\ \\
+\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}} \\  \\
+\dfrac{x : \tau \in \Gamma \ \ \ \Gamma \vdash \tau :: *}{\Gamma \vdash x : \tau } \\ \\ 
+\dfrac{\Gamma \vdash \sigma :: * \ \ \ \Gamma, x : \sigma \vdash e : \tau}
+	{\Gamma \vdash \lambda (x : \sigma).e : \Pi x:\sigma.\tau } \\ \\
+\dfrac{\Gamma \vdash e_1: \Pi x:\sigma.\tau \ \ \ \Gamma \vdash e_2 : \sigma}
+	{\Gamma \vdash e_1 \ e_2 : [x \mapsto e_2]\tau} \\ \\
+\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}
+	{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
+, \circ \in \{+,-,*,/\} \\ \\ 
+\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}
+	{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
+	, \circ \in \{=, <, >, \geq, \leq\} \\ \\ 
+\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
+	{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
+\dfrac{\Gamma \vdash e_1 : \Pi x : \texttt{real}.\texttt{real} \ \ \ \Gamma \vdash e_2 : 
+\Pi x : \texttt{list(n)} . \texttt{real} \ \ \ \Gamma \vdash e_3 : \Pi x: \texttt{list(n)}.\texttt{list(}e_2(x)\texttt{)}}
+	{\Gamma \vdash \texttt{rec}(e_1, e_2, e_3) : \Pi x : \texttt{list(n)} . \texttt{real}} \\ \\ 
+\end{array}
+\]
+\end{figure}
+
+\section{Denotational Semantics}
  
