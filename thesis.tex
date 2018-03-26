@@ -45,7 +45,13 @@
 \newcommand{\bind}[2]{{#1}\mapsto{#2}}
 \newcommand{\ifelse}[3]{\texttt{if } #1 \texttt{ then } #2 \texttt{ else } #3}
 
+\makeatletter
+\def\@bibitem#1{\item[]%
+    \if@filesw\immediate\write\@auxout{\string \bibcite {#1}{\the\value{\@listctr }}}\fi\ignorespaces}
+\makeatletter
+
 \begin{document}
+
 \begin{abstract}
 abstract goes here:)
 \end{abstract}
@@ -56,5 +62,23 @@ abstract goes here:)
 \include{expression_language}
 \include{translation}
 \include{rec_relations}
+
+\begin{thebibliography}{9}
+\bibitem{Karp}
+	R. M. Karp. Probabilistic recurrence relations. J.
+	ACM, 41(6):1136?1150, 1994.
+	
+\bibitem{ICFP}
+	N. Danner, D. Licata, and R. Ramyaa.
+        Denotational cost semantics for functional languages with inductive types.
+	\emph{International Conference on Functional Programming}, 2015
+
+\bibitem{Coq}
+	J. Tassarotti and R. Harper. 2017. Verified Tail Bounds for Randomized Programs. 
+	Proc. ACM Program. Lang. 1, 1, Article 1 (January 2017).
+
+\end{thebibliography}
+
+
 
 \end{document}

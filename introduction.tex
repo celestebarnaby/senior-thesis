@@ -30,7 +30,7 @@ is linear in the length of the list.
 However, this approach has several problems. To start, this is an ad hoc way to analyze cost. We cannot generalize
 this result for use in other functions; thus, all traditional cost analyses involve writing recurrences by hand. Further, there is 
 no formal connection between an algorithm and its recurrence, meaning we must also manually verify that the recurrence
-we wrote down accurately describes the function we are analyzing. The combination of these issues creates a lot of potential
+we write down accurately describes the function we are analyzing. The combination of these issues creates a lot of potential
 for human error.
 
 Another problem is that we assume that the work done to each element of the list requites a constant number of steps. 
@@ -43,11 +43,11 @@ let rec map f ys =
 	| (y::ys') -> f(y):: map f ys'
 \end{verbatim}
 Suppose $ys$ is a list of lists of integers, and $f$ is a function that performs selection sort on a single list. Then $f(y)$ does
-not take a constant amount of work; rather, its cost is quadratic in the length of $y$. In order to correctly write a recurrence
-for $\texttt{map}$, we need some information about the cost of $f(m)$, where $m$ is the length of a list. This issue
-becomes even thornier, if the function $f$ is a composition of functions $g \circ h$. In this case, we need information about the cost of $g(h(m))$, meaning we in turn need information about the \emph{size} of $h(m)$--- the list output by applying a list of length $m$ to $h$. 
+not take a constant amount of work; rather, its cost is quadratic in the length of $y$. In order to write a correct recurrence
+for $\texttt{map}$, we need some information about the cost of $f(y)$, where the size of y is variable. This issue
+becomes even thornier if the function $f$ is a composition of functions $g \circ h$. In this case, we need information about the cost of $g(h(y))$, meaning we in turn need information about the \emph{size} of $h(y)$--- the list output by applying a list $y$ to $h$. 
 
-Danner et al. [CITE HERE] aims to resolve these issues by developing a formal method for extracting
+\cite{ICFP} aim to resolve these issues by developing a formal method for extracting
 recurrences that bound the complexity of higher-order programs. This work offers a translation function that maps programs written in a language with structural list recursion--- referred to as a source language--- to a complexity. A complexity is a pair
 consisting of a cost---a bound on the steps required to evaluate the program---and a potential---a bound on the size of the 
 output of this program. 
@@ -61,15 +61,14 @@ However, in the average case it is $O(n\log n)$, making it one of the most effic
 
 While there are proofs that the expected runtime of randomized quicksort is $O(n\log n)$, they commonly use
 imprecise, ad hoc arguments: that is, they cannot be applied to other algorithms with similar randomized elements. 
-Previous work has offered a method for analyzing stochastic divide-and-conquer processes by describing them as recurrence relations of the form
+\cite{Karp} offers a method for analyzing stochastic divide-and-conquer processes by describing them as recurrence relations of the form
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x))
 \end{align*}
 where $x$ is a non-negative real number describing the size of the input, $h_1(x) \dots h_n(x)$ are random variables 
 describing the sizes of the subproblems (e.g. in the case of quicksort $h_1(x)$ and $h_2(x)$ describe the sizes of the two 
 sublists), $a$ is a function describing the work necessary to generate these subproblems, and $T(x)$ is a random variable 
-describing the total running time of the algorithm. Karp then offers several methods for obtaining tight bounds on the upper tails 
-of the probability distribution of $T(x)$. 
+describing the total running time of the algorithm. Karp then offers several methods for obtaining tight bounds on the upper tails of the probability distribution of $T(x)$. 
 
 Note, however, that the recurrence relation $T(x) = a(x) + T(h(x))$ has some clear flaws that 
 emerge when we attempt to assign types to its expressions. Since $T(x)$ is supposed to be random
@@ -88,7 +87,7 @@ Taking this a step further, we could interpret this to mean $T(x)(l) = a(x) + T(
 additional function $\hat{h}(x)$ that takes an input $l$ and returns the derived subproblem $l'$. 
 Even worse, this function is of type $\Omega_x \rightarrow \Omega_{h(x)(l)}$ --- that is, its type is dependent 
 upon the random variable $h(x)$. Thus, we find that Karp's seemingly straightforward recurrence relation quickly becomes 
-increasingly complicated when we attempt to type-check it. Other researchers [Tassarotti and Harper 2017] have corroborated 
+increasingly complicated when we attempt to type-check it. Other researchers \cite{Coq} have corroborated 
 these observations. 
 
 
