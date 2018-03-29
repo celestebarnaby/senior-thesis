@@ -122,7 +122,7 @@ running into the problems of the previous approaches.
 {\Gamma \vdash \texttt{rec}(\lambda x.e_1, \lambda x.e_2) : \texttt{real} \rightarrow \texttt{real}} \\ \\ 
 \end{array}
 \]
-\caption{Typing for the language .}
+\caption{Typing for the language.}
 \label{fig:typing}
 \end{figure}
 
@@ -139,7 +139,7 @@ e = e \\ \\
 \lambda x.e = \lambda y.e\{x \mapsto y \}, \text{provided } y \text{ not free in } e. \\ \\ 
 \lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\} \\
 \texttt{rec}(\lambda x.e_1, \lambda x.e_2) = 
-			\lambda x.(e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x.\ e_2)) \\
+			\lambda x.e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x.\ e_2) \\
 \end{array}
 \]
 \caption{Equational semantics for the language.}
@@ -194,27 +194,24 @@ e = e \\ \\
  \begin{thm}
  \begin{align*}
  \llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \rrbracket \eta 
- = \llbracket \lambda x.(e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2))) \rrbracket \eta
+ = \llbracket \lambda x.e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2)) \rrbracket \eta
  \end{align*} 
  \end{thm}
  
  \begin{proof}
  Note that
  \begin{align*}
- \llbracket \lambda x.(e_1 + \texttt{rec}(\lambda x. &(\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2))) \rrbracket \eta
+ \llbracket \lambda x.e_1 + \texttt{rec}(\lambda x. &(\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2)) \rrbracket \eta
  = f : \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
- f(d) &= \llbracket e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2)) \rrbracket \eta\{x 
- \mapsto d\} \\
- &= \llbracket e_1 \rrbracket\eta\{x \mapsto d\} + \llbracket \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda 
- y.e_2 \ e_2)) \rrbracket \eta\{x \mapsto d\} \\
+ f(d) &=  \llbracket e_1 \rrbracket\eta\{x \mapsto d\} + 
+ 		\llbracket \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda 
+ y.e_2 \ e_2)) \rrbracket \eta(d) \\
  &=  \llbracket e_1 \rrbracket\eta\{x \mapsto d\} + \sum_{i=0}^\infty \llbracket \lambda x. (\lambda y.e_1  \ e_2) \rrbracket \eta
  	(\llbracket \lambda x.e_2 \rrbracket\eta)^i  (d))\\
 &= \llbracket \lambda x.e_1\rrbracket\eta(d) + \sum_{i=0}^\infty \llbracket \lambda x.e_1 \rrbracket\eta (\llbracket \lambda x.e_2 \rrbracket\eta((\llbracket \lambda x.e_2\rrbracket\eta)^i(d))) \\
 &= \llbracket \lambda x.e_1\rrbracket\eta(d) + \sum_{i=1}^\infty \llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2\rrbracket\eta)^i(d)) \\ 
 &= \sum_{i=0}^\infty \llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2\rrbracket\eta)^i(d)) \\
 &=  \llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \rrbracket \eta (d)
- %\llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \rrbracket \eta 
-%	 = \sum_{i=0}^\infty \llbracket e_1\rrbracket\eta(\llbracket e_2 \rrbracket \eta)^i(d)$
 \end{align*}
 \end{proof}
 

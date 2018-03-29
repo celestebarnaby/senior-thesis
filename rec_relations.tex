@@ -16,9 +16,10 @@ a &: \R \rightarrow \R
 However, for other terms it is less clear what the type should should be. Karp alternates between saying that $h$ is a random 
 variable and $h(x)$ is a random variable, so it is not immediately obvious 
 what the meaning of this function is. However, since $h$ takes $x \in \R$ as an input, it would not make sense for $h$ to be a 
-random variable from $\R \rightarrow \R$. This would make $h$ a function that takes an input size and returns the 
-size of the derived subproblem---thus sidestepping the stochastic part of the algorithm. Then it must be that $h(x)$ is a random
-variable that takes a \emph{specific input} of size $x$ and returns the size of the derived subproblem.
+random variable of type $\R \rightarrow \R$. This would make $h$ a function that takes an input size and returns the 
+size of the derived subproblem---thus sidestepping the stochastic part of the algorithm. Then it must be that $h(x)$ is a 
+random variable on \emph{specific input} of size $x$---i.e., the sample space $\Omega_x$ and returns the size of the derived 
+subproblem.
 \begin{align*}
 h_i(x) &: \Omega_x \rightarrow \R \\
 h_i &: \prod_{x \in \R}(\Omega_x \rightarrow \R) 
@@ -78,29 +79,21 @@ the type $\Pi x:\real.\lst(x)$, where the type $\lst(x)$ is dependent upon an in
 The syntax consists of entities of three levels: expressions, types, and kinds. The inclusion of kinds lets us
 differentiate between proper types, $*$, and type families.
 
-\section{Well-formed Kinds}
+\begin{figure}
 \[
 \begin{array}{c}
 \Gamma \vdash * \\ \\
-\dfrac{\Gamma \vdash \tau :: * \ \ \ \Gamma,x:\tau \vdash k}{\Gamma \vdash \Pi x:\tau.k} \\
-\end{array}
-\]
+\dfrac{\Gamma \vdash \tau :: * \ \ \ \Gamma,x:\tau \vdash k}{\Gamma \vdash \Pi x:\tau.k} \\ \\
 
-\section{Kinding}
-\begin{figure}[H]
-\[
-\begin{array}{c}
 \dfrac{X :: k \in \Gamma \ \ \ \Gamma \vdash k}{\Gamma \vdash X :: k} \\ \\
 \dfrac{\Gamma \vdash \tau_1 :: * \ \ \ \Gamma, x:\tau_1 \vdash \tau_2 :: *}{\Gamma \vdash \Pi x:\tau_1.\tau_2 :: *} \\ \\
 \dfrac{\Gamma \vdash S :: \Pi x:\tau.k \ \ \ \Gamma \vdash e : \tau}{\Gamma \vdash S \ e : [x \mapsto t]k} \\ \\
 \end{array}
 \]
+\caption{Well-forming kinds and kind judgements for dependent type language.}
 \end{figure}
 
-\section{Kind/Type equivalence?}
-
-\section{Typing}
-\begin{figure}[H]
+\begin{figure}
 \[
 \begin{array}{lr}
 \Gamma \vdash \texttt{real} :: * \\ \\
@@ -124,6 +117,7 @@ differentiate between proper types, $*$, and type families.
 	{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \Pi x:\tau.\tau} \\ \\ 
 \end{array}
 \]
+\caption{Typing for dependent type language.}
 \end{figure}
 
 \section{Denotational Semantics}

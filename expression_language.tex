@@ -411,34 +411,28 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  from $\llbracket \tau \rrbracket$ to $\llbracket \tau \rrbracket$.
  \end{proof}
  % Lemmas
- \begin{lemma} $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1}= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}
+ \begin{lemma} $\bigvee_j(\bigvee_i((F_i)^j \perp))= \bigvee_i(\bigvee_j((F_i)^j \perp))$\\
  \label{lem1}
- _{j=1}\}^{\infty}_{i=1}$\\
  \end{lemma}
  \begin{proof}
- $\Rightarrow$ We want to show that\\ \\ \centerline{$\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}
- _{j=1} \geq  \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1}$} \\ \\ First, notice that $\forall i, j \bigvee\{\bigvee
- \{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \geq (F_i)^j$. \\
+ $\Rightarrow$ We want to show that\\ \\ \centerline{$\bigvee_j(\bigvee_i((F_i)^j \perp))
+  \geq  \bigvee_i(\bigvee_j((F_i)^j \perp))$} \\ \\ First, notice that $\forall i, j \bigvee_j(\bigvee_i
+ ((F_i)^j \perp)) \geq (F_i)^j$. \\
  Suppose, now, that 
  \begin{align*}
- &\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} < \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1}\\ 
- \Rightarrow \exists i \text{ s.t. \ \  \ } &\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} < \bigvee\{(F_i)^j \perp\}
- ^{\infty}_{j=1}\\
- \Rightarrow \exists i, j \text{ s.t. } &\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} < (F_i)^j \perp 
+ &\bigvee_j(\bigvee_i((F_i)^j \perp)) < \bigvee)i(\bigvee_j((F_i)^j \perp))\\ 
+ \Rightarrow \exists i \text{ s.t. \ \  \ } &\bigvee_j(\bigvee_i((F_i)^j \perp)) < \bigvee_j (F_i)^j \\
+ \Rightarrow \exists i, j \text{ s.t. } &\bigvee_j(\bigvee_i((F_i)^j \perp)) < (F_i)^j \perp  \ \
  \Rightarrow\Leftarrow\\
  \end{align*}
- Thus, it must be that $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \geq  \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}
- _{j=1}\}^{\infty}_{i=1}$ \\ \\
- $\Leftarrow$ By parallel reasoning, $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \leq  \bigvee\{\bigvee\{(F_i)^j 
- \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1}$ \\ \\
- Therefore, $\bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} = \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}
- ^{\infty}_{i=1}$ 
+ Thus, it must be that $\bigvee_j(\bigvee_i((F_i)^j \perp)) \geq  \bigvee_i(\bigvee_j((F_i)^j \perp))$ \\ \\
+ $\Leftarrow$ By parallel reasoning, $\bigvee_j(\bigvee_i((F_i)^j \perp)) \leq  \bigvee_i(\bigvee_j((F_i)^j  \perp))$ \\ \\
+ Therefore, $\bigvee_j(\bigvee_i((F_i)^j \perp)) = \bigvee_i(\bigvee_j((F_i)^j \perp))$ 
  \end{proof}
  %
  \begin{lemma}
  \label{lem2}
- $\bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1} = \bigvee\{\bigvee\{F^j \perp(x_i)\}^{\infty}
- _{j=1}\}^{\infty}_{i=1}$\\ 
+ $\bigvee_j(\bigvee_i(F^j \perp(x_i)))= \bigvee_i(\bigvee_j(F^j \perp(x_i)))$\\ 
  \end{lemma}
  \begin{proof} 
  By reasoning similar to Lemma \ref{lem1}. 
@@ -463,7 +457,7 @@ Let $\texttt{F} = \lambda f \lambda x.e$, and see that
 &= \llbracket \lambda x.e\rrbracket\eta\{f \mapsto \llbracket \texttt{fix}(\texttt{F})\rrbracket\} \\
 &=\llbracket \lambda x.e\rrbracket\eta\{f \mapsto fix\}(\llbracket \texttt{F} \rrbracket\eta)\} \\
 &= \llbracket \lambda f.\lambda x.e \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)\} \\
-&= \llbracket F \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) \\
+&= \llbracket F \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) 
 \end{align*}
 Since $fix$ assigns the least fixed point to continuous functions, 
 $\llbracket \texttt{F} \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) = fix(\llbracket \texttt{F}\rrbracket\eta) =  \llbracket \texttt{fix}(\lambda f. \lambda x.e)\rrbracket \eta$.
