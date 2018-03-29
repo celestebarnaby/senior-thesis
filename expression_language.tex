@@ -1,7 +1,7 @@
-\chapter{Expression Language}
+\chapter{Deterministic Recurrences as Fixpoints}
 In section 2, Karp offers several example applications of his cost-bounding theorems. However, the recurrences
 he offers here do not follow the definition he set forth in the prior section. For example, a recurrence for a randomized list 
-ranking algorithms written as
+ranking algorithms is written as
 \begin{align*}
 T(1) &= 1 \\
 T(n) &= 1 + T(3/4n)
@@ -16,7 +16,7 @@ in section 2 of Karp's paper. The syntax of this language is mostly analogous to
 $\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses in this section. 
 We will circumvent the issues we had with this approach in the previous chapter by writing these recurrences
 using conditional statements $\ifelse{e_1}{e_2}{e_3}$, with $e_2$ corresponding to the initial condition and $e_3$
-to the general condition. We will see that this approach will allow us to have strict evaluation of addition, while
+to the general condition. We will see that this approach will allow us to have strict evaluation of base operations, while
 still obtaining correct solutions to recurrences.\\ 
 \[
 \begin{array}{rcl}
@@ -28,8 +28,7 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 \end{array}
 \]
 
-\section{Type System}
-\begin{figure}[H]
+\begin{figure}
 \[
 \begin{array}{lr}
 \dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\
@@ -47,10 +46,11 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 {\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau} \\ \\ \\ 
 \end{array}
 \]
+\caption{Typing for the language.}
+\label{fig:typing}
 \end{figure}
 
-\section{Equational Semantics}
-\begin{figure}[H]
+\begin{figure}
 \[
 \begin{array}{lr}
 e = e \\ \\
@@ -65,13 +65,14 @@ e = e \\ \\
 \texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}
 \end{array}
 \]
+\caption{Equational Semantics for the language.}
+\label{fig:typing}
 \end{figure}
 
-\section{Denotational Semantics}
 The denotational semantics of our expression language is  standard, with types interpreting to flat-ordered sets. 
 That is, each type interprets to a set with a bottom element, $\perp$, where each element of the set is comparable
 only to $\perp$. 
-\begin{figure}[H]
+\begin{figure}
  \begin{align*}
 \llbracket \texttt{real} \rrbracket &= \R_{\perp} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
@@ -81,10 +82,11 @@ only to $\perp$.
  \ f \text{ is continuous}\} \\
  \text{ For } \forall f, \ g \in \llbracket \tau \rightarrow \sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
  \llbracket \tau \rrbracket, \ f(x) \leq g(x) \\
- %\end{align*}
- %\end{figure}
- %\begin{figure}[H]
- %\begin{align*}
+ \end{align*}
+ \caption{Denotational semantics for types.}
+ \end{figure}
+ \begin{figure}
+ \begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
   \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
   \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket
@@ -117,6 +119,7 @@ only to $\perp$.
  \text{, where } fix \text{ assigns the least fixed point} \\ 
  &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
  \end{align*}
+ \caption{Denotational semantics for expressions.}
  \end{figure}
  
  We will interpret $\texttt{fix}$ expressions using the CPO fixpoint theorem. This theorem states that, for a CPO $P$ and a continuous, order-preserving map $\Phi : P \rightarrow P$, the least fixpoint of $\Phi$ exists and is equal to $\bigvee_i \Phi^n(\perp)$.
@@ -203,7 +206,7 @@ $\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
 We will see, that in order to prove type soundness for $\lambda x.e$ expressions, we will need to show that 
 $\llbracket \lambda x.e \rrbracket$ is a continuous function. Thus, it will be necessary to have $1$.
 \begin{proof}
-by induction on the structure of $e$. For all cases, let $\{ \eta_i \}^{\infty}_{i=1}$ be a chain, and suppose $ a = \bigvee_i a_i$. 
+by induction on the structure of $e$. For all cases, let $\{ a_i \}^{\infty}_{i=1}$ be a chain, and suppose $ a = \bigvee_i a_i$. 
 Note that 2 is trivial in all but the abstraction and $\texttt{fix}$ cases.\\
  \emph{Base Cases: } 
  \begin{itemize}
@@ -379,11 +382,11 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \begin{align*}
  \llbracket \texttt{fix} (\lambda f.\lambda x.e)\rrbracket\eta\{x\mapsto \bigvee_i a_i\} &= 
  fix(\llbracket \lambda f. \lambda x.e \rrbracket\eta\{x\mapsto \bigvee_i a_i\})\\
- \text{(by inductive hypothesis)} &= fix(\bigvee\{F_i\}^{\infty}_{i=1}) \\
- &= \bigvee\{\bigvee\{(F_i)^j \}^{\infty}_{i=1}\perp\}^{\infty}_{j=1} \\
- &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{i=1}\}^{\infty}_{j=1} \\ 
-\text{(by \ref{lem1})} &= \bigvee\{\bigvee\{(F_i)^j \perp\}^{\infty}_{j=1}\}^{\infty}_{i=1} \\ 
-&= \bigvee\{fix(F_i)\}^{\infty}_{i=1}\\
+ \text{(by inductive hypothesis)} &= fix(\bigvee_i(F_i)) \\
+ &= \bigvee_j(\bigvee_i((F_i)^j )\perp) \\
+ &= \bigvee_j(\bigvee_i((F_i)^j \perp)) \\ 
+\text{(by Lemma \ref{lem1})} &= \bigvee_i(\bigvee_j((F_i)^j \perp)) \\ 
+&= \bigvee_i(fix(F_i))\\
 &= \bigvee_i \llbracket \Gamma \vdash \texttt{fix}(\lambda f \lambda x.e)\rrbracket\eta\{x\mapsto a_i\}
  \end{align*}
  %
@@ -393,14 +396,14 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  $\llbracket \tau \rrbracket$ to $\llbracket \tau \rrbracket$. Let $\{a_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$,
   and see that 
  \begin{align*}
- \llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta \bigvee_i a_i &= 
- fix(F)\bigvee_i a_i\\
- &=\bigvee\{F^j \perp\}^{\infty}_{j=1}\bigvee_i a_i\\
- &= \bigvee\{F^j \perp(\bigvee_i a_i)\}^{\infty}_{j=1}\\ 
- \text{(by continuity of $F^j \perp$) }&= \bigvee\{\bigvee\{F^j \perp(a_i)\}^{\infty}_{i=1}\}^{\infty}_{j=1}\\ 
- \text{(by \ref{lem2})} &=\bigvee\{\bigvee\{F^j \perp(a_i)\}^{\infty}_{j=1}\}^{\infty}_{i=1}\\
- &= \bigvee\{fix(F)(a_i)\}^{\infty}_{i=1}\\
- &= \bigvee\{\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta(a_i)\}^{\infty}_{i=1}\\
+ (\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta)( \bigvee_i a_i) &= 
+ fix(F)(\bigvee_i a_i)\\
+ &=(\bigvee_j F^j \perp)(\bigvee_i a_i)\\
+ &= \bigvee_j (F^j \perp(\bigvee_i a_i))\\ 
+ \text{(by continuity of $F^j \perp$) }&= \bigvee_j(\bigvee_i(F^j \perp(a_i)))\\ 
+ \text{(by Lemma \ref{lem2})} &=\bigvee(\bigvee(F^j \perp(a_i))) \\
+ &= \bigvee_i(fix(F)(a_i))\\
+ &= \bigvee_i(\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta(a_i))\\
  \end{align*}
  \end{enumerate}
  \end{itemize}
@@ -438,9 +441,34 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  _{j=1}\}^{\infty}_{i=1}$\\ 
  \end{lemma}
  \begin{proof} 
- By reasoning similar to \ref{lem1}. 
+ By reasoning similar to Lemma \ref{lem1}. 
  \end{proof}
  %
+
+  We will prove soundness of our denotational semantics for $\texttt{fix}$ expressions, in order to ensure that
+ our interpretation of recurrences reflects their equational meaning.
+ \begin{thm}
+ \begin{align*}
+ \llbracket \texttt{fix}(\lambda f. \lambda x.e)\rrbracket \eta = \llbracket \lambda x.e 
+ 	\{ f \mapsto \texttt{fix}(\lambda f\lambda x.e)\} \rrbracket\eta
+ \end{align*}
+ \end{thm}
+ 
+\begin{proof}
+We may show by a simple inductive argument that 
+$\llbracket e[x \mapsto e']\rrbracket\eta = \llbracket e \rrbracket\eta\{x \mapsto \llbracket e' \rrbracket\eta\}$.
+Let $\texttt{F} = \lambda f \lambda x.e$, and see that
+\begin{align*}
+\llbracket \lambda x.e[f \mapsto \texttt{fix}(\texttt{F})]\rrbracket\eta 
+&= \llbracket \lambda x.e\rrbracket\eta\{f \mapsto \llbracket \texttt{fix}(\texttt{F})\rrbracket\} \\
+&=\llbracket \lambda x.e\rrbracket\eta\{f \mapsto fix\}(\llbracket \texttt{F} \rrbracket\eta)\} \\
+&= \llbracket \lambda f.\lambda x.e \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)\} \\
+&= \llbracket F \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) \\
+\end{align*}
+Since $fix$ assigns the least fixed point to continuous functions, 
+$\llbracket \texttt{F} \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) = fix(\llbracket \texttt{F}\rrbracket\eta) =  \llbracket \texttt{fix}(\lambda f. \lambda x.e)\rrbracket \eta$.
+\end{proof}
+ 
 \section{Examples}
 We will look at some of the example recurrences Karp offers in this section, to check whether recurrences in our expression
 language exhibit the same behavior. First, consider the following recurrence:
@@ -462,7 +490,10 @@ We may express this recurrence in our expression language as the follows:
  &\text{ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rrbracket, \\   
  &F(\alpha) = \llbracket\lambda x.\ifelse{x<1}{0}{1 + f(p*x)}\rrbracket\{f \mapsto \alpha\} \\
  \llbracket \texttt{real}\rrbracket &= \R_{\perp}  \\
- \\\text{By the CPO fixpoint theorem, } fix(\llbracket \texttt{F} \rrbracket) &= fix(F) \\
+ \end{align*}
+ By the CPO fixpoint theorem,  
+\begin{align*}
+ fix(\llbracket \texttt{F} \rrbracket) &= fix(F) \\
 &= \bigvee\{F^n (\perp)\}^{\infty}_{n=1} \\
 &= \lim_{n \to \infty}\{F^n (\perp)\}
  \end{align*}

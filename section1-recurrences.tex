@@ -1,14 +1,16 @@
-\chapter{Section 1 Recurrences}
-In section 1, Karp states that stochastic processes that appear in divide-and-conquer algorithms may be described by
-recurrence relations of the form $T(x) = a(x) + T(h(x))$, where $x$ is a non-negative real number, $h(x)$ and $T(x)$ are random variables, and $a$ is a non-negative, real-valued function. He then offers a deterministic counterpart to this
+\chapter{Deterministic Recurrences as Infinite Sums}
+In section 1, Karp states that the expected cost of stochastic processes that appear in divide-and-conquer algorithms may be 
+described by
+recurrence relations of the form $T(x) = a(x) + T(h(x))$, where $x$ is a non-negative real number, $h(x)$ and $T(x)$ are 
+random variables, and $a$ is a non-negative, real-valued function. He then offers a deterministic counterpart to this
 probabilistic recurrence, $T'(x) = a(x) + T'(m(x))$, where $m$ is a real-valued function such that for 
-$\forall x \in \R, \ E(h(x)) \leq m(x) , 0 \leq m(x) \leq m(x)$, and $m(x), m(x)/x$ are nondecreasing. This recurrence then
+$\forall x \in \R, \ E(h(x)) \leq m(x) , 0 \leq m(x)$, and $m(x), m(x)/x$ are nondecreasing. He asserts that this recurrence 
 has a least nonnegative solution $u$ given by the Tarski fixed-point theorem, $u(x) = \sum_{i=1}^{\infty}a(m^i(x))$, where 
 $m^i$ is the $i^{th}$ iterate of $m$. The solution $u$ and the function $m$ are used in theorems 1.1 and 1.2 to obtain a 
 bound on the upper tail of $T(x)$.
 
 In this chapter, we will define an expression language that allows us to write and type-check
-deterministic recurrences such as those described by Karp. Further, we will define a denotational semantics for this language, 
+deterministic recurrences such as $T'$. Further, we will define a denotational semantics for this language, 
 such that the interpretation of our recurrences exhibit the same behavior as Karp's recurrences. 
 
 Consider that, in order to describe recurrence relations, our language must have some way of defining recursive functions.
@@ -19,9 +21,10 @@ bottom element $\perp$, with each real number comparable only to $\perp$. Follow
 $\tau \rightarrow \sigma$, interpret to a CPO whose bottom element is a function $\perp: \tau \rightarrow \sigma$ such
 that $\perp(x) = \perp_{\sigma}, \forall x \in \tau$.
 
-However, this approach proves problematic: if we consider a function $F: (\R_{\perp} \rightarrow \R_{\perp}) 
-\rightarrow (\R_{\perp} \rightarrow \R_{\perp})$ such that $F(g) = a(x) + g(px)$, then by CPO fixpoint, the least fixed
-point of F is $\bigvee\{F^n(\perp)\}^{\infty}_{n=1}$. However, 
+However, this approach proves problematic, due to the fact that the standard interpretation of the base operations is strict---e.g. the 
+sum of $\perp$ and any other element should be $\perp$. However, if we consider a function $F: (\R_{\perp} \rightarrow 
+\R_{\perp}) \rightarrow (\R_{\perp} \rightarrow \R_{\perp})$ such that $F(g) = a(x) + g(px)$, then by CPO fixpoint, the least 
+fixed point of F is $\bigvee\{F^n(\perp)\}^{\infty}_{n=1}$. Then 
 \begin{align*}
 F(\perp)(x) &= a(x) + \perp(px)\\
 &= a(x) + \perp \\
@@ -32,8 +35,8 @@ This result, is, clearly, not a solution to the recurrence $T(x) + a(x) + T(px)$
 unusable to us. 
 
 A second approach involves altering the interpretation of the $\texttt{real}$ type to 
-$R_{[0,+\infty]}$---that is, the non-negative, extended reals. See that $R_{[0,+\infty]}$ is a CPO: $0$ is a bottom element,
-and any directed subset of $R_{[0,+\infty]}$ must have a least upper bound. Such an interpretation
+$\extR$---that is, the non-negative, extended reals. See that $\extR$ is a CPO: $0$ is a bottom element,
+and any directed subset of $\extR$ must have a least upper bound. Such an interpretation
 resolves the issue of all recursive functions interpreting to $\perp$. In the above example, for instance, we would have
 \begin{align*}
 F(\perp)(x) &= a(x) + \perp(px)\\
@@ -46,7 +49,7 @@ so, by induction,
 $\forall n, \ F^n(\perp)(x) = \sum_{i=1}^{n}a(p^{i-1}x) \ \implies \bigvee\{F^n(\perp)\}^{\infty}_{n=1}(x) = \sum_{i=1}^{\infty}
 a(p^{i-1}x)$. This $\emph{is}$ the solution to the recurrence $T(x) = a(x) + T(px)$, suggesting that this is the 
 appropriate denotational semantics to use. However, this causes unexpected problems. For one, note that
- The standard interpretation of the equality operator is as follows:
+ the standard interpretation of the equality operator is as follows:
 \begin{align*}
  \llbracket e_1 = e_2 \rrbracket\eta &= 
  \begin{cases} 
@@ -83,7 +86,7 @@ and chains $a_0 \leq a_1 \leq \ldots,$
   \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto \bigvee_i a_i\}
   = \bigvee_i \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto a_i\}
 \end{align*}
-Also, (interpretation of non-termination functions).
+Also, (interpretation of non-terminating functions).
 
 Thus, this approach will not work. In light of this, we define the following expression language. 
 \[
@@ -100,8 +103,7 @@ recurrences of the form $T(x) = a(x) + T(m(x))$, where $T$, $a$, and $m$ are rea
 restrictive subset of recursive functions, it allows us to express the recurrences described by Karp in section 1, without
 running into the problems of the previous approaches. 
 
-\section{Type System}
-\begin{figure}[H]
+\begin{figure}
 \[
 \begin{array}{lr}
 \dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\ \\
@@ -120,10 +122,11 @@ running into the problems of the previous approaches.
 {\Gamma \vdash \texttt{rec}(\lambda x.e_1, \lambda x.e_2) : \texttt{real} \rightarrow \texttt{real}} \\ \\ 
 \end{array}
 \]
+\caption{Typing for the language .}
+\label{fig:typing}
 \end{figure}
 
-\section{Equational Semantics}
-\begin{figure}[H]
+\begin{figure}
 \[
 \begin{array}{lr}
 e = e \\ \\
@@ -135,14 +138,15 @@ e = e \\ \\
 \ifelse{\texttt{ false }}{e_1}{e_2} = e_2 \\ \\ 
 \lambda x.e = \lambda y.e\{x \mapsto y \}, \text{provided } y \text{ not free in } e. \\ \\ 
 \lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\} \\
-\texttt{rec}(\lambda x.e_1, \lambda x.e_2) = (\lambda x.(e_1 + f(e_2)))
-\{f \mapsto \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \\
+\texttt{rec}(\lambda x.e_1, \lambda x.e_2) = 
+			\lambda x.(e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x.\ e_2)) \\
 \end{array}
 \]
+\caption{Equational semantics for the language.}
+\label{fig:eqsem}
 \end{figure}
 
-\section{Denotational Semantics}
-\begin{figure}[H]
+\begin{figure}
  \begin{align*}
 \llbracket \texttt{real} \rrbracket &= \R \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}} \\
@@ -150,8 +154,10 @@ e = e \\ \\
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
  \ f \text{ is continuous}\} \\
  \end{align*}
+ \caption{Denotational semantics for types.}
+ \label{fig:densemtypes}
  \end{figure}
- \begin{figure}[H]
+ \begin{figure}
 \begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
   \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
@@ -174,13 +180,43 @@ e = e \\ \\
  \begin{cases} 
       \llbracket e_2 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = true \\
       \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\
-      \perp \text{      otherwise} \\
    \end{cases}
   \\
    \llbracket  \texttt{rec} (e_1 : \texttt{real} \rightarrow \texttt{real}, e_2 : \texttt{real} \rightarrow \texttt{real}) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in R, \\
-   rec(d) &= \sum_{i=0}^{\infty}\llbracket e_1 \rrbracket\eta (\llbracket e_2 \rrbracket\eta^i(d))
+   rec(d) &= \sum_{i=0}^{\infty}\llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2 \rrbracket\eta)^i(d))
  \end{align*}
+ \caption{Denotational semantics for expressions.}
+ \label{fig:densemexps}
  \end{figure}
+ 
+  We will prove soundness of our denotational semantics for $\texttt{rec}$ expressions, in order to ensure that
+ our interpretation of recurrences reflects their equational meaning.
+ \begin{thm}
+ \begin{align*}
+ \llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \rrbracket \eta 
+ = \llbracket \lambda x.(e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2))) \rrbracket \eta
+ \end{align*} 
+ \end{thm}
+ 
+ \begin{proof}
+ Note that
+ \begin{align*}
+ \llbracket \lambda x.(e_1 + \texttt{rec}(\lambda x. &(\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2))) \rrbracket \eta
+ = f : \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
+ f(d) &= \llbracket e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2)) \rrbracket \eta\{x 
+ \mapsto d\} \\
+ &= \llbracket e_1 \rrbracket\eta\{x \mapsto d\} + \llbracket \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda 
+ y.e_2 \ e_2)) \rrbracket \eta\{x \mapsto d\} \\
+ &=  \llbracket e_1 \rrbracket\eta\{x \mapsto d\} + \sum_{i=0}^\infty \llbracket \lambda x. (\lambda y.e_1  \ e_2) \rrbracket \eta
+ 	(\llbracket \lambda x.e_2 \rrbracket\eta)^i  (d))\\
+&= \llbracket \lambda x.e_1\rrbracket\eta(d) + \sum_{i=0}^\infty \llbracket \lambda x.e_1 \rrbracket\eta (\llbracket \lambda x.e_2 \rrbracket\eta((\llbracket \lambda x.e_2\rrbracket\eta)^i(d))) \\
+&= \llbracket \lambda x.e_1\rrbracket\eta(d) + \sum_{i=1}^\infty \llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2\rrbracket\eta)^i(d)) \\ 
+&= \sum_{i=0}^\infty \llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2\rrbracket\eta)^i(d)) \\
+&=  \llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \rrbracket \eta (d)
+ %\llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \rrbracket \eta 
+%	 = \sum_{i=0}^\infty \llbracket e_1\rrbracket\eta(\llbracket e_2 \rrbracket \eta)^i(d)$
+\end{align*}
+\end{proof}
 
 \section{Examples}
 \subsection{Example 1}
@@ -212,10 +248,7 @@ T(x) &=
  &= \sum_{i=0}^{\infty}\underline{a} (\underline{m}^i(d)) \\
  &= \sum_{i=0}^{\infty}\underline{a} (p^i(d))
  \end{align*}
-Note that, for $\forall d<1 \in \R$,
-\begin{align*}
-\llbracket \texttt{T} \rrbracket(d) = 0
-\end{align*}
+Note that, for $\forall d<1 \in \R, \ \llbracket \texttt{T} \rrbracket(d) = 0$
 and for $\forall d \geq 1 \in R$, since $p < 1, \ \exists k \in \N \text{ s.t } \dfrac{1}{p^{k-1}} \leq d < \dfrac{1}{p^k}$. Then
 \begin{align*}
 \llbracket \texttt{T} \rrbracket(d)&= \sum_{i=0}^{\infty}\underline{a} (p^i(d)) \\

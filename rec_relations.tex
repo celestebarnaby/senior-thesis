@@ -1,6 +1,6 @@
-\chapter{Well-Typed Recurrence Relations}
-Karp's paper is premised on the notion that algorithms with stochastic processes may be described as 
-recurrence relations of the form
+\chapter{Well-Typed Probabilistic Recurrence Relations}
+Karp's paper is premised on the notion that the cost of a stochastic algorithm may be described as a
+recurrence relation of the form
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x)).
 \end{align*}
@@ -56,25 +56,25 @@ $h_2(x)(l)$. The arguments to these random variables, then, should be the left a
  
  Thus, we find that attempting to formally assigns types to Karp's probabilistic recurrences reveals a lot of hidden 
  complications and ambiguities, which Karp never addresses directly. Most notably, we find that the types of the 
- functions $T, \ h, and \hat{h}$ are dependent upon a real number $x$, describing the size of problems in the sample space.
+ functions $T, \ h,$ and $\hat{h}$ are dependent upon a real number $x$, describing the size of problems in the sample space.
  
 We define a syntax to write and type-check these recurrences. This syntax is based on $\lambda$LF---a simple system of 
 dependent types. 
  
  \[
 \begin{array}{rcl}
-\tau &::=& X \mid \texttt{real} \mid \texttt{nat} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \mid \Pi x:\tau.\tau
-\mid \tau \ e \mid \texttt{list(x)}? \\
+\tau &::=& X \mid \texttt{real} \mid \texttt{nat} \mid \texttt{bool} \mid \tau \times \tau \mid \Pi x:\tau.\tau
+\mid \tau \ e \mid \texttt{list} \mid \texttt{list}(e) \\
 k &::=& * \mid \Pi x : \tau.k \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \mid \texttt{rec}(e, e, e) \\
+     \ifelse{e}{e}{e} \mid \texttt{rec}(e, e, e) 
 \end{array}
 \]
 
 In this syntax, we replace the arrow type $\sigma \rightarrow \tau$ with the dependent product type
 $\Pi x:\sigma.\tau$, and introduce type families. These are collections of types that depend on some input: for instance,
-the type $\Pi x:\texttt{real}.list(x)$, where the type $list(x)$ is dependent upon an input $x$ of type \texttt{real}.
+the type $\Pi x:\real.\lst(x)$, where the type $\lst(x)$ is dependent upon an input $x$ of type \texttt{real}.
 The syntax consists of entities of three levels: expressions, types, and kinds. The inclusion of kinds lets us
 differentiate between proper types, $*$, and type families.
 
@@ -120,9 +120,8 @@ differentiate between proper types, $*$, and type families.
 	, \circ \in \{=, <, >, \geq, \leq\} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
 	{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
-\dfrac{\Gamma \vdash e_1 : \Pi x : \texttt{real}.\texttt{real} \ \ \ \Gamma \vdash e_2 : 
-\Pi x : \texttt{list(n)} . \texttt{real} \ \ \ \Gamma \vdash e_3 : \Pi x: \texttt{list(n)}.\texttt{list(}e_2(x)\texttt{)}}
-	{\Gamma \vdash \texttt{rec}(e_1, e_2, e_3) : \Pi x : \texttt{list(n)} . \texttt{real}} \\ \\ 
+\dfrac{\Gamma \vdash \lambda f \lambda x.e : \Pi x:(\Pi x:\tau.\tau).(\Pi x:\tau.\tau)}
+	{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \Pi x:\tau.\tau} \\ \\ 
 \end{array}
 \]
 \end{figure}
