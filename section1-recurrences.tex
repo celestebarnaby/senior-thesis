@@ -136,8 +136,8 @@ e = e \\ \\
 (n =n) = \texttt{true} \\ (n=m) = \texttt{false}\text{, provided } n, \ m \text{ distinct numerals.}\\ \\ 
 \ifelse{\texttt{ true }}{e_1}{e_2} = e_1 \\
 \ifelse{\texttt{ false }}{e_1}{e_2} = e_2 \\ \\ 
-\lambda x.e = \lambda y.e\{x \mapsto y \}, \text{provided } y \text{ not free in } e. \\ \\ 
-\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\} \\
+\lambda x.e = \lambda y.[x \mapsto y]e, \text{provided } y \text{ not free in } e. \\ \\ 
+\lambda x.e_1 \ e_2 = [x \mapsto e_2]e_1 \\
 \texttt{rec}(\lambda x.e_1, \lambda x.e_2) = 
 			\lambda x.e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x.\ e_2) \\
 \end{array}

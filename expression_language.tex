@@ -60,9 +60,9 @@ e = e \\ \\
 (n =n) = \texttt{true} \\ (n=m) = \texttt{false}\text{, provided } n, \ m \text{ distinct numerals.}\\ \\ 
 \ifelse{\texttt{ true }}{e_1}{e_2} = e_1 \\
 \ifelse{\texttt{ false }}{e_1}{e_2} = e_2 \\ \\ 
-\lambda x.e = \lambda y.e\{x \mapsto y \}, \text{provided } y \text{ not free in } e. \\ \\ \\
-\lambda x.e_1 \ e_2 = e_1\{x \mapsto e_2\} \\
-\texttt{fix}(\lambda f. \lambda x.e) = (\lambda x.e)\{f \mapsto \texttt{fix}(\lambda f.\lambda x.e)\}
+\lambda x.e = \lambda y.[x \mapsto y]e, \text{provided } y \text{ not free in } e. \\ \\ \\
+\lambda x.e_1 \ e_2 = [x \mapsto e_2]e_1 \\
+\texttt{fix}(\lambda f. \lambda x.e) = [f \mapsto \texttt{fix}(\lambda f.\lambda x.e)](\lambda x.e)
 \end{array}
 \]
 \caption{Equational Semantics for the language.}
@@ -137,7 +137,7 @@ by induction on the structure of $\tau$. \\
 \begin{itemize}
 \item $\tau = \texttt{real}$
 \item $\tau = \texttt{bool}$ \\
-In this case, $\llbracket \tau \rrbracket$ is set with flat ordering, and is thus a CPO. 
+In this case, $\llbracket \tau \rrbracket$ is a set with flat ordering, and is thus a CPO. 
 \end{itemize}
 \emph{Inductive Cases: }
 \begin{itemize}
@@ -243,7 +243,7 @@ In the case that $ y \neq x$, note that
  \begin{itemize}
  % arithmetic operations
  \item $e = e_1 \circ e_2, \ \circ \in \{+, -, *, / \}$ \\ \\
- Then 
+ We assume that $\circ$ is continuous in each argument. Then 
  \begin{align*}
  \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\} &= \llbracket \Gamma\vdash e_1 : \tau 
  \rrbracket\eta\ \{x \mapsto \bigvee_i a_i\} \circ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}\\
@@ -376,6 +376,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{align*}
  \end{enumerate} 
  % fix operation
+ We use several lemmas for this case, which are stated after the proof.
  \item $e = \texttt{fix} (\lambda f.\lambda x.e)$ \\
  \begin{enumerate}
 \item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta\{x\mapsto a_i\}$, and consider that 
@@ -439,7 +440,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{proof}
  %
 
-  We will prove soundness of our denotational semantics for $\texttt{fix}$ expressions, in order to ensure that
+ We will prove soundness of our denotational semantics for $\texttt{fix}$ expressions, in order to ensure that
  our interpretation of recurrences reflects their equational meaning.
  \begin{thm}
  \begin{align*}
@@ -450,10 +451,10 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  
 \begin{proof}
 We may show by a simple inductive argument that 
-$\llbracket e[x \mapsto e']\rrbracket\eta = \llbracket e \rrbracket\eta\{x \mapsto \llbracket e' \rrbracket\eta\}$.
+$\llbracket [x \mapsto e']e\rrbracket\eta = \llbracket e \rrbracket\eta\{x \mapsto \llbracket e' \rrbracket\eta\}$.
 Let $\texttt{F} = \lambda f \lambda x.e$, and see that
 \begin{align*}
-\llbracket \lambda x.e[f \mapsto \texttt{fix}(\texttt{F})]\rrbracket\eta 
+\llbracket [f \mapsto \texttt{fix}(\texttt{F})]\lambda x.e\rrbracket\eta 
 &= \llbracket \lambda x.e\rrbracket\eta\{f \mapsto \llbracket \texttt{fix}(\texttt{F})\rrbracket\} \\
 &=\llbracket \lambda x.e\rrbracket\eta\{f \mapsto fix\}(\llbracket \texttt{F} \rrbracket\eta)\} \\
 &= \llbracket \lambda f.\lambda x.e \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)\} \\
@@ -487,8 +488,7 @@ We may express this recurrence in our expression language as the follows:
  \end{align*}
  By the CPO fixpoint theorem,  
 \begin{align*}
- fix(\llbracket \texttt{F} \rrbracket) &= fix(F) \\
-&= \bigvee\{F^n (\perp)\}^{\infty}_{n=1} \\
+ fix(F) &= \bigvee_n(F^n (\perp)) \\
 &= \lim_{n \to \infty}\{F^n (\perp)\}
  \end{align*}
  \begin{lemma}

@@ -4,7 +4,7 @@ recurrence relation of the form
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x)).
 \end{align*}
-But what does this equation actually mean? To unpack this, we will attempt to assign types to this recurrence
+But what does this equation actually mean? To unpack this, we will attempt to assign types to this recurrence.
 
  Following Karp's definitions, we can immediately assign types to some of these terms:
 \begin{align*}
@@ -68,8 +68,8 @@ dependent types.
 \mid \tau \ e \mid \texttt{list} \mid \texttt{list}(e) \\
 k &::=& * \mid \Pi x : \tau.k \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
-  && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \mid \texttt{rec}(e, e, e) 
+  && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
+     \ifelse{e}{e}{e} \mid \texttt{fix}(\lambda f. \lambda x.e) 
 \end{array}
 \]
 
@@ -77,17 +77,17 @@ In this syntax, we replace the arrow type $\sigma \rightarrow \tau$ with the dep
 $\Pi x:\sigma.\tau$, and introduce type families. These are collections of types that depend on some input: for instance,
 the type $\Pi x:\real.\lst(x)$, where the type $\lst(x)$ is dependent upon an input $x$ of type \texttt{real}.
 The syntax consists of entities of three levels: expressions, types, and kinds. The inclusion of kinds lets us
-differentiate between proper types, $*$, and type families.
+differentiate between proper types, $*$, and type families. We use the constant $\texttt{list}$ to denote the type family of kind
+$\Pi x:\texttt{nat}.*$.
 
 \begin{figure}
 \[
 \begin{array}{c}
 \Gamma \vdash * \\ \\
 \dfrac{\Gamma \vdash \tau :: * \ \ \ \Gamma,x:\tau \vdash k}{\Gamma \vdash \Pi x:\tau.k} \\ \\
-
 \dfrac{X :: k \in \Gamma \ \ \ \Gamma \vdash k}{\Gamma \vdash X :: k} \\ \\
 \dfrac{\Gamma \vdash \tau_1 :: * \ \ \ \Gamma, x:\tau_1 \vdash \tau_2 :: *}{\Gamma \vdash \Pi x:\tau_1.\tau_2 :: *} \\ \\
-\dfrac{\Gamma \vdash S :: \Pi x:\tau.k \ \ \ \Gamma \vdash e : \tau}{\Gamma \vdash S \ e : [x \mapsto t]k} \\ \\
+\dfrac{\Gamma \vdash \tau :: \Pi x:\sigma \ \ \ \Gamma \vdash e : \sigma}{\Gamma \vdash \tau \ e : [x \mapsto e]k} \\ \\
 \end{array}
 \]
 \caption{Well-forming kinds and kind judgements for dependent type language.}
@@ -120,5 +120,124 @@ differentiate between proper types, $*$, and type families.
 \caption{Typing for dependent type language.}
 \end{figure}
 
-\section{Denotational Semantics}
+
+\begin{figure}
+\[
+\begin{array}{lr}
+e = e \\ \\
+\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots  \\
+\text{equivalent rules for } -, \ * \text{, and } /\text{ operations.}
+\\ \\
+(n =n) = \texttt{true} \\ (n=m) = \texttt{false}\text{, provided } n, \ m \text{ distinct numerals.}\\ \\ 
+\ifelse{\texttt{ true }}{e_1}{e_2} = e_1 \\
+\ifelse{\texttt{ false }}{e_1}{e_2} = e_2 \\ \\ 
+\lambda x.e = \lambda y.[x \mapsto y]e, \text{provided } y \text{ not free in } e. \\ \\ \\
+\lambda x.e_1 \ e_2 = [x \mapsto e_2]e_1 \\
+\texttt{fix}(\lambda f. \lambda x.e) = [f \mapsto  \texttt{fix}(\lambda f.\lambda x.e)](\lambda x.e)
+\end{array}
+\]
+\caption{Equational Semantics for the language.}
+\label{fig:typing}
+\end{figure}
+
+\begin{figure}
+ \begin{align*}
+\llbracket \texttt{real} \rrbracket &= \R_{\perp} \\
+\llbracket \texttt{nat} \rrbracket &= \N_{\perp} \\
+ \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
+ \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
+ \text{For } \forall (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a<c \text{ and } b<d. \\ 
+ \llbracket \Pi x:\tau.\sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
+ \ f \text{ is continuous}\} \\
+ \text{ For } \forall f, \ g \in \llbracket \Pi x : \tau.\sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
+ \llbracket \tau \rrbracket, \ f(x) \leq g(x) \\
+ \llbracket (\tau :: \Pi x: \sigma.k) \ (e : \sigma) \rrbracket &= \llbracket [x \mapsto e]k \rrbracket \\
+ \llbracket \texttt{list} \rrbracket &= ??? \\
+ %
+ \llbracket \texttt{list}(e) \rrbracket\eta &= \Omega_{\llbracket e \rrbracket\eta}
+ \end{align*}
+ \caption{Denotational semantics for types.}
+ \end{figure}
+ \begin{figure}
+ \begin{align*}
+ \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
+  \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
+  \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket
+\text{ s.t. } \forall d \in \llbracket \tau \rrbracket, f(d) = \llbracket e \rrbracket\eta\{ x \mapsto d \} \\
+ \llbracket e_1 \ e_2 \rrbracket \eta &= \llbracket e_1 \rrbracket\eta ( \llbracket e_2 \rrbracket\eta ) \\
+ \llbracket e_1 + e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta + \llbracket e_2 \rrbracket\eta \\
+ \llbracket e_1 - e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta - \llbracket e_2 \rrbracket\eta \\
+ \llbracket e_1 * e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta * \llbracket e_2 \rrbracket\eta \\
+  \llbracket e_1 / e_2 \rrbracket\eta &=
+  \begin{cases}
+  \perp \text{ if }  \llbracket e_2 \rrbracket\eta = 0 \\
+   \llbracket e_1 \rrbracket\eta / \llbracket e_2 \rrbracket\eta \text{ otherwise}
+   \end{cases} \\
+  \llbracket \texttt{true} \rrbracket\eta &= true, \ \llbracket \texttt{false} \rrbracket\eta = false \\
+ \llbracket e_1 = e_2 \rrbracket\eta &= 
+ \begin{cases} 
+      true \text{ if } (\llbracket e_1 \rrbracket\eta = \llbracket e_2 \rrbracket\eta \neq \perp) \\
+      false \text{  if } (\llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta, \llbracket e_1 \rrbracket\eta \neq \perp, \llbracket e_2 \rrbracket\eta \neq \perp)\\
+      \perp \text{ otherwise}
+   \end{cases} \\
+\text{Similar rules for $<, \ \leq, >, \geq$} \\
+  \llbracket \ifelse{e_1}{e_2}{e_3} \rrbracket \eta &= 
+ \begin{cases} 
+      \llbracket e_2 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = true \\
+      \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\
+      \perp \text{      otherwise} \\
+   \end{cases}
+  \\
+   \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= fix\llbracket \lambda f.\lambda x.e \rrbracket\eta \
+ \text{, where } fix \text{ assigns the least fixed point} \\ 
+ &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
+ \end{align*}
+ \caption{Denotational semantics for expressions.}
+ \end{figure}
+ 
+ In order to use the CPO fixpoint theorem, we need to prove the same stuff as in chapter 3. These proofs are 
+ identical except for the types and expressions that are unique to this language, so we will only consider those cases.
+ 
+ \begin{thm}
+For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
+set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
+upper bound in $\llbracket \tau \rrbracket$. \\
+\end{thm}
+\begin{proof}
+\begin{itemize}
+\item $\tau = (\tau' :: \Pi x:\sigma.k)(e : \sigma) $ \\
+Then $\llbracket \tau \rrbracket = \llbracket [x \mapsto e]k\rrbracket$. Then, by inductive hypothesis, $\llbracket \tau \rrbracket$ is a CPO.
+\end{itemize}
+\end{proof}
+
+\section{Example}
+We will look at a random variable $T$ describing the cost of quicksort, where the pivot is chosen to be the first element 
+of the list. Following Karp's definition, this random variable has the form $T(x)(l) = a(x) + T(h_1(x)(l))(\hat{h_1}(x)(l))
++ T(h_2(x)(l))(\hat{h_2}(x)(l))$, where $a(x) = x-1$, the cost of one step of quicksort (i.e. comparing all other elements
+in the list to the pivot), $h_1(x)$ and $h_2(x)$ give the sizes of the left and right sublists of an input, and
+$\hat{h_1}$ and $\hat{h_2}$ give the sublists themselves. We may express this function in our expression language
+as follows:
+\begin{align*}
+\texttt{T} = \texttt{fix}(\lambda x. \lambda f. \lambda l. ((x-1) 
+		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l)))
+\end{align*}
+ 
+ We want to gain some intuition that the interpretation of this expression corresponds to what we would expect
+ the cost of quicksort to be. Let $l$ be a sorted list of length $3$, $F = \lambda x. \lambda f. \lambda l. ((x-1) 
+		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l))$  and see that
+ \begin{align*}
+ \llbracket \texttt{T} \rrbracket &= fix(\llbracket \texttt{F} \rrbracket) \\
+ \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{?} \rightarrow \texttt{?}\rrbracket \rightarrow \llbracket \texttt{?} \rightarrow \texttt{?}\rrbracket \\ 
+ &\text{ s.t. } \forall \alpha \in \llbracket \texttt{?}\rrbracket \rightarrow \llbracket \texttt{?} \rrbracket, \\   
+ &F(\alpha) = \llbracket\lambda f. \lambda l. ((x-1) 
+		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l))\rrbracket\{f \mapsto \alpha\} \\
+ \llbracket \texttt{?}\rrbracket &= ?  \\
+ \end{align*}
+ By the CPO fixpoint theorem,  
+\begin{align*}
+ fix(F) &= \bigvee_n(F^n (\perp)) \\
+&= \lim_{n \to \infty}\{F^n (\perp)\}
+ \end{align*}
+ 
+ 
  
