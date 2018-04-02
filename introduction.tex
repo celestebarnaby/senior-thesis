@@ -52,8 +52,11 @@ recurrences that bound the complexity of higher-order programs. This work offers
 output of this program. Further, it provides a bounding theorem which guarantees that this extracted complexity is a 
 bound on the actual cost of evaluating the source language program. 
 
-The recurrences produced by this extraction function are all syntactic: they are essential cost-annotated source language
-programs. A denotational semantics for the syntactic recurrence language yields more familiar recurrences.
+The recurrences produced by the extraction function are all syntactic: they are cost-annotated source language
+programs, rather than what we would traditionally think of as a recurrence for an algorithm. Danner et al. define a 
+denotational semantics for this complexity language, as a formal means of constructing a mathematical object to
+describe the meaning of programs in this language. The denotations of these cost-annotated programs resemble
+more familiar recurrences.
 
 \section{Probabilistic Recurrence Relations}
 
@@ -70,7 +73,7 @@ imprecise, ad hoc arguments: that is, they cannot be applied to other algorithms
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x))
 \end{align*}
-where $x$ is a non-negative real number describing the size of the input, $h_1(x) \dots h_n(x)$ are random variables 
+where $x$ is a non-negative real number describing the size of the input,\\ $h_1(x) \dots h_n(x)$ are random variables 
 describing the sizes of the subproblems (e.g. in the case of quicksort $h_1(x)$ and $h_2(x)$ describe the sizes of the two 
 sublists), $a$ is a function describing the work necessary to generate these subproblems, and $T(x)$ is a random variable 
 describing the total running time of the algorithm. Karp then offers several methods for obtaining tight bounds on the upper tails of the probability distribution of $T(x)$. 
@@ -92,7 +95,7 @@ Taking this a step further, we could interpret this to mean $T(x)(l) = a(x) + T(
 additional function $\hat{h}(x)$ that takes an input $l$ and returns the derived subproblem $l'$. 
 Even worse, this function is of type $\Omega_x \rightarrow \Omega_{h(x)(l)}$ --- that is, its type is dependent 
 upon the random variable $h(x)$. Thus, we find that Karp's seemingly straightforward recurrence relation quickly becomes 
-increasingly complicated when we attempt to type-check it. Other researchers \cite{Coq} have corroborated 
+increasingly complicated when we attempt to type-check it. Other researchers (\cite{Tassarotti:2017aa}) have corroborated 
 these observations. 
 
 

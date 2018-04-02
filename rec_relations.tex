@@ -60,7 +60,7 @@ $h_2(x)(l)$. The arguments to these random variables, then, should be the left a
  functions $T, \ h,$ and $\hat{h}$ are dependent upon a real number $x$, describing the size of problems in the sample space.
  
 We define a syntax to write and type-check these recurrences. This syntax is based on $\lambda$LF---a simple system of 
-dependent types. 
+dependent types (\cite{Pierce:2005aa}).
  
  \[
 \begin{array}{rcl}
@@ -69,7 +69,8 @@ dependent types.
 k &::=& * \mid \Pi x : \tau.k \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \mid \texttt{fix}(\lambda f. \lambda x.e) 
+     \ifelse{e}{e}{e} \mid \\
+     && \texttt{fix}(\lambda f. \lambda x.e) 
 \end{array}
 \]
 

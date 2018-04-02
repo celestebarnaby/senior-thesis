@@ -86,7 +86,7 @@ and chains $a_0 \leq a_1 \leq \ldots,$
   \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto \bigvee_i a_i\}
   = \bigvee_i \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto a_i\}
 \end{align*}
-Also, (interpretation of non-terminating functions).
+%Also, (interpretation of non-terminating functions).
 
 Thus, this approach will not work. In light of this, we define the following expression language. 
 \[
@@ -94,7 +94,8 @@ Thus, this approach will not work. In light of this, we define the following exp
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \mid \texttt{rec}(\lambda x.e, \lambda x.e) 
+     \ifelse{e}{e}{e} \mid \\
+    && \texttt{rec}(\lambda x.e, \lambda x.e) 
 \end{array}
 \]
 
@@ -161,8 +162,8 @@ e = e \\ \\
 \begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
   \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
-  \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket
-\text{ s.t. } \forall d \in \llbracket \tau \rrbracket, f(d) = \llbracket e \rrbracket\eta\{ x \mapsto d \} \\
+  \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \\
+\text{ s.t. } \forall d \in \llbracket \tau \rrbracket, f(d) &= \llbracket e \rrbracket\eta\{ x \mapsto d \} \\
  \llbracket e_1 \ e_2 \rrbracket \eta &= \llbracket e_1 \rrbracket\eta ( \llbracket e_2 \rrbracket\eta ) \\
  \llbracket e_1 + e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta + \llbracket e_2 \rrbracket\eta \\
  \llbracket e_1 - e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta - \llbracket e_2 \rrbracket\eta \\

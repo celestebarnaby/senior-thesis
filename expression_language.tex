@@ -24,7 +24,8 @@ still obtaining correct solutions to recurrences.\\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e 
 \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \mid \texttt{fix} (\lambda f.\lambda x.e) \\
+     \ifelse{e}{e}{e} \mid \\
+     && \texttt{fix} (\lambda f.\lambda x.e) \\
 \end{array}
 \]
 
@@ -115,9 +116,8 @@ only to $\perp$.
       \perp \text{      otherwise} \\
    \end{cases}
   \\
-   \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= fix\llbracket \lambda f.\lambda x.e \rrbracket\eta \
- \text{, where } fix \text{ assigns the least fixed point} \\ 
- &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
+   \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= fix\llbracket \lambda f.\lambda x.e \rrbracket\eta \\
+ \text{where } fix &\text{ assigns the least fixed point to continuous functions} \\
  \end{align*}
  \caption{Denotational semantics for expressions.}
  \end{figure}
@@ -197,8 +197,10 @@ $\llbracket \tau \rrbracket$.
 For all expressions $e$ and environments $\Gamma$,
 \begin{enumerate}
 \item For all chains $a_0\leq a_1\leq\dotsb$,
-$\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
-\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$.
+\begin{align*}
+\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
+\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}.
+\end{align*}
 \item For all $\Gamma\vdash e : \tau$ and all $\Gamma$-environments~$\eta$,
 $\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
 \end{enumerate}
@@ -236,13 +238,13 @@ In the case that $ y \neq x$, note that
   \llbracket \Gamma \vdash x : \tau \rrbracket\eta\{y\mapsto\bigvee_i a_i\} &= \eta\{y\mapsto \bigvee_i a_i\}(x) \\
   &= \bigvee_i a_i \\
   &=\bigvee_i \eta\{y \mapsto a_i\}(x)  \\
-  &= \bigvee_i\tmden{\typing\Gamma x\tau}{\extend\eta y {a_i}} \\
+  &= \bigvee_i\tmden{\typing\Gamma x\tau}{\extend\eta y {a_i}}
   \end{align*}
  \end{itemize}
  \emph{Inductive Cases: }
  \begin{itemize}
  % arithmetic operations
- \item $e = e_1 \circ e_2, \ \circ \in \{+, -, *, / \}$ \\ \\
+ \item $e = e_1 \circ e_2, \ \circ \in \{+, -, *, / \}$ \\
  We assume that $\circ$ is continuous in each argument. Then 
  \begin{align*}
  \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\} &= \llbracket \Gamma\vdash e_1 : \tau 
@@ -324,22 +326,21 @@ In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x
 \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$.
 % application
  \item $ e = e_1 \ e_2$ \\ \\
-Then
+Let $b = \llbracket \Gamma \vdash e_2 : \sigma \rrbracket$, and see that
 \begin{align*}
-\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\} &=
+\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i a\} &=
 \llbracket \Gamma \vdash e_1 : \sigma \rightarrow \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}
-(\llbracket \Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto \bigvee_i a_i\}) \\
-&= \llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}
-(\llbracket \Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto \bigvee_i a_i\}) \\
+(b \ \eta\{x \mapsto \bigvee_i a_i\}) \\
+&= \llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto a\}
+(b \ \eta\{x \mapsto a\}) \\
 \text{(by inductive hypothesis)} &= 
-\llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}
-(\bigvee_i \llbracket \Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto a_i\}) \\
-&= \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto \bigvee_i a_i\}\{y \mapsto (\bigvee_i \llbracket 
-\Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto a_i\})\} \\
+\llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto a\}
+(\bigvee_i b \ \eta\{x \mapsto a_i\}) \\
+&= \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto a\}\{y \mapsto (\bigvee_i b \ \eta\{x \mapsto a_i\})\} \\
 \text{(by inductive hypothesis)}&= \bigvee_i \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto 
-a_i\}\{y \mapsto (\llbracket \Gamma \vdash e_2 : \sigma \rrbracket\eta\{x \mapsto a_i\})\} \\
+a_i\}\{y \mapsto (b \ \eta\{x \mapsto a_i\})\} \\
 &=\bigvee_i \llbracket \Gamma \vdash e_1: \sigma \rightarrow \tau\rrbracket\eta\{x\mapsto a_i\}
-(\llbracket\Gamma\vdash e_2 : \sigma\rrbracket\eta\{x\mapsto a_i\}) \\
+(b \ \eta\{x\mapsto a_i\}) \\
 &= \bigvee_i \llbracket \Gamma \vdash e:\tau\rrbracket\eta\{ x \mapsto a_i\} \\
 \end{align*}
  % abstraction
