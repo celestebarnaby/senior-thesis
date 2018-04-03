@@ -65,8 +65,8 @@ dependent types (\cite{Pierce:2005aa}).
  \[
 \begin{array}{rcl}
 \tau &::=& X \mid \texttt{real} \mid \texttt{nat} \mid \texttt{bool} \mid \tau \times \tau \mid \Pi x:\tau.\tau
-\mid \tau \ e \mid \texttt{list} \mid \texttt{list}(e) \\
-k &::=& * \mid \Pi x : \tau.k \\
+\mid \tau \ e \mid \texttt{list} \\
+k &::=& * \mid \tau \rightarrow k \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
      \ifelse{e}{e}{e} \mid \\
@@ -76,22 +76,23 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 
 In this syntax, we replace the arrow type $\sigma \rightarrow \tau$ with the dependent product type
 $\Pi x:\sigma.\tau$, and introduce type families. These are collections of types that depend on some input: for instance,
-the type $\Pi x:\real.\lst(x)$, where the type $\lst(x)$ is dependent upon an input $x$ of type \texttt{real}.
+the type $\Pi n:\texttt{nat}.\lst(n)$, where the type $\lst(n)$ is dependent upon an input $n$ of type \texttt{nat}.
+We use the constant $\texttt{list}$ to denote the type family of kind
+$\Pi n:\texttt{nat}.*$.
 The syntax consists of entities of three levels: expressions, types, and kinds. The inclusion of kinds lets us
-differentiate between proper types, $*$, and type families. We use the constant $\texttt{list}$ to denote the type family of kind
-$\Pi x:\texttt{nat}.*$.
+differentiate between proper types, $*$, and type families $\tau \rightarrow k$. 
 
 \begin{figure}
 \[
 \begin{array}{c}
 \Gamma \vdash * \\ \\
-\dfrac{\Gamma \vdash \tau :: * \ \ \ \Gamma,x:\tau \vdash k}{\Gamma \vdash \Pi x:\tau.k} \\ \\
-\dfrac{X :: k \in \Gamma \ \ \ \Gamma \vdash k}{\Gamma \vdash X :: k} \\ \\
+\dfrac{\Gamma \vdash \tau :: * \ \ \ \Gamma \vdash k}{\Gamma \vdash \tau \rightarrow k} \\ \\
+%\dfrac{X :: k \in \Gamma \ \ \ \Gamma \vdash k}{\Gamma \vdash X :: k} \\ \\
 \dfrac{\Gamma \vdash \tau_1 :: * \ \ \ \Gamma, x:\tau_1 \vdash \tau_2 :: *}{\Gamma \vdash \Pi x:\tau_1.\tau_2 :: *} \\ \\
-\dfrac{\Gamma \vdash \tau :: \Pi x:\sigma \ \ \ \Gamma \vdash e : \sigma}{\Gamma \vdash \tau \ e : [x \mapsto e]k} \\ \\
+\dfrac{\Gamma \vdash \tau :: \sigma \rightarrow k \ \ \ \Gamma \vdash e : \sigma}{\Gamma \vdash \tau \ e :: k} \\ \\
 \end{array}
 \]
-\caption{Well-forming kinds and kind judgements for dependent type language.}
+\caption{Well-formed kinds and kind judgements for dependent type language.}
 \end{figure}
 
 \begin{figure}
@@ -143,21 +144,27 @@ e = e \\ \\
 
 \begin{figure}
  \begin{align*}
+\llbracket * \rrbracket &= \bigcup_{k \in \N} A_k \\
+\text{Where $A_k$ is defined inductively as follows:} \\
+A_0 &= \{\R_{\perp}, \ \N_{\perp}, \ \{true, \ false\}_{\perp}\} \\
+A_{k+1} &= A_k \cup \{ X \times Y \mid X, Y \in A_k\} \cup \\
+\{ Y \rightarrow X \mid Y \in A_k, \ \exists X_i &\in A_k \text{ for } i \in Y \text{ s.t. } X = \bigcup_{i \in Y} X_i\} \\
+\llbracket \tau \rightarrow k \rrbracket\eta &= \{f : \llbracket \tau \rrbracket\eta \rightarrow \llbracket k \rrbracket\eta\}\\ \\
 \llbracket \texttt{real} \rrbracket &= \R_{\perp} \\
 \llbracket \texttt{nat} \rrbracket &= \N_{\perp} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
- \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
+ \llbracket \tau \times \sigma \rrbracket\eta &= \llbracket \tau \rrbracket\eta \times \llbracket \sigma \rrbracket\eta  \\
  \text{For } \forall (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a<c \text{ and } b<d. \\ 
- \llbracket \Pi x:\tau.\sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
- \ f \text{ is continuous}\} \\
- \text{ For } \forall f, \ g \in \llbracket \Pi x : \tau.\sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
- \llbracket \tau \rrbracket, \ f(x) \leq g(x) \\
- \llbracket (\tau :: \Pi x: \sigma.k) \ (e : \sigma) \rrbracket &= \llbracket [x \mapsto e]k \rrbracket \\
- \llbracket \texttt{list} \rrbracket &= ??? \\
+ \llbracket \Pi x:\tau.\sigma \rrbracket\eta &= \{f: \llbracket \tau \rrbracket\eta \rightarrow 
+ \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma \rrbracket\eta\{x \mapsto a\}
+ \mid f \text{ is continuous}\} \\
+ \text{ For } \forall f, \ g \in \llbracket \Pi x : \tau.\sigma \rrbracket\eta &\text{, let } f \leq g \text{ if and only if } \forall x \in 
+ \llbracket \tau \rrbracket\eta, \ f(x) \leq g(x) \\
+ \llbracket \tau \ e \rrbracket\eta &= \llbracket \tau \rrbracket\eta( \llbracket e \rrbracket\eta) \\
+ \llbracket \texttt{list} \rrbracket &= \llbracket \texttt{nat} \rightarrow * \rrbracket  \\
  %
- \llbracket \texttt{list}(e) \rrbracket\eta &= \Omega_{\llbracket e \rrbracket\eta}
  \end{align*}
- \caption{Denotational semantics for types.}
+ \caption{Denotational semantics for types and kinds.}
  \end{figure}
  \begin{figure}
  \begin{align*}
@@ -206,8 +213,8 @@ upper bound in $\llbracket \tau \rrbracket$. \\
 \end{thm}
 \begin{proof}
 \begin{itemize}
-\item $\tau = (\tau' :: \Pi x:\sigma.k)(e : \sigma) $ \\
-Then $\llbracket \tau \rrbracket = \llbracket [x \mapsto e]k\rrbracket$. Then, by inductive hypothesis, $\llbracket \tau \rrbracket$ is a CPO.
+\item $\tau = (\tau' :: \sigma \rightarrow k)(e : \sigma) $ \\
+Then $\llbracket \tau \rrbracket\eta = \llbracket \tau \rrbracket\eta(\llbracket e \rrbracket\eta)$. Then, by inductive hypothesis, $\llbracket \tau \rrbracket$ is a CPO.
 \end{itemize}
 \end{proof}
 

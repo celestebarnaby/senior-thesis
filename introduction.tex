@@ -101,9 +101,11 @@ these observations.
 
 \section{Contributions of This Thesis}
 
-This thesis defines a syntax that allows us to write and type-check recurrences on
-random variables such as those described by Karp. This syntax comprises a simple expression language including natural number constants, identifiers, basic arithmetic operations, booleans, application, and a fixpoint operator. We also define a 
-denotational semantics for this expression language, wherein all types interpret to a complete partial order---that is, an ordered
+Karp offers the equation $T'(x) = a(x) + T'(m(x))$ as a deterministic counterpart of a recurrence relation $T(x) = a(x) + 
+T(h(x))$, where, for all $x$, $m(x)$ is equal to the upper bound of $h(x)$. This thesis defines syntaxes that allow
+us to write and type-check both probabilistic recurrences of the form $T'$, and deterministic recurrences
+of the form $T$. These syntaxes comprise a simple expression language including natural number constants, identifiers, basic arithmetic operations, booleans, application, and a fixpoint operator. We also define a 
+denotational semantics for these expression languages, wherein all types interpret to a complete partial order---that is, an ordered
 set which has a bottom element and where every chain has a least upper bound. For instance, the type {\tt bool}, assigned
 to boolean constants, interprets to $\{\text{true, false}\}_{\perp}$---the flat partial order of the set  $\{true, 
 \ false\}$ where
@@ -113,9 +115,5 @@ both elements are comparable to only a bottom element $\perp$. In addition each 
  
  While imposing these restrictions limits the programs we can interpret to some extent, it ensures 
 that every type interprets to a CPO, and every arrow type expression interprets to a continuous function. These two 
-criteria allow us to use the CPO fixpoint theorem to define a function $fix$ which assigns the least fixpoint to continuous functions with type $\tau \rightarrow \tau$. This in turn allows us to interpret recurrence relations by defining a $\texttt{fix}$ operation and letting all $\texttt{fix}(\lambda f.\lambda x.e)$ expressions interpret to $fix(\llbracket\lambda f.\lambda x.e\rrbracket$, .
-
-Karp offers the equation $\tau(x) = a(x) + \tau(m(x))$ as a deterministic counterpart of a recurrence relation $T(x) = a(x) + 
-T(h(x))$, where, for all $x$, $m(x)$ is equal to the upper bound of $h(x)$. He then defines its least nonnegative solution 
-$u(x)$ using Tarski fixpoint construction. We prove that our interpretation of a recurrence is equal to this solution, thus 
-verifying that our relations are equivalent to Karp's. 
+criteria allow us to use the CPO fixpoint theorem to define a function $fix$ which assigns the least fixed point to continuous functions with type $\tau \rightarrow \tau$. This in turn allows us to interpret recurrence relations by defining a $\texttt{fix}$ operation and letting all $\texttt{fix}(\lambda f.\lambda x.e)$ expressions interpret to $fix(\llbracket\lambda f.\lambda x.e\rrbracket$. We show that our denotation of a recurrence is equal to the solution Karp offers,
+thus verifying that our recurrence relations are equivalent to Karp's.
