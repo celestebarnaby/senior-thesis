@@ -326,21 +326,21 @@ In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x
 \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$.
 % application
  \item $ e = e_1 \ e_2$ \\ \\
-Let $b = \llbracket \Gamma \vdash e_2 : \sigma \rrbracket$, and see that
+Let $\beta = \llbracket \Gamma \vdash e_2 : \sigma \rrbracket$, and see that
 \begin{align*}
 \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i \} &=
 \llbracket \Gamma \vdash e_1 : \sigma \rightarrow \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}
-(b \ \eta\{x \mapsto \bigvee_i a_i\}) \\
+(\beta \ \eta\{x \mapsto \bigvee_i a_i\}) \\
 &= \llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto a\}
-(b \ \eta\{x \mapsto a\}) \\
+(\beta \ \eta\{x \mapsto a\}) \\
 \text{(by inductive hypothesis)} &= 
 \llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto a\}
-(\bigvee_i b \ \eta\{x \mapsto a_i\}) \\
-&= \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto a\}\{y \mapsto (\bigvee_i b \ \eta\{x \mapsto a_i\})\} \\
+(\bigvee_i\beta\ \eta\{x \mapsto a_i\}) \\
+&= \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto a\}\{y \mapsto (\bigvee_i\beta\ \eta\{x \mapsto a_i\})\} \\
 \text{(by inductive hypothesis)}&= \bigvee_i \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto 
-a_i\}\{y \mapsto (b \ \eta\{x \mapsto a_i\})\} \\
+a_i\}\{y \mapsto (\beta \ \eta\{x \mapsto a_i\})\} \\
 &=\bigvee_i \llbracket \Gamma \vdash e_1: \sigma \rightarrow \tau\rrbracket\eta\{x\mapsto a_i\}
-(b \ \eta\{x\mapsto a_i\}) \\
+(\beta \ \eta\{x\mapsto a_i\}) \\
 &= \bigvee_i \llbracket \Gamma \vdash e:\tau\rrbracket\eta\{ x \mapsto a_i\} \\
 \end{align*}
  % abstraction

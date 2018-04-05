@@ -166,8 +166,9 @@ e = e \\ \\
  \begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
   \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
-  \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket
-\text{ s.t. } \forall d \in \llbracket \tau \rrbracket, f(d) = \llbracket e \rrbracket\eta\{ x \mapsto d \} \\
+  \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket\eta 
+  \rightarrow \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma \rrbracket\eta\{x\mapsto a\} \\
+\text{ s.t. } \forall a \in \llbracket \tau \rrbracket\eta, f(a) &= \llbracket e \rrbracket\eta\{ x \mapsto a \} \\
  \llbracket e_1 \ e_2 \rrbracket \eta &= \llbracket e_1 \rrbracket\eta ( \llbracket e_2 \rrbracket\eta ) \\
  \llbracket e_1 + e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta + \llbracket e_2 \rrbracket\eta \\
  \llbracket e_1 - e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta - \llbracket e_2 \rrbracket\eta \\
@@ -192,9 +193,8 @@ e = e \\ \\
       \perp \text{      otherwise} \\
    \end{cases}
   \\
-   \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= fix\llbracket \lambda f.\lambda x.e \rrbracket\eta \
- \text{, where } fix \text{ assigns the least fixed point} \\ 
- &\text{ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ to continuous functions} \\
+    \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= fix\llbracket \lambda f.\lambda x.e \rrbracket\eta \\
+ \text{where } fix &\text{ assigns the least fixed point to continuous functions} 
  \end{align*}
  \caption{Denotational semantics for expressions.}
  \end{figure}
@@ -207,30 +207,104 @@ For all well-formed types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that
 set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a 
 least upper bound in $\llbracket \tau \rrbracket$. \\
 \end{thm}
-\begin{proof}
+\begin{proof} 
 \begin{itemize}
 \item $\tau = \texttt{nat}$ \\
-Then $\llbracket \tau \rrbracket$ is flat-ordered, so it is a CPO.
+Then $\llbracket \tau \rrbracket\eta$ is flat-ordered, so it is a CPO.
 \item $\tau = \lst(e)$ \\
-Then $e : \texttt{nat}$ and $\llbracket \tau \rrbracket = \Omega_{\llbracket e \rrbracket}$. This set is flat-ordered,
+Then $e : \texttt{nat}$ and $\llbracket \tau \rrbracket\eta = \Omega_{\llbracket e \rrbracket\eta}$. This set is flat-ordered,
 so $\llbracket \tau \rrbracket$ is a CPO.
 \item $\tau = \Pi x:\tau_1.\tau_2$ \\
-Then $\llbracket \tau \rrbracket =  \{f: \llbracket \tau_1 \rrbracket\eta \rightarrow 
+Then $\llbracket \tau \rrbracket\eta =  \{f: \llbracket \tau_1 \rrbracket\eta \rightarrow 
  \bigcup_{a \in \llbracket \tau_1 \rrbracket\eta} \llbracket \tau_2 \rrbracket\eta\{x \mapsto a\}
  \mid f \text{ is continuous}\}$.  \\ \\
  %
  Need Lemma: $\forall f \in \llbracket \tau \rrbracket\eta, \forall a \in \llbracket \tau_1 \rrbracket\eta, \
- f(a) \in \llbracket \tau_2 \rrbracket\eta\{x \mapsto a' \}$, for some $a' \in \llbracket \tau_1 \rrbracket\eta$.  \\ \\
+ f(a) \in \llbracket \tau_2 \rrbracket\eta\{x \mapsto a \}$. (True b/c of type soundness)  \\ \\
  %
  By inductive hypothesis, $\llbracket \tau_2 \rrbracket\eta\{x\mapsto a\}$ is a CPO
  $\forall a \in \llbracket \tau_2 \rrbracket\eta$, so it has a bottom element. 
  Let $\perp : \llbracket \tau_1 \rrbracket\eta \rightarrow 
  \bigcup_{a \in \llbracket \tau_1 \rrbracket\eta} \llbracket \tau_2 \rrbracket\eta\{x \mapsto a\}$ be a function such that, for 
- $\forall a \in \llbracket \tau_1 \rrbracket, \ \perp(a) = \perp_{\llbracket \tau_2 \rrbracket\eta\{x\mapsto a'\}}$. See, then,
+ $\forall a \in \llbracket \tau_1 \rrbracket, \ \perp(a) = \perp_{\llbracket \tau_2 \rrbracket\eta\{x\mapsto a\}}$. See, then,
  that $\perp$ is a continuous(?) function that is less than or equal to every functions in $\llbracket \tau \rrbracket\eta$,
  so $\perp$ is the bottom element of $\llbracket \tau \rrbracket\eta$.
 \end{itemize}
 \end{proof}
+
+\begin{thm} 
+For all expressions $e$ and environments $\Gamma$,
+\begin{enumerate}
+\item For all chains $a_0\leq a_1\leq\dotsb$,
+\begin{align*}
+\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
+\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}.
+\end{align*}
+\item For all $\Gamma\vdash e : \tau$ and all $\Gamma$-environments~$\eta$,
+$\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}\eta$.
+\end{enumerate}
+\end{thm}
+
+\begin{proof}
+\begin{itemize}
+ \item $ e = e_1 \ e_2$ \\ \\
+Let $\beta = \llbracket \Gamma \vdash e_2 : \sigma \rrbracket$, and see that
+\begin{align*}
+\llbracket \Gamma \vdash e : [y \mapsto e_2]\tau \rrbracket\eta\{x \mapsto a \} &=
+\llbracket \Gamma \vdash e_1 : \Pi y: \sigma.\tau \rrbracket\eta\{x \mapsto a\}
+(\beta \ \eta\{x \mapsto a\}) \\
+&= \llbracket \Gamma \vdash \lambda (y:\sigma).e'  \rrbracket\eta\{x \mapsto a\}
+(\beta \ \eta\{x \mapsto a\}) \\
+\text{(by inductive hypothesis)} &= 
+\llbracket \Gamma \vdash \lambda (y:\sigma).e' \rrbracket\eta\{x \mapsto a\}
+(\bigvee_i \beta \ \eta\{x \mapsto a_i\}) \\
+&= \llbracket \Gamma. y : \sigma \vdash e' : \tau \rrbracket\eta\{x \mapsto a\}\{y \mapsto (\bigvee_i \beta \ \eta\{x \mapsto a_i\})\} \\
+\text{(by inductive hypothesis)}&= \bigvee_i \llbracket \Gamma. y : \sigma \vdash e' : \tau \rrbracket\eta\{x \mapsto 
+a_i\}\{y \mapsto (\beta \ \eta\{x \mapsto a_i\})\} \\
+&=\bigvee_i \llbracket \Gamma \vdash e_1: \Pi y:\sigma.\tau\rrbracket\eta\{x\mapsto a_i\}
+(\beta \ \eta\{x\mapsto a_i\}) \\
+&= \bigvee_i \llbracket \Gamma \vdash e:\tau\rrbracket\eta\{ x \mapsto a_i\} \\
+\end{align*}
+ \item $e = \lambda (y : \tau) . (e' : \tau')$
+ \begin{enumerate}
+ \item Then $\llbracket \Gamma \vdash e : \Pi y: \tau.\tau' \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$ 
+ is a function $f: \llbracket \tau \rrbracket \rightarrow \bigcup_{d \in \llbracket \tau \rrbracket\eta\{x\mapsto a\}}\llbracket 
+ \tau'  \rrbracket\{y\mapsto d\}$ such that for 
+ $\forall d \in \llbracket \tau \rrbracket, \ f(d) = \llbracket \Gamma \ y : \tau \vdash e' : \tau' 
+ \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}\{y \mapsto d\}$. 
+ 
+ We want to show that
+ \begin{align*}
+ \tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
+\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}
+\end{align*}
+Let $d \in \llbracket \tau \rrbracket$, and consider that
+\begin{align*}
+\llbracket \Gamma \vdash e : \Pi y: \tau.\tau' \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}(d) 
+&= \llbracket \Gamma.y : \tau \vdash e' : \tau'\rrbracket\eta\{x\mapsto  \bigvee_i a_i\}
+\{y \mapsto d\} \\
+&= \llbracket \Gamma.y : \tau \vdash e' : \tau'\rrbracket(\eta\{y \mapsto d\})\{x\mapsto  \bigvee_i a_i\} \\
+\text{(by inductive hypothesis)}&=\bigvee_i\llbracket \Gamma.y:\tau\vdash e':\tau'\rrbracket(\eta\{y\mapsto d\})
+\{x\mapsto a_i\} \\
+&=\bigvee_i\llbracket \Gamma.y:\tau\vdash e':\tau'\rrbracket(\eta\{x\mapsto a_i\})\{y\mapsto d\} \\
+&= \bigvee_i \llbracket \Gamma \vdash \lambda y : \tau.e' : \tau' \rrbracket \eta\{x\mapsto a_i\}(d) \\
+&= \bigvee_i \llbracket \Gamma \vdash e : \Pi y:\tau.\tau' \rrbracket \eta\{x\mapsto a_i\}(d) 
+\end{align*}
+%
+ \item We want to show that $\llbracket \Gamma \vdash e : \Pi x:\tau.\tau' \rrbracket\eta \in \llbracket \Pi x:\tau.
+ \tau'\rrbracket\eta$---that is, it is a continuous function from $\llbracket \tau \rrbracket\eta$ to 
+ $\bigcup_{d\in \llbracket \tau \rrbracket\eta}\llbracket \tau' \rrbracket\eta\{x \mapsto d\}$. Let 
+ $\{a_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$, and see that
+ \begin{align*}
+ \llbracket \Gamma \vdash e : \Pi x:\tau.\tau' \rrbracket\eta(\bigvee_i a_i) &= \llbracket \Gamma.x : \tau 
+ \vdash e' : \tau'\rrbracket\eta \{x \mapsto \bigvee_i a_i\} \\
+ \text{(by 1)} &= \bigvee_i \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\eta\{x\mapsto a_i\}\\
+ &= \bigvee_i \llbracket \Gamma \vdash e : \Pi x:\tau.\tau' \rrbracket\eta(a_i) 
+ \end{align*}
+ \end{enumerate} 
+\end{itemize}
+\end{proof}
+
 
 \section{Example}
 We will look at a random variable $T$ describing the cost of quicksort, where the pivot is chosen to be the first element 
