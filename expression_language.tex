@@ -328,7 +328,7 @@ In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x
  \item $ e = e_1 \ e_2$ \\ \\
 Let $b = \llbracket \Gamma \vdash e_2 : \sigma \rrbracket$, and see that
 \begin{align*}
-\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i a\} &=
+\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i \} &=
 \llbracket \Gamma \vdash e_1 : \sigma \rightarrow \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}
 (b \ \eta\{x \mapsto \bigvee_i a_i\}) \\
 &= \llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto a\}
@@ -346,9 +346,9 @@ a_i\}\{y \mapsto (b \ \eta\{x \mapsto a_i\})\} \\
  % abstraction
  \item $e = \lambda (y : \tau) . (e' : \tau')$
  \begin{enumerate}
- \item Then $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$ i
- s a function $f: \llbracket \tau \rrbracket \rightarrow \llbracket \tau'  \rrbracket$ such that for 
- $\forall d \in \llbracket \tau \rrbracket, \ f(d) = \llbracket \Gamma y : \tau \vdash e' : \tau 
+ \item Then $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$ 
+ is a function $f: \llbracket \tau \rrbracket \rightarrow \llbracket \tau'  \rrbracket$ such that for 
+ $\forall d \in \llbracket \tau \rrbracket, \ f(d) = \llbracket \Gamma \ y : \tau \vdash e' : \tau 
  \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}\{y \mapsto d\}$. We want to show that
  $\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
 \bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$
