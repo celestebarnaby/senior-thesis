@@ -28,7 +28,7 @@ fixed point of F is $\bigvee\{F^n(\perp)\}^{\infty}_{n=1}$. Then
 \begin{align*}
 F(\perp)(x) &= a(x) + \perp(px)\\
 &= a(x) + \perp \\
-&= \perp \\
+&= \perp 
 \end{align*}
 so by induction we may show that for $\forall n, \ F^n(\perp)(x) = \perp \implies \bigvee\{F^n(\perp)\}^{\infty}_{n=1}  = \perp$. 
 This result, is, clearly, not a solution to the recurrence $T(x) + a(x) + T(px)$, making this denotational semantics
@@ -140,7 +140,7 @@ e = e \\ \\
 \lambda x.e = \lambda y.[x \mapsto y]e, \text{provided } y \text{ not free in } e. \\ \\ 
 \lambda x.e_1 \ e_2 = [x \mapsto e_2]e_1 \\
 \texttt{rec}(\lambda x.e_1, \lambda x.e_2) = 
-			\lambda x.e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x.\ e_2) \\
+			\lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e2)) \\
 \end{array}
 \]
 \caption{Equational semantics for the language.}
@@ -195,22 +195,25 @@ e = e \\ \\
  \begin{thm}
  \begin{align*}
  \llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \rrbracket \eta 
- = \llbracket \lambda x.e_1 + \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2)) \rrbracket \eta
+ = \llbracket \lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e2)) \rrbracket \eta
  \end{align*} 
  \end{thm}
  
  \begin{proof}
  Note that
  \begin{align*}
- \llbracket \lambda x.e_1 + \texttt{rec}(\lambda x. &(\lambda y.e_1  \ e_2), \lambda x. (\lambda y.e_2 \ e_2)) \rrbracket \eta
- = f : \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
- f(d) &=  \llbracket e_1 \rrbracket\eta\{x \mapsto d\} + 
- 		\llbracket \texttt{rec}(\lambda x. (\lambda y.e_1  \ e_2), \lambda x. (\lambda 
- y.e_2 \ e_2)) \rrbracket \eta(d) \\
- &=  \llbracket e_1 \rrbracket\eta\{x \mapsto d\} + \sum_{i=0}^\infty \llbracket \lambda x. (\lambda y.e_1  \ e_2) \rrbracket \eta
- 	(\llbracket \lambda x.e_2 \rrbracket\eta)^i  (d))\\
-&= \llbracket \lambda x.e_1\rrbracket\eta(d) + \sum_{i=0}^\infty \llbracket \lambda x.e_1 \rrbracket\eta (\llbracket \lambda x.e_2 \rrbracket\eta((\llbracket \lambda x.e_2\rrbracket\eta)^i(d))) \\
-&= \llbracket \lambda x.e_1\rrbracket\eta(d) + \sum_{i=1}^\infty \llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2\rrbracket\eta)^i(d)) \\ 
+ \llbracket \lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e_2)) \rrbracket \eta
+ &= f : \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
+ f(d) =  \llbracket e_1 \rrbracket\{x\mapsto d\} &+ \llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e_2)\rrbracket\eta
+ \{x\mapsto d\} \\
+ = \llbracket \lambda x.e_1\rrbracket(d) &+ \llbracket\texttt{rec}(\lambda x.e_1, \lambda x.e_2)\rrbracket\eta
+ (\llbracket e_2 \rrbracket\eta\{x \mapsto d\}) \\
+ =  \llbracket \lambda x.e_1\rrbracket(d) &+ \llbracket\texttt{rec}(\lambda x.e_1, \lambda x.e_2)\rrbracket\eta
+ (\llbracket \lambda x.e_2 \rrbracket(d)) \\
+ = \llbracket \lambda x.e_1\rrbracket(d) &+ \sum_{i=0}^{\infty} \llbracket \lambda x.e_1\rrbracket\eta
+ ((\llbracket \lambda x.e_2 \rrbracket\eta)^i (\llbracket \lambda x.e_2\rrbracket\eta(d))) \\
+ = \llbracket \lambda x.e_1\rrbracket(d) &+ \sum_{i=1}^{\infty} \llbracket \lambda x.e_1\rrbracket\eta
+ ((\llbracket \lambda x.e_2 \rrbracket\eta)^i (d)) \\
 &= \sum_{i=0}^\infty \llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2\rrbracket\eta)^i(d)) \\
 &=  \llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \rrbracket \eta (d)
 \end{align*}
