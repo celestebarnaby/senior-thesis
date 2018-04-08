@@ -83,7 +83,81 @@ $\Pi x:\sigma.\tau$, and introduce type families.
 These are collections of types that depend an input: for instance,
 the type $\Pi n:\texttt{nat}.\lst(n)$, where the type $\lst(n)$ is dependent upon an input $n$ of type \texttt{nat}.
 
-We offer standard type judgements, as well as judgements for when a type is well-formed, denoted by $\tau :: *$. 
+We offer standard type judgements, as well as judgements for when a type is well-formed, denoted by $\tau :: *$. We 
+also offer a denotational semantics for types and expressions. Note that the denotation for dependent product types
+$\Pi (x : \tau).\sigma$ over the environment $\eta$ is a subset of continuous functions from 
+$\llbracket \tau \rrbracket\eta$ to 
+$\bigcup_{a \in \llbracket \tau \rrbracket\eta}\llbracket \sigma \rrbracket\eta\{x \mapsto a\}$. However, our definition of
+continuity only holds for functions whose domain and range are CPOs, and it is not immediately obvious that 
+$\bigcup_{a \in \llbracket \tau \rrbracket\eta}\llbracket \sigma \rrbracket\eta\{x \mapsto a\}$. We prove that this is
+the case for all types $\sigma$. 
+
+\begin{lemma}
+For all types $\tau, \ \sigma$, environments $\Gamma$ and $\Gamma$-environments $\eta$,
+\begin{align*}
+\Pi(x : \tau).\sigma :: * \implies \bigcup_{a \in \llbracket \tau \rrbracket\eta}
+\llbracket \sigma \rrbracket\eta\{x\mapsto a\} 
+\end{align*}
+is a CPO.
+\end{lemma}
+
+\begin{proof}
+By induction on $\sigma$.
+\begin{itemize}
+\item $\sigma = \texttt{real}$ 
+\item $\sigma = \texttt{nat}$ 
+\item $\sigma = \texttt{bool}$ \\
+In these cases, $\sigma$ is not dependent on any value, so 
+$\bigcup_{a \in \llbracket \tau \rrbracket\eta}\llbracket\sigma\rrbracket\eta\{x\mapsto a\} = \llbracket \sigma \rrbracket\eta$,
+which we know to be a CPO.
+\item $\sigma = \sigma_1 \times \sigma_2$ \\
+Then 
+\begin{align*}
+\bigcup_{a \in \llbracket \tau \rrbracket\eta}
+\llbracket \sigma \rrbracket\eta\{x\mapsto a\} &= 
+\bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\} 
+\times \llbracket \sigma_2 \rrbracket\eta\{x\mapsto a\} \\
+&= \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\} 
+\times \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma_2 \rrbracket\eta\{x\mapsto a\}  
+\end{align*}
+By inductive hypothesis, $\bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\} $
+and $ \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma_2 \rrbracket\eta\{x\mapsto a\}$ are CPOs. Thus,
+$\bigcup_{a \in \llbracket \tau \rrbracket\eta}\llbracket \sigma \rrbracket\eta\{x\mapsto a\}$ is the cross product of two 
+CPOs, which we know from an earlier proof to be a CPO.
+\item $\sigma = \Pi(y: \sigma_1).\sigma_2$ \\
+We want to show $\bigcup_{a \in \llbracket \tau \rrbracket\eta} 
+\llbracket \Pi(y: \sigma_1).\sigma_2\rrbracket\eta\{x \mapsto a\}$ is a CPO. Note
+\begin{align*}
+\bigcup_{a \in \llbracket \Gamma \vdash \tau \rrbracket\eta} 
+\llbracket \Pi(y: \sigma_1).\sigma_2\rrbracket\eta\{x \mapsto a\}
+&= \bigcup_{a \in \llbracket \Gamma \vdash \tau \rrbracket\eta} \{ f : \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\}
+\rightarrow \bigcup_{b \in \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\}} \llbracket \sigma_2\rrbracket\eta
+\{x\mapsto a\}\{y\mapsto b\}\}
+\end{align*} 
+By induction hypothesis, for $\forall a \in \llbracket \tau \rrbracket\eta,$
+\begin{align*}
+\bigcup_{b \in \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\}} \llbracket \sigma_2\rrbracket\eta
+\{x\mapsto a\}\{y\mapsto b\}
+\end{align*} 
+is a CPO --- call this $Q_a$.  Also,  $\llbracket\sigma_1\rrbracket\eta\{x\mapsto a\} $ is a CPO --- call this $P_a$.
+\begin{align*}
+&= \{ f : \bigcup_{a \in \llbracket\tau\rrbracket\eta} P_a \rightarrow 
+\bigcup_{a \in \llbracket \tau \rrbracket\eta} Q_a \mid
+d \in P_a \implies f(d) \in Q_a\}
+\end{align*}
+We can show that this set is a CPO by constructing a bottom element $\perp$ such that for 
+$\forall a \in \llbracket\tau\rrbracket\eta, \ \forall d \in P_a, \
+\perp(d) = \perp_{Q_a}$, the bottom element of $Q_a$. Also, for any chain $C$ in this set, we can construct
+a least upper bound $\bigvee C$ in a similar pointwise fashion. This proof is analogous to the proof that
+$\llbracket \Pi(x: \tau).\sigma\rrbracket\eta$ is a CPO.
+\item $\sigma = \lst(e)$ \\
+Then $\bigcup_{a \in \llbracket \tau \rrbracket\eta}
+\llbracket \sigma \rrbracket\eta\{x\mapsto a\} \subseteq \Omega$ containing $\perp_{\Omega}$. This is a flat-ordered
+set with a bottom element, so it is a CPO.
+
+\end{itemize}
+\end{proof}
+
 
 \begin{figure}
 \[
@@ -153,12 +227,15 @@ e = e \\ \\
  \text{For } \forall (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a<c \text{ and } b<d. \\ 
  \llbracket \Pi x:\tau.\sigma \rrbracket\eta &= \{f: \llbracket \tau \rrbracket\eta \rightarrow 
  \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma \rrbracket\eta\{x \mapsto a\}
- \mid f \text{ is continuous}\} \\
+ \mid f \text{ is continuous}  \\
+ &\text{  \ \ \ \   and } \forall a \in \llbracket \tau \rrbracket\eta, \ f(a) \in \llbracket \sigma\rrbracket\eta\{x\mapsto a\}\} \\
  \text{ For } \forall f, \ g \in \llbracket \Pi x : \tau.\sigma \rrbracket\eta &\text{, let } f \leq g \text{ if and only if } \forall x \in 
  \llbracket \tau \rrbracket\eta, \ f(x) \leq g(x) \\
  \llbracket \lst(e) \rrbracket\eta &= \Omega_{\llbracket e \rrbracket\eta} \\
- \text{For } \forall n \in \N, \ &\Omega_n \text{ is the flat-ordered set of all lists of length } n. \\
- &\Omega_{\perp_\N} \text{ is the set } \{\perp_\N\}.
+ \Omega &\text{ is the flat-ordered set of all lists.} \\
+ \text{For } \forall n \in \N, \ \Omega_n \subset \Omega& \text{ is the flat-ordered set of lists of length $n$, and } 
+ \perp_{\Omega}. \\
+ \Omega&_{\perp_\N} \text{ is the set } \{\perp_\N\}.
  \end{align*}
  \caption{Denotational semantics for types.}
  \end{figure}
@@ -216,20 +293,30 @@ Then $\llbracket \tau \rrbracket\eta$ is flat-ordered, so it is a CPO.
 Then $e : \texttt{nat}$ and $\llbracket \tau \rrbracket\eta = \Omega_{\llbracket e \rrbracket\eta}$. This set is flat-ordered,
 so $\llbracket \tau \rrbracket$ is a CPO.
 \item $\tau = \Pi x:\tau_1.\tau_2$ \\
-Then $\llbracket \tau \rrbracket\eta =  \{f: \llbracket \tau_1 \rrbracket\eta \rightarrow 
+Then 
+\begin{align*}
+\llbracket \tau \rrbracket\eta &=  \{f: \llbracket \tau_1 \rrbracket\eta \rightarrow 
  \bigcup_{a \in \llbracket \tau_1 \rrbracket\eta} \llbracket \tau_2 \rrbracket\eta\{x \mapsto a\}
- \mid f \text{ is continuous}\}$.  \\ \\
- %
- Need Lemma: $\forall f \in \llbracket \tau \rrbracket\eta, \forall a \in \llbracket \tau_1 \rrbracket\eta, \
- f(a) \in \llbracket \tau_2 \rrbracket\eta\{x \mapsto a \}$. (True b/c of type soundness)  \\ \\
- %
+ \mid f \text{ is continuous} \\
+ &\text{\ \ \ \ and } \forall a \in \llbracket \tau_1 \rrbracket\eta, \ f(a) \in \llbracket \tau_2 \rrbracket\eta\{x\mapsto a\}\}
+ \end{align*} 
+
  By inductive hypothesis, $\llbracket \tau_2 \rrbracket\eta\{x\mapsto a\}$ is a CPO
  $\forall a \in \llbracket \tau_2 \rrbracket\eta$, so it has a bottom element. 
  Let $\perp : \llbracket \tau_1 \rrbracket\eta \rightarrow 
  \bigcup_{a \in \llbracket \tau_1 \rrbracket\eta} \llbracket \tau_2 \rrbracket\eta\{x \mapsto a\}$ be a function such that, for 
  $\forall a \in \llbracket \tau_1 \rrbracket, \ \perp(a) = \perp_{\llbracket \tau_2 \rrbracket\eta\{x\mapsto a\}}$. See, then,
- that $\perp$ is a continuous(?) function that is less than or equal to every functions in $\llbracket \tau \rrbracket\eta$,
+ that $\perp$ is a continuous function that is less than or equal to every functions in $\llbracket \tau \rrbracket\eta$,
  so $\perp$ is the bottom element of $\llbracket \tau \rrbracket\eta$.
+ 
+ Let $C \subset \llbracket \tau \rrbracket\eta$ be a chain, and consider that for $\forall a \in \llbracket \tau_1\rrbracket\eta,
+ \ \{f(a) \mid f \in C\}$ is a chain in $ \llbracket \tau_2 \rrbracket\eta\{x\mapsto a\}$. Call this set $F_a$, and note that $
+ \bigvee F_a \in \llbracket \tau_2 \rrbracket\eta\{x\mapsto a\}$ exists. We define a 
+ function $g: \llbracket \tau_1\rrbracket\eta \rightarrow \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \tau_2 
+ \rrbracket\eta\{x\mapsto a\}$ such that for $\forall a \in \llbracket \tau_1\rrbracket\eta, \ g(a) = \bigvee F_a \in \llbracket 
+ \tau_2 \rrbracket\eta\{x\mapsto a\}$. See, then, that $g = \bigvee C \in \llbracket \tau \rrbracket\eta$.
+ 
+ Therefore, $\llbracket\tau\rrbracket\eta$ is a CPO.
 \end{itemize}
 \end{proof}
 
@@ -303,48 +390,6 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  &= \bigvee_i \llbracket \Gamma \vdash e : \Pi x:\tau.\tau' \rrbracket\eta(a_i) 
  \end{align*}
  \end{enumerate} 
-\end{itemize}
-\end{proof}
-
-
-\begin{lemma}
-For all types $\tau, \ \sigma$, environments $\Gamma$ and $\Gamma$-environments $\eta$,
-\begin{align*}
-\Pi(x : \tau).\sigma :: * \implies \bigcup_{a \in \llbracket \tau \rrbracket\eta}
-\llbracket \sigma \rrbracket\eta\{x\mapsto a\} 
-\end{align*}
-is a CPO.
-\end{lemma}
-
-\begin{proof}
-By induction on $\sigma$.
-\begin{itemize}
-\item $\sigma = \Pi(y: \sigma_1).\sigma_2$ \\
-We want to show $\bigcup_{a \in \llbracket \tau \rrbracket\eta} 
-\llbracket \Pi(y: \sigma_1).\sigma_2\rrbracket\eta\{x \mapsto a\}$ is a CPO. Note
-\begin{align*}
-\bigcup_{a \in \llbracket \Gamma \vdash \tau \rrbracket\eta} 
-\llbracket \Pi(y: \sigma_1).\sigma_2\rrbracket\eta\{x \mapsto a\}
-&= \bigcup_{a \in \llbracket \Gamma \vdash \tau \rrbracket\eta} \{ f : \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\}
-\rightarrow \bigcup_{b \in \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\}} \llbracket \sigma_2\rrbracket\eta
-\{x\mapsto a\}\{y\mapsto b\}\}
-\end{align*} 
-By induction hypothesis, for $\forall a \in \llbracket \tau \rrbracket\eta,$
-\begin{align*}
-\bigcup_{b \in \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\}} \llbracket \sigma_2\rrbracket\eta
-\{x\mapsto a\}\{y\mapsto b\}
-\end{align*} 
-is a CPO --- call this $Q_a$.  Also,  $\llbracket\sigma_1\rrbracket\eta\{x\mapsto a\} $ is a CPO --- call this $P_a$.
-\begin{align*}
-&= \{ f : \bigcup_{a \in \llbracket\tau\rrbracket\eta} P_a \rightarrow 
-\bigcup_{a \in \llbracket \tau \rrbracket\eta} Q_a \mid
-d \in P_a \implies f(d) \in Q_a\}
-\end{align*}
-We can show that this set is a CPO by constructing a bottom element $\perp$ such that for 
-$\forall a \in \llbracket\tau\rrbracket\eta, \ \forall d \in P_a, \
-\perp(d) = \perp_{Q_a}$, the bottom element of $Q_a$. Also, for any chain $C$ in this set, we can construct
-a least upper bound $\bigvee C$ in a similar pointwise fashion. This proof is analogous to the proof that
-$\llbracket \Pi(x: \tau).\sigma\rrbracket\eta$ is a CPO.
 \end{itemize}
 \end{proof}
 
