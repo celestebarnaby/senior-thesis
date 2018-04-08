@@ -166,9 +166,10 @@ e = e \\ \\
  \begin{align*}
  \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
   \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
-  \llbracket \lambda (x : \tau) . (e : \sigma) \rrbracket\eta &= f : \llbracket \tau \rrbracket\eta 
+  \llbracket \lambda (x : \tau) . e \rrbracket\eta &= f : \llbracket \tau \rrbracket\eta 
   \rightarrow \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma \rrbracket\eta\{x\mapsto a\} \\
-\text{ s.t. } \forall a \in \llbracket \tau \rrbracket\eta, f(a) &= \llbracket e \rrbracket\eta\{ x \mapsto a \} \\
+\text{ s.t. } \forall a \in \llbracket \tau \rrbracket\eta, f(a) &= \llbracket e \rrbracket\eta\{ x \mapsto a \} 
+  \in \llbracket \sigma \rrbracket\eta\{x\mapsto a\}\\
  \llbracket e_1 \ e_2 \rrbracket \eta &= \llbracket e_1 \rrbracket\eta ( \llbracket e_2 \rrbracket\eta ) \\
  \llbracket e_1 + e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta + \llbracket e_2 \rrbracket\eta \\
  \llbracket e_1 - e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta - \llbracket e_2 \rrbracket\eta \\
@@ -306,6 +307,47 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
 \end{proof}
 
 
+\begin{lemma}
+For all types $\tau, \ \sigma$, environments $\Gamma$ and $\Gamma$-environments $\eta$,
+\begin{align*}
+\Pi(x : \tau).\sigma :: * \implies \bigcup_{a \in \llbracket \tau \rrbracket\eta}
+\llbracket \sigma \rrbracket\eta\{x\mapsto a\} 
+\end{align*}
+is a CPO.
+\end{lemma}
+
+\begin{proof}
+By induction on $\sigma$.
+\begin{itemize}
+\item $\sigma = \Pi(y: \sigma_1).\sigma_2$ \\
+We want to show $\bigcup_{a \in \llbracket \tau \rrbracket\eta} 
+\llbracket \Pi(y: \sigma_1).\sigma_2\rrbracket\eta\{x \mapsto a\}$ is a CPO. Note
+\begin{align*}
+\bigcup_{a \in \llbracket \Gamma \vdash \tau \rrbracket\eta} 
+\llbracket \Pi(y: \sigma_1).\sigma_2\rrbracket\eta\{x \mapsto a\}
+&= \bigcup_{a \in \llbracket \Gamma \vdash \tau \rrbracket\eta} \{ f : \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\}
+\rightarrow \bigcup_{b \in \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\}} \llbracket \sigma_2\rrbracket\eta
+\{x\mapsto a\}\{y\mapsto b\}\}
+\end{align*} 
+By induction hypothesis, for $\forall a \in \llbracket \tau \rrbracket\eta,$
+\begin{align*}
+\bigcup_{b \in \llbracket \sigma_1 \rrbracket\eta\{x\mapsto a\}} \llbracket \sigma_2\rrbracket\eta
+\{x\mapsto a\}\{y\mapsto b\}
+\end{align*} 
+is a CPO --- call this $Q_a$.  Also,  $\llbracket\sigma_1\rrbracket\eta\{x\mapsto a\} $ is a CPO --- call this $P_a$.
+\begin{align*}
+&= \{ f : \bigcup_{a \in \llbracket\tau\rrbracket\eta} P_a \rightarrow 
+\bigcup_{a \in \llbracket \tau \rrbracket\eta} Q_a \mid
+d \in P_a \implies f(d) \in Q_a\}
+\end{align*}
+We can show that this set is a CPO by constructing a bottom element $\perp$ such that for 
+$\forall a \in \llbracket\tau\rrbracket\eta, \ \forall d \in P_a, \
+\perp(d) = \perp_{Q_a}$, the bottom element of $Q_a$. Also, for any chain $C$ in this set, we can construct
+a least upper bound $\bigvee C$ in a similar pointwise fashion. This proof is analogous to the proof that
+$\llbracket \Pi(x: \tau).\sigma\rrbracket\eta$ is a CPO.
+\end{itemize}
+\end{proof}
+
 \section{Example}
 We will look at a random variable $T$ describing the cost of quicksort, where the pivot is chosen to be the first element 
 of the list. Following Karp's definition, this random variable has the form $T(x)(l) = a(x) + T(h_1(x)(l))(\hat{h_1}(x)(l))
@@ -314,26 +356,26 @@ in the list to the pivot), $h_1(x)$ and $h_2(x)$ give the sizes of the left and 
 $\hat{h_1}$ and $\hat{h_2}$ give the sublists themselves. We may express this function in our expression language
 as follows:
 \begin{align*}
-\texttt{T} = \texttt{fix}(\lambda x. \lambda f. \lambda l. ((x-1) 
-		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l)))
+\texttt{T} = \texttt{fix}(\lambda x. \lambda f. \lambda l. \ifelse{x=0}{0}{((x-1) 
+		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l)))}
 \end{align*}
  
  We want to gain some intuition that the interpretation of this expression corresponds to what we would expect
- the cost of quicksort to be. Let $l$ be a sorted list of length $3$, $F = \lambda x. \lambda f. \lambda l. ((x-1) 
-		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l))$  and see that
+ the cost of quicksort to be. Let $l$ be a sorted list of length $3$, $F = \lambda x. \lambda f. \lambda l. \ifelse{x = 0}{0}
+ {((x-1) + f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l))}$  and see that
  \begin{align*}
  \llbracket \texttt{T} \rrbracket &= fix(\llbracket \texttt{F} \rrbracket) \\
- \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{?} \rightarrow \texttt{?}\rrbracket \rightarrow \llbracket \texttt{?} \rightarrow \texttt{?}\rrbracket \\ 
- &\text{ s.t. } \forall \alpha \in \llbracket \texttt{?}\rrbracket \rightarrow \llbracket \texttt{?} \rrbracket, \\   
+ \llbracket \texttt{F} \rrbracket &= F : \llbracket \Pi x.\texttt{real}.\texttt{real}\rrbracket \rightarrow \llbracket \Pi x:\texttt{real} . \texttt{real}\rrbracket \\ 
+ &\text{ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rrbracket, \\   
  &F(\alpha) = \llbracket\lambda f. \lambda l. ((x-1) 
-		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l))\rrbracket\{f \mapsto \alpha\} \\
- \llbracket \texttt{?}\rrbracket &= ?  \\
+		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l))\rrbracket\{f \mapsto \alpha\} 
  \end{align*}
  By the CPO fixpoint theorem,  
 \begin{align*}
  fix(F) &= \bigvee_n(F^n (\perp)) \\
 &= \lim_{n \to \infty}\{F^n (\perp)\}
  \end{align*}
+ 
  
  
  
