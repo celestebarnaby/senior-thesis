@@ -1,0 +1,261 @@
+\chapter{Well-Typed Probabilistic Recurrence Relations}
+Karp's paper is premised on the notion that the cost of a stochastic algorithm may be described as a
+recurrence relation of the form
+\begin{align*}
+T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x)).
+\end{align*}
+But what does this equation actually mean? To unpack this, we will attempt to assign types to this recurrence.
+
+ Following Karp's definitions, we can immediately assign types to some of these terms:
+\begin{align*}
+T(x) &: \Omega_x \rightarrow \R \text{, where } \Omega_x \text{ is the sample space of all problem instances of size } x \\
+T &: \prod_{x \in \R} (\Omega_x \rightarrow \R) \\ 
+a &: \R \rightarrow \R
+\end{align*}
+
+However, for other terms it is less clear what the type should should be. Karp alternates between saying that $h$ is a random 
+variable and $h(x)$ is a random variable, so it is not immediately obvious 
+what the meaning of this function is. However, since $h$ takes $x \in \R$ as an input, it would not make sense for $h$ to be a 
+random variable of type $\R \rightarrow \R$. This would make $h$ a function that takes an input size and returns the 
+size of the derived subproblem---thus sidestepping the stochastic part of the algorithm. Then it must be that $h(x)$ is a 
+random variable on \emph{specific input} of size $x$---i.e., the sample space $\Omega_x$ and returns the size of the derived 
+subproblem.
+\begin{align*}
+h_i(x) &: \Omega_x \rightarrow \R \\
+h_i &: \prod_{x \in \R}(\Omega_x \rightarrow \R) 
+\end{align*} 
+
+There are some inconsistencies in these type assignments. To start, $T$ is a function that takes a real number and 
+returns a random variable. But on the right-hand side of the relation, $T$ takes $h_i(x)$ as an argument; $h_i(x)$ is
+not a real number, but a random variable. 
+
+Thinking in terms of what we \emph{want} this recurrence to express, the arguments to the $T$'s on the righthand side of
+the equation should be the sizes of the derived subproblems---that is, the result of applying $h_i(x)$ to the original input.
+Then, given an input $l \in \Omega_x$, we should have
+\begin{align*}
+T(x)(l) &= a(x) + T(h_1(x)(l)) \dots + T(h_n(x)(l)) \\
+&\text{where } h(x)(l) : \R 
+\end{align*}
+ Thus, the term $T(h_i(x)(l))$ typechecks. However, we now run into another problem: $T(x)(l)$ and $a(x)$ are real numbers,
+but $T(h_i(x)(l))$ is a random variable of type $\Omega_{h_i(x)(l)} \rightarrow \R$. Then $T(h_i(x)(l))$ needs an argument.
+Consider that $T(h_i(x)(l))$ is a random variable describing the running time of the algorithm with an input of size 
+$h_i(x)(l)$. For instance, given a recurrence for randomized quicksort, $T(h_1(x)(l))$ and $T(h_2(x)(l))$ describe how long it 
+takes to quicksort the left and right sublists of an input list $l$, which themselves have length $h_1(x)(l)$ and
+$h_2(x)(l)$. The arguments to these random variables, then, should be the left and right sublists themselves. 
+
+ In order for us to obtain these sublists, it will be necessary for us to define a function 
+ \begin{align*}
+ \hat{h_i}(x) &: \prod_{l \in \Omega_x} \Omega_{h_i(x)(l)} \\
+ \hat{h_i} &: \prod_{x \in R} \ ( \prod_{l \in \Omega_x} \Omega_{h_i(x)(l)})
+ \end{align*}
+ such that $\hat{h_i}(x)$ takes an input of size $x$ and returns the derived subproblem of size $h_i(x)(l)$. See, then, that
+ $T(h_i(x)(l))(\hat{h_i}(x)(l))$ has type $\R$. So, this leaves us with the equation
+ \begin{align*}
+ T(x)(l) &= a(x) + T(h_1(x)(l))(\hat{h_1}(x)(l)) \dots + T(h_n(x)(l))(\hat{h_n}(x)(l))
+ \end{align*}
+ which, finally, typechecks.
+ 
+ Thus, we find that attempting to formally assigns types to Karp's probabilistic recurrences reveals a lot of hidden 
+ complications and ambiguities, which Karp never addresses directly. Most notably, we find that the types of the 
+ functions $T, \ h,$ and $\hat{h}$ are dependent upon a real number $x$, describing the size of problems in the sample space.
+ 
+We define a syntax to write and type-check these recurrences. This syntax is inspired $\lambda$LF---a simple system of 
+dependent types (\cite{Pierce:2005aa}). However, instead of general dependent types, our syntax only needs to
+describe sample space types $\Omega_n$ which are dependent upon a natural number $n$. Thus, we introduce
+a constant $\lst$ to our syntax, which works as a function from expressions to types. That is, for each 
+expression $e$, $\lst(e)$ is a type. There are many stochastic divide-and-conquer algorithms involving sample spaces
+on datatypes other than lists; this language could easily be expanded to include other constants such as
+ $\texttt{tree}, \ \texttt{graph}$, etc.
+ 
+ \[
+\begin{array}{rcl}
+\tau &::=& \texttt{real} \mid \texttt{nat} \mid \texttt{bool} \mid \tau \times \tau \mid \Pi x:\tau.\tau
+\mid \texttt{list}(e) \\
+e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
+  && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
+     \ifelse{e}{e}{e} \mid \\
+     && \texttt{rec}(a, h, \hat{h}) 
+\end{array}
+\]
+
+In this syntax, we replace the arrow type $\sigma \rightarrow \tau$ with the dependent product type
+$\Pi x:\sigma.\tau$, and introduce type families. 
+These are collections of types that depend an input: for instance,
+the type $\Pi n:\texttt{nat}.\lst(n)$, where the type $\lst(n)$ is dependent upon an input $n$ of type \texttt{nat}.
+As with our languages for deterministic recurrences, we need a way of defining recursive functions. We first attempt
+to define a PCF-like language analogous to the one in chapter 3, with a $\texttt{fix}$ operator that assigns the least
+fixed-point to continuous functions. However, the inclusion of dependent product types creates some unique problems
+in our denotational semantics.
+
+Consider that in standard PCF, the denotation of the arrow type, $\llbracket \tau \rightarrow \sigma \rrbracket$, is the
+set of continuous functions of type
+$\llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket$. But for dependent product types $\Pi(x:\tau).\sigma$,
+this denotation does not make sense: 
+since $\sigma$ may be dependent upon expressions of type $\tau$, there is no guarantee
+that $\llbracket \sigma \rrbracket$ is a well-formed type (for instance, given the type $\Pi(n:\texttt{nat}).\lst(n)$, see that
+$\llbracket \lst(n) \rrbracket$ is not well-formed because we do not know what $n$ is).
+
+Thus, the denotation of a dependent product type $\Pi(x:\tau).\sigma$ must instead be the set of all
+continuous functions $f$ 
+of type $\llbracket \tau \rrbracket \rightarrow \bigcup_{a \in \llbracket \tau \rrbracket} \llbracket \sigma \rrbracket\{x \mapsto a\}$
+where $\forall a \in \llbracket \tau \rrbracket, \ f(a) \in \llbracket \sigma \rrbracket\{x \mapsto a\}$. If we again look at the 
+type $\Pi(n:\texttt{nat}).\lst(n)$, we see that its denotation is the set of all functions that map a natural number $n$ 
+to a list of length $n$.
+
+But there is a problem here, stemming from the fact that our denotation of dependent product types must be a 
+set of \emph{continuous} functions. This is the case because the denotation of our fix operator,
+$\llbracket \texttt{fix}(\lambda f. \lambda x.e) \rrbracket$, is $fix(\llbracket \lambda f. \lambda x.e \rrbracket)$, where $fix$ 
+is a function that assigns the least fixed point to continuous functions. Thus, we must be able to guarantee that the denotation of any $\lambda f. \lambda x.e$ expression--that is, any expression with a dependent product type--- must be continuous. The formal definition of continuity in this setting is as 
+follows: we say $f: P \rightarrow Q$ (where $P$ and $Q$ are CPOs) is continuous if, for every chain $C$ in $P, \ 
+f(\bigvee C) = \bigvee f(C)$. That is, continuity of a function is premised on the fact that the domain and range of
+a function are CPOs. However, it is not necessarily the case that
+ $\bigcup_{a \in \llbracket \tau \rrbracket} \llbracket \sigma \rrbracket\{ x \mapsto a\}$ is a CPO, even though 
+ $\llbracket \sigma \rrbracket\{x\mapsto a\}$ is a CPO for $\forall a \in \llbracket \tau \rrbracket$.
+ 
+(Should I elaborate more here?)
+
+As a result, continuity does not have any meaning for functions of type $\llbracket \Pi (x: \tau).\sigma \rrbracket$. 
+So we cannot use the $\texttt{fix}$ operator on arbitrary $\lambda f. \lambda x.e$ expressions, and the whole
+framework of our denotational semantics falls apart. 
+ 
+ \begin{figure}
+\[
+\begin{array}{c}
+\Gamma \vdash \texttt{real} :: * \\ \\
+\Gamma \vdash \texttt{bool} :: *\\ \\
+\Gamma \vdash \texttt{nat} :: * \\ \\ 
+\dfrac{\Gamma \vdash \tau_1 :: * \ \ \ \Gamma, x:\tau_1 \vdash \tau_2 :: *}{\Gamma \vdash \Pi x:\tau_1.\tau_2 :: *} \\ \\
+\dfrac{\Gamma \vdash e : \texttt{nat}}{\Gamma \vdash \lst(e) :: *} 
+\end{array}
+\]
+\caption{Well-formed types for dependent type language.}
+\end{figure}
+
+As an alternative approach, we define a language which includes a $\texttt{rec}$ operator similar to the one in chapter 2,
+ which allows to write recurrences of the form $T(x)(l) = a(x) + T(h(x)(l))\hat{h}(x)(l)$, where $T, \ a, \ h$, and $\hat{h}$ 
+ are functions with types as described above. As in chapter 2, this approach restricts us to expressing only a small subset
+ of recursive functions; however, it does allow us to express the probabilistic recurrences described by Karp,
+ without having to worry about the problem of requiring continuity on functions with dependent product types. 
+
+We offer standard type judgements, as well as judgements for when a type is well-formed, denoted by $\tau :: *$. We 
+ also offer a denotational semantics for types and expressions. We may verify soundness of our denotation for
+ $\texttt{rec}$ expressions with an argument analogous to the one given in chapter 2. 
+
+\begin{figure}
+\[
+\begin{array}{lr}
+ \\ \\
+\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\ \\
+\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}} \\  \\
+\dfrac{x : \tau \in \Gamma \ \ \ \Gamma \vdash \tau :: *}{\Gamma \vdash x : \tau } \\ \\ 
+\dfrac{\Gamma \vdash \sigma :: * \ \ \ \Gamma, x : \sigma \vdash e : \tau}
+	{\Gamma \vdash \lambda (x : \sigma).e : \Pi x:\sigma.\tau } \\ \\
+\dfrac{\Gamma \vdash e_1: \Pi x:\sigma.\tau \ \ \ \Gamma \vdash e_2 : \sigma}
+	{\Gamma \vdash e_1 \ e_2 : [x \mapsto e_2]\tau} \\ \\
+\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}
+	{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
+, \circ \in \{+,-,*,/\} \\ \\ 
+\dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}
+	{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
+	, \circ \in \{=, <, >, \geq, \leq\} \\ \\ 
+\dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
+	{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
+\dfrac{\Gamma \vdash a: \Pi (n:\texttt{nat}).\texttt{nat} \ \ \ \Gamma \vdash h: \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat}) \ \ \ \Gamma \vdash H: \Pi(n: \texttt{nat}).(\Pi(l : \lst(n)).\lst(h n l))}
+	{\Gamma \vdash \texttt{rec}(a, h, H) : \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat})}
+\end{array}
+\]
+\caption{Typing for dependent type language.}
+\end{figure}
+
+\begin{figure}
+\[
+\begin{array}{lr}
+e = e \\ \\
+\texttt{0} + \texttt{0} = \texttt{0}, \ \texttt{0} + \texttt{1} = 1, \ldots, \ \texttt{3} + \texttt{5} = \texttt{8}, \ldots  \\
+\text{equivalent rules for } -, \ * \text{, and } /\text{ operations.}
+\\ \\
+(n =n) = \texttt{true} \\ (n=m) = \texttt{false}\text{, provided } n, \ m \text{ distinct numerals.}\\ \\ 
+\ifelse{\texttt{ true }}{e_1}{e_2} = e_1 \\
+\ifelse{\texttt{ false }}{e_1}{e_2} = e_2 \\ \\ 
+\lambda x.e = \lambda y.[x \mapsto y]e, \text{provided } y \text{ not free in } e. \\ \\ \\
+\lambda x.e_1 \ e_2 = [x \mapsto e_2]e_1 \\
+\texttt{rec}(\lambda x.e_1, \lambda x.\lambda l.e_2, \lambda x.\lambda l.e_3) = 
+\lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.\lambda l.e_2, \lambda x.\lambda l.e_3)(e_2)(e_3))
+\end{array}
+\]
+\caption{Equational Semantics for the language.}
+\label{fig:typing}
+\end{figure}
+
+\begin{figure}
+ \begin{align*}
+\llbracket \texttt{real} \rrbracket &= \R \\
+\llbracket \texttt{nat} \rrbracket &= \N\\
+ \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}\\
+ \llbracket \Pi x:\tau.\sigma \rrbracket\eta &= \{f: \llbracket \tau \rrbracket\eta \rightarrow 
+ \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma \rrbracket\eta\{x \mapsto a\}
+ \mid  \\
+ &\forall a \in \llbracket \tau \rrbracket\eta, \ f(a) \in \llbracket \sigma\rrbracket\eta\{x\mapsto a\}\} \\
+ \llbracket \lst(e) \rrbracket\eta &= \Omega_{\llbracket e \rrbracket\eta} \\
+ \forall n \in \N, \ \Omega_n &\text{ is the sample space of all lists of length } n. \\
+ \end{align*}
+ \caption{Denotational semantics for types.}
+ \end{figure}
+ \begin{figure}
+ \begin{align*}
+ \llbracket \texttt{0} \rrbracket\eta &= 0, \  \llbracket \texttt{1} \rrbracket\eta = 1, \ \ldots \\
+  \llbracket x : \tau \rrbracket\eta &= \eta(x) \\
+  \llbracket \lambda (x : \tau) . e \rrbracket\eta &= f : \llbracket \tau \rrbracket\eta 
+  \rightarrow \bigcup_{a \in \llbracket \tau \rrbracket\eta} \llbracket \sigma \rrbracket\eta\{x\mapsto a\} \\
+\text{ s.t. } \forall a \in \llbracket \tau \rrbracket\eta, f(a) &= \llbracket e \rrbracket\eta\{ x \mapsto a \} 
+  \in \llbracket \sigma \rrbracket\eta\{x\mapsto a\}\\
+ \llbracket e_1 \ e_2 \rrbracket \eta &= \llbracket e_1 \rrbracket\eta ( \llbracket e_2 \rrbracket\eta ) \\
+ \llbracket e_1 + e_2 \rrbracket\eta &= \llbracket e_1 \rrbracket\eta + \llbracket e_2 \rrbracket\eta \\
+\text{Similar rules for $-, \ *, \ /$} \\
+  \llbracket \texttt{true} \rrbracket\eta &= true, \ \llbracket \texttt{false} \rrbracket\eta = false \\
+ \llbracket e_1 = e_2 \rrbracket\eta &= 
+ \begin{cases} 
+      true \text{ if } (\llbracket e_1 \rrbracket\eta = \llbracket e_2 \rrbracket\eta) \\
+      false \text{  if } (\llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta\\
+   \end{cases} \\
+\text{Similar rules for $<, \ \leq, >, \geq$} \\
+  \llbracket \ifelse{e_1}{e_2}{e_3} \rrbracket \eta &= 
+ \begin{cases} 
+      \llbracket e_2 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = true \\
+      \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\ 
+   \end{cases}
+  \\
+    \llbracket  \texttt{rec} (a, h, H) \rrbracket\eta &= rec: \N \rightarrow 
+    (\bigcup_{n\in \N} \Omega_n \rightarrow \N) \text{ s.t. } \forall n \in \N, \ 
+    \forall l \in \Omega_n, \\
+    rec(n)(l) &= \sum_{i=0}^{\infty} \llbracket a \rrbracket\eta(\#1k^i(n,l)) \\
+    &k^i \text{ is defined inductively as follows:} \\
+    k^0 &= (n, l) \\
+    k^i &= (\llbracket h \rrbracket\eta (n') (l'), \llbracket H \rrbracket\eta (n') (l')), \\
+    &\text{ where } (n',l') = k^{i-1}(n, l) 
+ \end{align*}
+ \caption{Denotational semantics for expressions.}
+ \end{figure}
+
+\section{Example}
+We want to gain some intuition that our denotation of a $\texttt{rec}$ expression is equivalent to the solution of
+the corresponding semantic recurrence. 
+
+We will look at a random variable $T$ describing the cost of quicksort, where the pivot is chosen to be the first element 
+of the list. Following Karp's definition, this random variable has the form 
+\begin{align*}
+T(x)(l) = a(x) + T(h_1(x)(l))(\hat{h_1}(x)(l)) + T(h_2(x)(l))(\hat{h_2}(x)(l)), 
+\end{align*}
+where $a(x) = x-1$, the cost of one step of quicksort (i.e. comparing all other elements
+in the list to the pivot), $h_1(x)$ and $h_2(x)$ give the sizes of the left and right sublists of an input, and
+$\hat{h_1}$ and $\hat{h_2}$ give the sublists themselves. We may express this function in our expression language
+as follows:
+\begin{align*}
+\texttt{T} = \texttt{fix}(\lambda x. \lambda f. \lambda l. \ifelse{x=0}{0}{((x-1) 
+		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l)))}
+\end{align*}
+ 
+ We want to gain some intuition that the interpretation of this expression corresponds to what we would expect
+ the cost of quicksort to be. Let $l$ be a sorted list of length $3$, $F = \lambda x. \lambda f. \lambda l. \ifelse{x = 0}{0}
+ {((x-1) + f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l))}$  and see that
+

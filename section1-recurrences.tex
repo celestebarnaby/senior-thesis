@@ -140,7 +140,7 @@ e = e \\ \\
 \lambda x.e = \lambda y.[x \mapsto y]e, \text{provided } y \text{ not free in } e. \\ \\ 
 \lambda x.e_1 \ e_2 = [x \mapsto e_2]e_1 \\
 \texttt{rec}(\lambda x.e_1, \lambda x.e_2) = 
-			\lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e2)) 
+			\lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e_2)) 
 \end{array}
 \]
 \caption{Equational semantics for the language.}
@@ -190,7 +190,7 @@ e = e \\ \\
  \label{fig:densemexps}
  \end{figure}
  
-  We will prove soundness of our denotational semantics for $\texttt{rec}$ expressions, in order to ensure that
+  We will prove soundness of our denotation for $\texttt{rec}$ expressions, in order to ensure that
  our interpretation of recurrences reflects their equational meaning.
  \begin{thm}
  \begin{align*}

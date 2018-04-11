@@ -98,4 +98,52 @@ We can express this recurrence using our fixpoint syntax as
 This approach matches our intuition for how an initial condition should work---that once you reach the initial condition,
 you stop recursing. 
 
+With this in mind, we can identify a general strategy for extracting a recurrence in our chapter 2 syntax (with
+the $\texttt{rec}$ operator),given a recurrence in our chapter 3 syntax (with the $\texttt{fix}$ operator). 
+While we cannot extract a recurrence from every $\texttt{fix}(\lambda f \lambda x.e)$ expression, we can achieve this
+if $e$ is of a form that corresponds to a recurrence with an initial condition. 
+
+Suppose we have a recurrence with an initial condition, given as follows:
+\begin{align*}
+T(b) &= c, \text{ where } b, \ c, \ \in \R \\
+T(x) &= a(x) + T(m(x)).
+\end{align*}
+We write this recurrence in our chapter 3 syntax as 
+\begin{align*}
+\texttt{fix}(\lambda f.\lambda x. \ifelse{x = m}{c}{a(x) + f(m(x))}),
+\end{align*}
+an expression whose denotation will be a function $F$ such that
+\begin{align*}
+F(x) &=
+\begin{cases}
+c \text{ if } x = b \\
+a(x) + c \text{ if } m(x) = b \\
+a(x) + a(m(x)) + c \text{ if } m(m(x)) = b \\
+\ldots \\
+\sum_{i=1}^{n} a(m^{i-1}(x)) + c \text{ if } m^n(x) = b
+\end{cases}
+\end{align*}
+
+We may then write this recurrence in our chapter 2 syntax as $\texttt{rec}(a',m)$, where m is the same function
+as in the previous recurrence, and
+\begin{align*}
+a' = \lambda x.\lambda f. \ifelse{x < b}{0}{(\ifelse{x = b}{c}{a(x)})}.
+\end{align*}
+Then the denotation of $\texttt{rec}(a',m)$ is a function F' such that 
+\begin{align*}
+F'(x) &= \sum_{i=0}^{\infty} a(m^i(x)) \\
+&= \sum_{i=0}^{n-1} a(m^i(x)) + \sum_{i=n}^n c + \sum_{i = n+1}^{\infty} 0 \\
+&\text{ where } m^n(x) = b \\
+&= \sum_{i=1}^{n}a(m^{i-1}(x)) + c
+\end{align*}
+See, then, that F' = F. Therefore, this confirms that, given an expression $e$ of the specific form
+$e = \ifelse{x = m}{c}{a(x) + f(m(x))}$, we can extract a function a' such that 
+\begin{align*}
+\llbracket \texttt{fix}(\lambda f. \lambda x.e) \rrbracket = \llbracket \texttt{rec}(a',m)\rrbracket
+\end{align*}
+
+
+
+
+
  
