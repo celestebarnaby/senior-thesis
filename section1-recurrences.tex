@@ -120,7 +120,7 @@ running into the problems of the previous approaches.
 {\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
 \dfrac{\Gamma \vdash \lambda x.e_1 : \texttt{real} \rightarrow \texttt{real} \ \ \ \Gamma \vdash \lambda x.e_2 : 
 \texttt{real} \rightarrow \texttt{real}}
-{\Gamma \vdash \texttt{rec}(\lambda x.e_1, \lambda x.e_2) : \texttt{real} \rightarrow \texttt{real}} \\ \\ 
+{\Gamma \vdash \texttt{rec}(\lambda x.e_1, \lambda x.e_2) : \texttt{real} \rightarrow \texttt{real}} 
 \end{array}
 \]
 \caption{Typing for the language.}
@@ -140,7 +140,7 @@ e = e \\ \\
 \lambda x.e = \lambda y.[x \mapsto y]e, \text{provided } y \text{ not free in } e. \\ \\ 
 \lambda x.e_1 \ e_2 = [x \mapsto e_2]e_1 \\
 \texttt{rec}(\lambda x.e_1, \lambda x.e_2) = 
-			\lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e2)) \\
+			\lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e2)) 
 \end{array}
 \]
 \caption{Equational semantics for the language.}
@@ -152,8 +152,8 @@ e = e \\ \\
 \llbracket \texttt{real} \rrbracket &= \R \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}} \\
  \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
- \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
- \ f \text{ is continuous}\} \\
+ \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \mid
+ \ f \text{ is continuous}\} 
  \end{align*}
  \caption{Denotational semantics for types.}
  \label{fig:densemtypes}
@@ -183,7 +183,7 @@ e = e \\ \\
       \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\
    \end{cases}
   \\
-   \llbracket  \texttt{rec} (e_1 : \texttt{real} \rightarrow \texttt{real}, e_2 : \texttt{real} \rightarrow \texttt{real}) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in R, \\
+   \llbracket  \texttt{rec} (e_1 : \texttt{real} \rightarrow \texttt{real}, e_2 : \texttt{real} \rightarrow \texttt{real}) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
    rec(d) &= \sum_{i=0}^{\infty}\llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2 \rrbracket\eta)^i(d))
  \end{align*}
  \caption{Denotational semantics for expressions.}

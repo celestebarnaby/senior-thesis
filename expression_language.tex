@@ -25,26 +25,26 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
      \ifelse{e}{e}{e} \mid \\
-     && \texttt{fix} (\lambda f.\lambda x.e) \\
+     && \texttt{fix} (\lambda f.\lambda x.e) 
 \end{array}
 \]
 
 \begin{figure}
 \[
 \begin{array}{lr}
-\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \ \ \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\
-\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}} \\ \\ \\
-\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau } \\ \\ \\
-\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda (x : \sigma).e : \sigma \rightarrow \tau } \\ \\ \\ 
-\dfrac{\Gamma \vdash e_1: \sigma \rightarrow \tau \ \ \ \Gamma \vdash e_2 : \sigma}{\Gamma \vdash e_1 \ e_2 : \tau} \\ \\ \\
+\dfrac{}{\Gamma \vdash \texttt{0}: \texttt{real}}, \quad \dfrac{}{\Gamma \vdash \texttt{1}: \texttt{real}}, \ldots \\
+\dfrac{}{\Gamma \vdash \texttt{true} : \texttt{bool}}, \ \ \dfrac{}{\Gamma \vdash \texttt{false} : \texttt{bool}} \\ \\
+\dfrac{x : \tau \in \Gamma}{\Gamma \vdash x : \tau } \\ \\
+\dfrac{\Gamma, x : \sigma \vdash e : \tau}{\Gamma \vdash \lambda (x : \sigma).e : \sigma \rightarrow \tau } \\ \\ 
+\dfrac{\Gamma \vdash e_1: \sigma \rightarrow \tau \ \ \ \Gamma \vdash e_2 : \sigma}{\Gamma \vdash e_1 \ e_2 : \tau} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{real}}
-, \circ \in \{+,-,*,/\} \\ \\ \\
+, \circ \in \{+,-,*,/\} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \texttt{real} \ \ \ \Gamma \vdash e_2 : \texttt{real}}{\Gamma \vdash e_1 \circ e_2 : \texttt{bool}}
-, \circ \in \{=, <, >, \geq, \leq\} \\ \\ \\
+, \circ \in \{=, <, >, \geq, \leq\} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
-{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ \\
+{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
 \dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
-{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau} \\ \\ \\ 
+{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau} 
 \end{array}
 \]
 \caption{Typing for the language.}
@@ -82,7 +82,7 @@ only to $\perp$.
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
  \ f \text{ is continuous}\} \\
  \text{ For } \forall f, \ g \in \llbracket \tau \rightarrow \sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
- \llbracket \tau \rrbracket, \ f(x) \leq g(x) \\
+ \llbracket \tau \rrbracket, \ f(x) \leq g(x) 
  \end{align*}
  \caption{Denotational semantics for types.}
  \end{figure}
@@ -117,7 +117,7 @@ only to $\perp$.
    \end{cases}
   \\
    \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= fix\llbracket \lambda f.\lambda x.e \rrbracket\eta \\
- \text{where } fix &\text{ assigns the least fixed point to continuous functions} \\
+ \text{where } fix &\text{ assigns the least fixed point to continuous functions} 
  \end{align*}
  \caption{Denotational semantics for expressions.}
  \end{figure}
@@ -129,7 +129,7 @@ we must first show that for all types $\tau$, $\llbracket \tau \rrbracket$ is a 
 \begin{thm}
 For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
 set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
-upper bound in $\llbracket \tau \rrbracket$. \\
+upper bound in $\llbracket \tau \rrbracket$. 
 \end{thm}
 \begin{proof}
 by induction on the structure of $\tau$. \\
@@ -183,7 +183,7 @@ Let $f \in C$, and note that for $\forall x \in \llbracket \tau_1 \rrbracket, \ 
 Now let $\rho \in \llbracket \tau \rrbracket$ be an upper bound of $C$. Then for $\forall x \in \llbracket \tau_1 \rrbracket, \forall f \in C, \ f(x) \leq \rho(x)$, so $\rho(x)$ is an upper bound of $\{f(x) : f \in C\} = F_x$. Thus $\rho(x) \geq F_x = g(x), \ \forall x \in 
 \llbracket \tau_1 \rrbracket$, so $g \leq \rho$. Therefore, g is the least upper bound of $C$.
 
-See, then, that by definition $\llbracket \tau \rrbracket$ is a CPO. \\
+See, then, that by definition $\llbracket \tau \rrbracket$ is a CPO. 
 \end{itemize} 
 \end{proof}
 %
@@ -465,8 +465,8 @@ Since $fix$ assigns the least fixed point to continuous functions,
 $\llbracket \texttt{F} \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) = fix(\llbracket \texttt{F}\rrbracket\eta) =  \llbracket \texttt{fix}(\lambda f. \lambda x.e)\rrbracket \eta$.
 \end{proof}
  
-\section{Examples}
-We will look at some of the example recurrences Karp offers in this section, to check whether recurrences in our expression
+\section{Example}
+We will look at a recurrence Karp offers in this section as an example, to check whether recurrences in our expression
 language exhibit the same behavior. First, consider the following recurrence:
 \begin{align*}
 T(1) &= 0 \\
