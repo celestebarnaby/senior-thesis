@@ -15,7 +15,7 @@ such that the interpretation of our recurrences exhibit the same behavior as Kar
 
 Consider that, in order to describe recurrence relations, our language must have some way of defining recursive functions.
 A first attempt at this involves defining a PCF-like language with a $\texttt{real}$ type and a $\texttt{fix}$ operator
-that assigns the least fixed-point to continuous functions using the CPO fixpoint theorem. Our denotational semantics 
+that assigns the least fixed-point to continuous functions using the CPO fixed-point theorem. Our denotational semantics 
 then interprets all base types as flat-ordered CPOs---for instance, $\texttt{real}$  interprets to $R_{\perp}$, the reals with a 
 bottom element $\perp$, with each real number comparable only to $\perp$. Following standard PCF, arrow types
 $\tau \rightarrow \sigma$, interpret to a CPO whose bottom element is a function $\perp: \tau \rightarrow \sigma$ such
@@ -23,8 +23,8 @@ that $\perp(x) = \perp_{\sigma}, \forall x \in \tau$.
 
 However, this approach proves problematic, due to the fact that the standard interpretation of the base operations is strict---e.g. the 
 sum of $\perp$ and any other element should be $\perp$. However, if we consider a function $F: (\R_{\perp} \rightarrow 
-\R_{\perp}) \rightarrow (\R_{\perp} \rightarrow \R_{\perp})$ such that $F(g) = a(x) + g(px)$, then by CPO fixpoint, the least 
-fixed point of F is $\bigvee\{F^n(\perp)\}^{\infty}_{n=1}$. Then 
+\R_{\perp}) \rightarrow (\R_{\perp} \rightarrow \R_{\perp})$ such that $F(g) = a(x) + g(px)$, then by the CPO fixed-point
+theorem, the least fixed point of F is $\bigvee\{F^n(\perp)\}^{\infty}_{n=1}$. Then 
 \begin{align*}
 F(\perp)(x) &= a(x) + \perp(px)\\
 &= a(x) + \perp \\
@@ -80,7 +80,7 @@ To see why this is a problem, consider the expression $x = \texttt{0}$ and the c
 \end{align*}
 so, since $\llbracket \texttt{bool} \rrbracket$ is flat-ordered, the set 
 $\{\llbracket x = \texttt{0}\rrbracket\{x \mapsto n\}\}_{n=0}^{\infty}$ has no supremum. However, as we will see in chapter 3,
-in order to use the CPO fixpoint theorem it will be necessary to show that for all expressions $e$, environments $\Gamma$,
+in order to use the CPO fixed-point theorem it will be necessary to show that for all expressions $e$, environments $\Gamma$,
 and chains $a_0 \leq a_1 \leq \ldots,$
 \begin{align*}
   \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto \bigvee_i a_i\}
@@ -219,9 +219,8 @@ e = e \\ \\
 \end{align*}
 \end{proof}
 
-\section{Examples}
-\subsection{Example 1}
-Consider the simple example Karp offers, wherein $m(x) = px$, with $p$ a
+\section{Example}
+Consider the example Karp offers, wherein $m(x) = px$, with $p$ a
 positive constant less than 1, and $a(x) = 0, \ x < 1, \ a(x) = 1, \ x \geq 1$.
 Then $T(x) = a(x) + T(px)$, so by a simple inductive argument we can show that 
 

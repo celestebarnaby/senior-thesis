@@ -1,0 +1,24 @@
+\chapter{Conclusion}
+
+We have defined three syntaxes which allow us to write and typecheck the several types of recurrences
+described by Karp. The first allows us to describe deterministic recurrences of the form $T(x) = a(x) + T(m(x))$, where $a$ and $m$ are real-valued functions. The second allows us to describe recurrences of this form, but with an added initial 
+condition $T(m) = c$. And the third allows us to describe probabilistic recurrences of the form 
+$T(x) = a(x) + T(h(x)(l))\hat{h}(x)(l)$, where $a$ is a real-valued function, $h(x)$ is a random variable of type
+$\Omega_x \rightarrow \R$, and $\hat{h}(x)$ is a random variable of type
+ $\prod_{l \in \Omega_x} \Omega_{h(x)(l)}$. Moreover, we have discussed a means of translating between
+ the first and second syntaxes. 
+ 
+ \section{Future Work}
+ In future work, we hope to tie in the work done in this thesis to the current cost extraction framework developed
+ by \cite{N.-Danner:2015aa}. Its current structure is as follows: a source language program $e$ is mapped by an 
+ extraction function to a syntactic cost recurrence $E$. This syntactic recurrence is then mapped by a denotational
+ semantics to a semantic recurrence $\llbracket E \rrbracket$ which describes an upper bound on the cost of $e$. 
+ \begin{align*}
+ e\xrightarrow{\text{extr. function}}E\xrightarrow{\text{den. semantics}}\llbracket E \rrbracket
+ \end{align*}
+ However, as discussed in the introduction, this denotational semantics does not always offer useful bounds on 
+ probabilistic recurrences. We aim to expand the cost recurrence syntax to support the syntax for 
+ probabilistic recurrences offered in this thesis, as well as to include the denotational semantics for that syntax.
+ This will mean that, given a syntactic recurrence $E$, we can interpret it using either denotational semantics;
+which semantics we use will be determined by what kind of analysis we wish to make. This will allow us to obtain 
+better bounds on the costs of a wider range of algorithms.

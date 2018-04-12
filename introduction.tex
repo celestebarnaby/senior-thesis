@@ -119,7 +119,7 @@ both elements are comparable to only a bottom element $\perp$. In addition each 
 
  While imposing these restrictions limits the programs we can interpret to some extent, it ensures 
 that every type interprets to a CPO, and every arrow type expression interprets to a continuous function. These two 
-criteria allow us to use the CPO fixpoint theorem to define a function $fix$ which assigns the least fixed point to continuous functions with type $\tau \rightarrow \tau$. This in turn allows us to interpret recurrence relations by defining a $\texttt{fix}$ operation and letting all $\texttt{fix}(\lambda f.\lambda x.e)$ expressions interpret to $fix(\llbracket\lambda f.\lambda x.e\rrbracket$. We show that our denotation of a recurrence is equal to the solution Karp offers,
+criteria allow us to use the CPO fixed-point theorem to define a function $fix$ which assigns the least fixed point to continuous functions with type $\tau \rightarrow \tau$. This in turn allows us to interpret recurrence relations by defining a $\texttt{fix}$ operation and letting all $\texttt{fix}(\lambda f.\lambda x.e)$ expressions interpret to $fix(\llbracket\lambda f.\lambda x.e\rrbracket$. We show that our denotation of a recurrence is equal to the solution Karp offers,
 thus verifying that our recurrence relations are equivalent to Karp's.
  
  However, as we will see in chapters 2 and 5,  complications arise which  prohibit us from taking

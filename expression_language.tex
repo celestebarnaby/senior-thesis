@@ -1,4 +1,4 @@
-\chapter{Deterministic Recurrences as Fixpoints}
+\chapter{Deterministic Recurrences as fixed-points}
 In section 2, Karp offers several example applications of his cost-bounding theorems. However, the recurrences
 he offers here do not follow the definition he set forth in the prior section. For example, a recurrence for a randomized list 
 ranking algorithms is written as
@@ -122,7 +122,7 @@ only to $\perp$.
  \caption{Denotational semantics for expressions.}
  \end{figure}
  
- We will interpret $\texttt{fix}$ expressions using the CPO fixpoint theorem. This theorem states that, for a CPO $P$ and a continuous, order-preserving map $\Phi : P \rightarrow P$, the least fixpoint of $\Phi$ exists and is equal to $\bigvee_i \Phi^n(\perp)$.
+ We will interpret $\texttt{fix}$ expressions using the CPO fixed-point theorem. This theorem states that, for a CPO $P$ and a continuous, order-preserving map $\Phi : P \rightarrow P$, the least fixed-point of $\Phi$ exists and is equal to $\bigvee_i \Phi^n(\perp)$.
 
 In order to use this theorem on the interpretation of $\texttt{fix}(\lambda f. \lambda x.e): \tau \rightarrow \tau$ expressions, 
 we must first show that for all types $\tau$, $\llbracket \tau \rrbracket$ is a CPO.
@@ -472,22 +472,24 @@ language exhibit the same behavior. First, consider the following recurrence:
 T(1) &= 0 \\
 T(n) &= 1 + T(pn), \ 0 < p < 1
 \end{align*} 
-For $\forall n > 1, \ \exists k \in \N$ such that $p^kn \leq1, p^{k-1}n > 1$. See, then, that $T(n) = 1 + \left \lfloor{\log_{p}1/n}\right \rfloor$.
+Consider that this recurrence only makes sense if we assume that there can be no input may be smaller than 1,
+and if for any input $n$, there exists a $k \in \N$ such that $p^kn = 1$.
+For $\forall n > 1, \ \exists k \in \N$ such that $p^kn \leq1, p^{k-1}n > 1$. See, then, that $T(n) = 1 + \left \lfloor{\log_{p}1/n}\right \rfloor$. CHANGE STUFF HERE
 
 We may express this recurrence in our expression language as the follows:
 \begin{align*}
-\texttt{T} = \texttt{fix}(\lambda f. \lambda x.\ifelse{x<1}{0}{1 + f(p*x)})
+\texttt{T} = \texttt{fix}(\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(p*x)})
  \end{align*}
  We want to show that the denotation of this expression has the same behavior as the recurrence described above. 
- First, let $\texttt{F} =\lambda f. \lambda x.\ifelse{x<1}{0}{1 + f(p*x)}$, and note the following: 
+ First, let $\texttt{F} =\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(p*x)}$, and note the following: 
  \begin{align*}
  \llbracket \texttt{T} \rrbracket &= fix(\llbracket \texttt{F} \rrbracket) \\
  \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ 
  &\text{ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rrbracket, \\   
- &F(\alpha) = \llbracket\lambda x.\ifelse{x<1}{0}{1 + f(p*x)}\rrbracket\{f \mapsto \alpha\} \\
+ &F(\alpha) = \llbracket\lambda x.\ifelse{x=1}{0}{1 + f(p*x)}\rrbracket\{f \mapsto \alpha\} \\
  \llbracket \texttt{real}\rrbracket &= \R_{\perp}  \\
  \end{align*}
- By the CPO fixpoint theorem,  
+ By the CPO fixed-point theorem,  
 \begin{align*}
  fix(F) &= \bigvee_n(F^n (\perp)) \\
 &= \lim_{n \to \infty}\{F^n (\perp)\}
@@ -495,10 +497,10 @@ We may express this recurrence in our expression language as the follows:
  \begin{lemma}
  $\forall x \in \R_{\perp}, \ F^{n+1}(\perp)(x) =  
  \begin{cases}
- 0 \text{ if } x < 1 \\
- 1 \text{ if } px < 1 \leq x \\
+ 0 \text{ if } x = 1 \\
+ 1 \text{ if } px = 1 \\
  \dots \\
- n - 1 \text{ if } \ p^{n}x < 1 \leq p^{n-1} \\
+ n - 1 \text{ if } \ p^{n}x = 1  \\
  \perp \text{ otherwise}
  \end{cases}$
  \end{lemma}
@@ -509,12 +511,12 @@ We may express this recurrence in our expression language as the follows:
 F^{n+1}(\perp)(x) &= F(\perp) \\
 &= 
 \begin{cases}
-0 \text{ if } x<1 \\
+0 \text{ if } x=1 \\
 1 + \perp(px) \text{ otherwise}
 \end{cases} \\
 &=
 \begin{cases}
-0 \text{ if } x<1 \\
+0 \text{ if } x=1 \\
 \perp \text{ otherwise}
 \end{cases} \\
 \end{align*}
@@ -523,7 +525,7 @@ Note $p^{n}x = p^0x = x$, so trivially the claim holds. \\
 \begin{align*}
 F^{n+1}(\perp)(x) &=  
 \begin{cases}
-0 \text{ if } x<1 \\
+0 \text{ if } x=1 \\
 1 + F^{n}(\perp)(px) \text{ otherwise}
 \end{cases} \\
 \end{align*}
@@ -532,10 +534,10 @@ By inductive hypothesis,
 F^{n}(\perp)(px) &= F^{(n-1) + 1}(\perp)(px) \\
 &=  
  \begin{cases}
- 0 \text{ if } px < 1 \\
- 1 \text{ if } p^2x < 1 \leq x \\
+ 0 \text{ if } px = 1 \\
+ 1 \text{ if } p^2x = 1  \\
  \dots \\
- n - 1 \text{ if }  p^{n}x < 1 \leq p^{n-1}x \\
+ n - 1 \text{ if }  p^{n}x =1  \\
  \perp \text{ otherwise}
  \end{cases}
  \end{align*}
@@ -544,11 +546,11 @@ See, then, that
 \begin{align*}
 F^{n+1}(\perp)(x) &=  
 \begin{cases}
-0 \text{ if } x<1 \\
-1 \text{ if } px < 1 \\
-2 \text{ if } p^2x < 1 \leq x \\
+0 \text{ if } x=1 \\
+1 \text{ if } px = 1 \\
+2 \text{ if } p^2x = 1 \leq x \\
 \dots \\
-n-1 \text{ if } p^{n}x < 1 \leq p^{n-1}x \\
+n-1 \text{ if } p^{n}x = 1 \leq p^{n-1}x \\
 \perp \text{ otherwise } 
 \end{cases}
 \end{align*}
