@@ -31,7 +31,7 @@ F(\perp)(x) &= a(x) + \perp(px)\\
 &= \perp 
 \end{align*}
 so by induction we may show that for $\forall n, \ F^n(\perp)(x) = \perp \implies \bigvee\{F^n(\perp)\}^{\infty}_{n=1}  = \perp$. 
-This result, is, clearly, not a solution to the recurrence $T(x) + a(x) + T(px)$, making this denotational semantics
+This result, is, clearly, not a solution to the recurrence $T(x) = a(x) + T(px)$, making this denotational semantics
 unusable to us. 
 
 A second approach involves altering the interpretation of the $\texttt{real}$ type to 
@@ -235,7 +235,7 @@ T(x) &=
  \begin{align*}
  \texttt{T} = \texttt{rec}(\lambda x.(\ifelse{x<\texttt{1}}{\texttt{0}}{\texttt{1}}), \lambda x. \texttt{p}*x)
  \end{align*}
- We want to show that the interpretation of this expression has the same behavior as the function described by Karp.
+ We want to show that the interpretation of this expression has the same solution as the function described by Karp.
  Let $\texttt{a} = \lambda x.\ifelse{x<1}{0}{1}, \ \texttt{m} = \lambda x.\texttt{p}*x$, and see that
  \begin{align*}
   \llbracket \texttt{a} \rrbracket &= \underline{a} : \R \rightarrow \R \text{ s.t. } \underline{a}(d) = 0, 

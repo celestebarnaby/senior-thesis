@@ -65,7 +65,8 @@ describe sample space types $\Omega_n$ which are dependent upon a natural number
 a constant $\lst$ to our syntax, which works as a function from expressions to types. That is, for each 
 expression $e$, $\lst(e)$ is a type. There are many stochastic divide-and-conquer algorithms involving sample spaces
 on datatypes other than lists; this language could easily be expanded to include other constants such as
- $\texttt{tree}, \ \texttt{graph}$, etc.
+ $\texttt{tree}, \ \texttt{graph}$, etc. Note that lists can only be indexed over natural numbers (it would not make 
+ sense for a list to be any other size), so we include the type $\texttt{nat}$ in our language as well.
  
  \[
 \begin{array}{rcl}
@@ -112,7 +113,7 @@ a function are CPOs. However, it is not necessarily the case that
  $\bigcup_{a \in \llbracket \tau \rrbracket} \llbracket \sigma \rrbracket\{ x \mapsto a\}$ is a CPO, even though 
  $\llbracket \sigma \rrbracket\{x\mapsto a\}$ is a CPO for $\forall a \in \llbracket \tau \rrbracket$.
  
-(Should I elaborate more here?)
+(XXXXX Should I elaborate more here?)
 
 As a result, continuity does not have any meaning for functions of type $\llbracket \Pi (x: \tau).\sigma \rrbracket$. 
 So we cannot use the $\texttt{fix}$ operator on arbitrary $\lambda f. \lambda x.e$ expressions, and the whole
@@ -160,8 +161,8 @@ We offer standard type judgements, as well as judgements for when a type is well
 	, \circ \in \{=, <, >, \geq, \leq\} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
 	{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
-\dfrac{\Gamma \vdash a: \Pi (n:\texttt{nat}).\texttt{nat} \ \ \ \Gamma \vdash h: \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat}) \ \ \ \Gamma \vdash H: \Pi(n: \texttt{nat}).(\Pi(l : \lst(n)).\lst(h n l))}
-	{\Gamma \vdash \texttt{rec}(a, h, H) : \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat})}
+\dfrac{\Gamma \vdash a: \Pi (n:\texttt{nat}).\texttt{nat} \ \ \ \Gamma \vdash h: \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat}) \ \ \ \Gamma \vdash \hat{h}: \Pi(n: \texttt{nat}).(\Pi(l : \lst(n)).\lst(h n l))}
+	{\Gamma \vdash \texttt{rec}(a, h, \hat{h}) : \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat})}
 \end{array}
 \]
 \caption{Typing for dependent type language.}
@@ -225,13 +226,13 @@ e = e \\ \\
       \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\ 
    \end{cases}
   \\
-    \llbracket  \texttt{rec} (a, h, H) \rrbracket\eta &= rec: \N \rightarrow 
+    \llbracket  \texttt{rec} (a, h, \hat{h}) \rrbracket\eta &= rec: \N \rightarrow 
     (\bigcup_{n\in \N} \Omega_n \rightarrow \N) \text{ s.t. } \forall n \in \N, \ 
     \forall l \in \Omega_n, \\
     rec(n)(l) &= \sum_{i=0}^{\infty} \llbracket a \rrbracket\eta(\#1k^i(n,l)) \\
     &k^i \text{ is defined inductively as follows:} \\
     k^0 &= (n, l) \\
-    k^i &= (\llbracket h \rrbracket\eta (n') (l'), \llbracket H \rrbracket\eta (n') (l')), \\
+    k^i &= (\llbracket h \rrbracket\eta (n') (l'), \llbracket \hat{h} \rrbracket\eta (n') (l')), \\
     &\text{ where } (n',l') = k^{i-1}(n, l) 
  \end{align*}
  \caption{Denotational semantics for expressions.}
@@ -248,14 +249,14 @@ T(x)(l) = a(x) + T(h_1(x)(l))(\hat{h_1}(x)(l)) + T(h_2(x)(l))(\hat{h_2}(x)(l)),
 \end{align*}
 where $a(x) = x-1$, the cost of one step of quicksort (i.e. comparing all other elements
 in the list to the pivot), $h_1(x)$ and $h_2(x)$ give the sizes of the left and right sublists of an input, and
-$\hat{h_1}$ and $\hat{h_2}$ give the sublists themselves. We may express this function in our expression language
+$\hat{h_1}$ and $\hat{h_2}$ give the sublists themselves. 
+
+We may express this function in our expression language
 as follows:
 \begin{align*}
-\texttt{T} = \texttt{fix}(\lambda x. \lambda f. \lambda l. \ifelse{x=0}{0}{((x-1) 
-		+ f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l)))}
+\texttt{T} = \texttt{rec}(a, (h_1, h_2), (\hat{h_1}, \hat{h_2}))
 \end{align*}
  
  We want to gain some intuition that the interpretation of this expression corresponds to what we would expect
- the cost of quicksort to be. Let $l$ be a sorted list of length $3$, $F = \lambda x. \lambda f. \lambda l. \ifelse{x = 0}{0}
- {((x-1) + f(\texttt{h\_left} \ x \ l)(\texttt{H\_left} \ x \ l) + f(\texttt{h\_right} \ x \ l)(\texttt{H\_right} \ x \ l))}$  and see that
+ the cost of quicksort to be. As a very simple example, let $l = [1,2,3]$ be a list of length $3$,
 

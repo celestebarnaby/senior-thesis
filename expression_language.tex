@@ -12,7 +12,7 @@ this recurrence does not seem to be within the domain of recurrences Karp descri
 of writing this recurrence using the expression language defined in the previous chapter. 
 
 In this chapter, we define an expression language which will allow us to write and type-check the recurrence relations offered 
-in section 2 of Karp's paper. The syntax of this language is mostly analogous to PCF, with one key exception: instead of a 
+in section 2 of Karp's paper. The syntax of this language is mostly analogous to Programming Computable Functions (PCF) ---a typed functional language with a fixed-point combinator--- with one exception: instead of a 
 $\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses in this section. 
 We will circumvent the issues we had with this approach in the previous chapter by writing these recurrences
 using conditional statements $\ifelse{e_1}{e_2}{e_3}$, with $e_2$ corresponding to the initial condition and $e_3$
@@ -422,7 +422,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  ((F_i)^j \perp)) \geq (F_i)^j$. \\
  Suppose, now, that 
  \begin{align*}
- &\bigvee_j(\bigvee_i((F_i)^j \perp)) < \bigvee)i(\bigvee_j((F_i)^j \perp))\\ 
+ &\bigvee_j(\bigvee_i((F_i)^j \perp)) < \bigvee_i(\bigvee_j((F_i)^j \perp))\\ 
  \Rightarrow \exists i \text{ s.t. \ \  \ } &\bigvee_j(\bigvee_i((F_i)^j \perp)) < \bigvee_j (F_i)^j \\
  \Rightarrow \exists i, j \text{ s.t. } &\bigvee_j(\bigvee_i((F_i)^j \perp)) < (F_i)^j \perp  \ \
  \Rightarrow\Leftarrow\\
@@ -467,14 +467,14 @@ $\llbracket \texttt{F} \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) 
  
 \section{Example}
 We will look at a recurrence Karp offers in this section as an example, to check whether recurrences in our expression
-language exhibit the same behavior. First, consider the following recurrence:
+language have the same solution. First, consider the following recurrence:
 \begin{align*}
 T(1) &= 0 \\
 T(n) &= 1 + T(pn), \ 0 < p < 1
 \end{align*} 
-Consider that this recurrence only makes sense if we assume that there can be no input may be smaller than 1,
-and if for any input $n$, there exists a $k \in \N$ such that $p^kn = 1$.
-For $\forall n > 1, \ \exists k \in \N$ such that $p^kn \leq1, p^{k-1}n > 1$. See, then, that $T(n) = 1 + \left \lfloor{\log_{p}1/n}\right \rfloor$. CHANGE STUFF HERE
+Consider that this recurrence only makes sense if its domain is the set $\{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$;
+we will assume that this set is the domain of $T$. 
+ See, then, that $T(n) = 1 +  \log_{p}1/n $
 
 We may express this recurrence in our expression language as the follows:
 \begin{align*}
@@ -548,25 +548,19 @@ F^{n+1}(\perp)(x) &=
 \begin{cases}
 0 \text{ if } x=1 \\
 1 \text{ if } px = 1 \\
-2 \text{ if } p^2x = 1 \leq x \\
+2 \text{ if } p^2x = 1  \\
 \dots \\
-n-1 \text{ if } p^{n}x = 1 \leq p^{n-1}x \\
+n-1 \text{ if } p^{n}x = 1  \\
 \perp \text{ otherwise } 
 \end{cases}
 \end{align*}
 Therefore, the claim holds for $\forall n$.
 
-Consider that since $p<1, \ \lim_{n \to \infty}\{(1/p)^n\} = \infty$. Then for $\forall x \in \R, \exists n \in \N$ such that 
-\begin{align*}
-(1/p)^{n-1} < \ &1/x \leq (1/p)^n \\
-x/p^{n-1} < \ &1 \leq x/p^n \\
-p^nx < \ &1 \leq p^{n-1}x \\
-\end{align*}
-Then $\llbracket \texttt{T} \rrbracket = lim_{n \to \infty}\{F^n (\perp)\}$ is defined for $\forall x \in \R$ as
+Then $\llbracket \texttt{T} \rrbracket = lim_{n \to \infty}\{F^n (\perp)\}$ is defined for $\forall x \in \{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$ as
 \begin{align*}
 \lim_{n \to \infty}\{F^n (\perp)\}(x) = n - 1
 \end{align*}
-Where $n \in \N$ is the minimum number such that $p^nx<1$. Then $\llbracket \texttt{T} \rrbracket(x) = 1 + \left \lfloor{\log_{p}1/n}\right \rfloor = T(x)$. Therefore, $\llbracket \texttt{T} \rrbracket = T$.
+Where $n \in \N$ is the minimum number such that $p^nx<1$. Then $\llbracket \texttt{T} \rrbracket(x) = 1 + \log_{p}1/n= T(x)$. Therefore, $\llbracket \texttt{T} \rrbracket = T$.
  
 
 

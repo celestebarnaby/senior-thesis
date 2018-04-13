@@ -7,7 +7,7 @@ As a first attempt, we consider a simple recurrence with an initial condition
 T(1) &= 0 \\
 T(n) &= 1 + T(n/2 ) 
 \end{align*}
-(for simplicity, suppose that the domain of $T$ is positive powers of $2$).
+As in the example in chapter 3, we assume that the domain of $T$ is positive powers of $2$.
 
 This is the kind of recurrence described in chapter 3. In order to make this fit the definition of a recurrence described in 
 chapter 2 --- that is, a recurrence of the form $T(n) = a(n) + T(m(n))$, we may interpret $a$ as a 
@@ -24,11 +24,11 @@ a(n) &=
 \end{align*} 
 This recurrence can then by expressed in our chapter 2 syntax as 
 \begin{align*}
-\texttt{T} &= \texttt{rec}(\texttt{a},\texttt{m}) \\
-\texttt{m} &= \lambda x.x/\texttt{2} \\
-\texttt{a} &= \lambda x.\ifelse{x\leq\texttt{1}}{\texttt{0}}{\texttt{1}} \\
-\llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(\texttt{a},\texttt{m}) \rrbracket(d) \\
-&= \sum_{i=0}^{\infty}\llbracket \texttt{a} \rrbracket(\llbracket \texttt{m}\rrbracket^i(d)) \\
+\texttt{T} &= \texttt{rec}(a,m) \\
+m &= \lambda x.x/\texttt{2} \\
+a &= \lambda x.\ifelse{x\leq\texttt{1}}{\texttt{0}}{\texttt{1}} \\
+\llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(a,m) \rrbracket(d) \\
+&= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(d)) \\
 &= \sum_{i=0}^{\log(n)-1} 1 + \sum_{i=log(n)}^{\infty} 0 \\
 &= \log(n) - 1
 \end{align*}
@@ -50,11 +50,11 @@ a(n) &=
 \end{align*}
 We then express this recurrence using our chapter 2 syntax as
 \begin{align*}
-\texttt{T} &= \texttt{rec}(\texttt{a},\texttt{m}) \\
-\texttt{m} &= \lambda x.x/\texttt{2} \\
-\texttt{a} &=\lambda x.\ifelse{x\leq\texttt{1}}{\texttt{1}}{\texttt{2}} \\
-\llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(\texttt{a},\texttt{m}) \rrbracket(d) \\
-&= \sum_{i=0}^{\infty}\llbracket \texttt{a} \rrbracket(\llbracket \texttt{m}\rrbracket^i(d)) \\
+\texttt{T} &= \texttt{rec}(a,m) \\
+m &= \lambda x.x/\texttt{2} \\
+a &=\lambda x.\ifelse{x\leq\texttt{1}}{\texttt{1}}{\texttt{2}} \\
+\llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(a,m) \rrbracket(d) \\
+&= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(d)) \\
 &= \sum_{i=0}^{\log(n)-1} 2 + \sum_{i=\log(n) }^{\infty} 1 \\
 &= \infty
 \end{align*}
@@ -76,21 +76,17 @@ a(n) &=
 \end{align*}
 We can express this recurrence using our fixed-point syntax as
 \begin{align*}
-\texttt{T} &= \texttt{rec}(\texttt{a},\texttt{m}) \\
-\texttt{m} &= \lambda x.x/\texttt{2} \\
-\texttt{a} &= \lambda x.\ifelse{x <1}{0}{(\ifelse{x = 1}{1}{2})} \\
-\llbracket \texttt{a} \rrbracket(d) &= 
-%\begin{cases}
-%0, \ d < 1 \\
-%\llbracket \ifelse{x=1}{1}{2}\rrbracket\{x \mapsto d\}, \ d \geq 1
-%\end{cases} \\
+\texttt{T} &= \texttt{rec}(a,m) \\
+m &= \lambda x.x/\texttt{2} \\
+a &= \lambda x.\ifelse{x <1}{0}{(\ifelse{x = 1}{1}{2})} \\
+\llbracket a \rrbracket(d) &= 
  \begin{cases}
 0, \ d < 1 \\
 1, \ d = 1 \\
 2, \ d > 1 
 \end{cases} \\
-\llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(\texttt{a},\texttt{m})\rrbracket(d) \\
-&= \sum_{i=0}^{\infty}\llbracket \texttt{a} \rrbracket(\llbracket \texttt{m}\rrbracket^i(d)) \\
+\llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(a,m)\rrbracket(d) \\
+&= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(d)) \\
 &= \sum_{i=0}^{\log(n)-1} 2 + \sum_{i=\log(n) }^{\log(n)} 1 + \sum_{i = \log(n) + 1}^{\infty} 0 \\
 &= 2\log(n) - 1
 \end{align*}
@@ -131,12 +127,12 @@ a' = \lambda x.\lambda f. \ifelse{x < b}{0}{(\ifelse{x = b}{c}{a(x)})}.
 \end{align*}
 Then the denotation of $\texttt{rec}(a',m)$ is a function F' such that 
 \begin{align*}
-F'(x) &= \sum_{i=0}^{\infty} a(m^i(x)) \\
-&= \sum_{i=0}^{n-1} a(m^i(x)) + \sum_{i=n}^n c + \sum_{i = n+1}^{\infty} 0 \\
-&\text{ where } m^n(x) = b \\
-&= \sum_{i=1}^{n}a(m^{i-1}(x)) + c
+F'(x) &= \sum_{i=0}^{\infty} \llbracket a' \rrbracket(\llbracket m \rrbracket^i(x)) \\
+&= \sum_{i=0}^{n-1} \llbracket a' \rrbracket( \llbracket m \rrbracket^i(x)) + \sum_{i=n}^n c + \sum_{i = n+1}^{\infty} 0 \\
+&\text{ where } \llbracket m \rrbracket^n(x) = b \\
+&= \sum_{i=1}^{n}\llbracket a' \rrbracket ( \llbracket m \rrbracket^{i-1}(x)) + c
 \end{align*}
-See, then, that F' = F. Therefore, this confirms that, given an expression $e$ of the specific form
+See, then, that $F' = F$. Therefore, this confirms that, given an expression $e$ of the specific form
 $e = \ifelse{x = m}{c}{a(x) + f(m(x))}$, we can extract a function a' such that 
 \begin{align*}
 \llbracket \texttt{fix}(\lambda f. \lambda x.e) \rrbracket = \llbracket \texttt{rec}(a',m)\rrbracket
