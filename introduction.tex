@@ -69,19 +69,20 @@ quicksort taking much longer than $O(n \log n)$ is very small.
 
 While there are proofs that the average-case runtime of randomized quicksort is $O(n\log n)$, they commonly use
 imprecise, ad hoc arguments: that is, they cannot be applied to other algorithms with similar randomized elements. 
-\cite{Karp} offers a method for analyzing stochastic divide-and-conquer processes by describing them as recurrence relations of the form
+\cite{Karp} offers a method for analyzing stochastic divide-and-conquer processes by describing their costs as recurrence relations of the form
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x))
 \end{align*}
-where $x$ is a non-negative real number describing the size of the input,\\ $h_1(x) \dots h_n(x)$ are random variables 
-describing the sizes of the subproblems (e.g. in the case of quicksort $h_1(x)$ and $h_2(x)$ describe the sizes of the two 
-sublists), $a$ is a function describing the work necessary to generate these subproblems, and $T(x)$ is a random variable 
-describing the total running time of the algorithm. Karp then offers several methods for obtaining tight bounds on the upper tails of the probability distribution of $T(x)$. 
+where $x$ is a non-negative real number describing the size of the input, $h_1(x)$ through $h_n(x)$ are random 
+variables describing the sizes of the subproblems (e.g. in the case of quicksort $h_1(x)$ and $h_2(x)$ describe the sizes 
+of the two sublists), $a$ is a function describing the work necessary to generate these subproblems, and $T(x)$ is a 
+random variable describing the total running time of the algorithm on an input of size x. Karp then offers several methods 
+for obtaining tight bounds on the upper tails of the probability distribution of $T(x)$. 
 
 Note, however, that the recurrence relation $T(x) = a(x) + T(h(x))$ has some clear flaws that 
 emerge when we attempt to assign types to its expressions. Since $T(x)$ is supposed to be random
 variable over inputs of size $x$, $T(x)$ is a function of type 
-$\Omega_x \rightarrow \R$, where $\Omega_x$ is the sample space of inputs of size $x$. Then $T$ is a 
+$\Omega_x \rightarrow \R$, where $\Omega_x$ is the sample space of inputs of size $x$. Then $T$ is essentially a 
 function of type $\R \rightarrow (\Omega_x \rightarrow \R)$. However, we see that $T$ recursively takes 
 $h(x)$ as an argument, even though $h(x)$ is a described as random variable with type $\Omega_x \rightarrow \R$, 
 rather than $\R$. This type-checking error is likely a result of the informality of the recurrence description, 
@@ -102,35 +103,26 @@ these observations.
 \section{Contributions of This Thesis}
 
 Karp offers the equation $T'(x) = a(x) + T'(m(x))$ as a deterministic counterpart of a recurrence relation $T(x) = a(x) + 
-T(h(x))$, where, for all $x$, $m(x)$ is equal to the upper bound of $h(x)$. This thesis defines syntaxes that allow
+T(h(x))$, where, for all $x$, $m(x)$ is equal to the upper bound of $h(x)$. This thesis defines languages that allow
 us to write and type-check both probabilistic recurrences of the form $T'$, and deterministic recurrences
-of the form $T$. These syntaxes comprise a simple expression language including natural number constants, identifiers, basic arithmetic operations, booleans, and application. Further, these syntaxes must provide
+of the form $T$. These languages comprise a simple expression language including natural number constants, identifiers, basic arithmetic operations, booleans, and application. Further, these languages must provide
 a way to express recursive functions, since this work centers around expressing recurrence relations. 
-A natural approach to this is to model our languages off of PCF, including a fixed-point combinator $\texttt{fix}$.  
-
- We also define a 
-denotational semantics for these expression languages, wherein all types interpret to a complete partial order---that is, an ordered
-set which has a bottom element and where every chain has a least upper bound. For instance, the type {\tt bool}, assigned
-to boolean constants, interprets to $\{\text{true, false}\}_{\perp}$---the flat partial order of the set  $\{true, 
-\ false\}$ where
-both elements are comparable to only a bottom element $\perp$. In addition each arrow type $\sigma 
-\rightarrow \tau$ interprets to the set of all continuous functions of type $\llbracket \sigma \rrbracket \rightarrow 
-\llbracket \tau \rrbracket$. 
-
- While imposing these restrictions limits the programs we can interpret to some extent, it ensures 
-that every type interprets to a complete partial order (CPO), and every arrow type expression interprets to a continuous 
-function. These two criteria allow us to use the CPO fixed-point theorem to define a function $fix$ which assigns the least 
-fixed point to continuous functions with type $\tau \rightarrow \tau$. This in turn allows us to interpret recurrence relations 
-by defining a $\texttt{fix}$ operation and letting all $\texttt{fix}(\lambda f.\lambda x.e)$ expressions interpret to 
-$fix(\llbracket\lambda f.\lambda x.e\rrbracket$. We show that our denotation of a recurrence is equal to the solution Karp 
-offers, thus verifying that our recurrence relations are equivalent to Karp's.
  
- However, as we will see in chapters 2 and 5,  complications arise which  prohibit us from taking
- such an approach in all but one specific case (described in chapter 3). 
- For our syntaxes for general deterministic and probabilistic recurrences, we instead introduce a $\texttt{rec}$ 
- operator, allowing us to interpret a subset of recursive functions---including recurrences of the form
- described by Karp.
- 
- The last three paragraphs of Chapter 1 need some work.  This should be a sort of narrative table of contents of the remaining chapters, and should follow the order of those chapters.  Thus you might start off by saying that in Chapter 2 you will define a language and denotational semantics that formalizes deterministic recurrences.  A natural approach would be to use a general fixpoint construction and CPO semantics, but this turns out to result in unexpected problems.  Instead, you define a more restricted language that has a more restricted recursion construct, which you interpret using infinite sums.  However, the recurrences that Karp proves theorems about do not have the same form as the ones that come up in his examples of applications.  Thus in Chapter 3 you formulate a language for those recurrences, and there you are able to use a general fixpoint construction and CPO semantics.  You then investigate the difficulty of reconciling these two seemingly different forms of recursive definitions in Chapter 4.  Of course, the main point of Karp's paper is probabilistic recurrences, and so you turn to a language and semantics for them in Chapter 5.  This turns out to be quite complex, as the typing of these recurrences itself is already problematic.  The solution is to use dependent types.  However, it is quite difficult to combine dependent types with CPOs, so you focus on a semantics that corresponds to the infinite sum interpretation for deterministic recurrences.  You conclude in Chapter 6 with a discussion of how your work fits into Danner et al.'s recurrence extraction framework and further work.
+In Chapter 2 we will define a language and denotational semantics that formalizes deterministic recurrences.  A natural 
+approach would be to use a general fixed-point construction and CPO semantics; however, this turns out to result in some 
+unexpected problems. Instead, we define a language that has a more restrictive recursion construct $\texttt{rec}$, which 
+we interpret using infinite sums.  
+
+While Karp proves theorems about recurrences of the form $T(x) = a(x) + T(m(x))$, the recurrences that come up in his 
+examples of applications take a different form. Thus in Chapter 3, we formulate a language for those recurrences, where 
+we are in fact able to use a general fixed-point construction and CPO semantics.  We then investigate the difficulty of 
+reconciling these two seemingly different forms of recursive definitions in Chapter 4. 
+
+ Of course, the main point of Karp's paper is probabilistic recurrences, and so we define a language and semantics for 
+ them in Chapter 5.  This turns out to be quite complex: as discussed above, the typing of these recurrences itself is 
+ already problematic. Our solution is to support dependent types in our language. Since it proves to be quite difficult to 
+ combine dependent types with CPOs, we focus on a semantics that corresponds to the infinite sum interpretation for
+ deterministic recurrences.  You conclude in Chapter 6 with a discussion of how your work fits into Danner et al.'s 
+ recurrence extraction framework and further work.
  
 

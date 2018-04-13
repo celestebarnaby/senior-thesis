@@ -75,7 +75,7 @@ on datatypes other than lists; this language could easily be expanded to include
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
      \ifelse{e}{e}{e} \mid \\
-     && \texttt{rec}(a, h, \hat{h}) 
+     && \texttt{rec}(a, (h_1, \ldots, h_n), (\hat{h_1}, \ldots \hat{h_n})) 
 \end{array}
 \]
 
@@ -162,7 +162,7 @@ We offer standard type judgements, as well as judgements for when a type is well
 \dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
 	{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
 \dfrac{\Gamma \vdash a: \Pi (n:\texttt{nat}).\texttt{nat} \ \ \ \Gamma \vdash h: \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat}) \ \ \ \Gamma \vdash \hat{h}: \Pi(n: \texttt{nat}).(\Pi(l : \lst(n)).\lst(h n l))}
-	{\Gamma \vdash \texttt{rec}(a, h, \hat{h}) : \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat})}
+	{\Gamma \vdash \texttt{rec}(a, (h_1, \ldots, h_n), (\hat{h_1} \ldots \hat{h_n})) : \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat})}
 \end{array}
 \]
 \caption{Typing for dependent type language.}
@@ -180,8 +180,10 @@ e = e \\ \\
 \ifelse{\texttt{ false }}{e_1}{e_2} = e_2 \\ \\ 
 \lambda x.e = \lambda y.[x \mapsto y]e, \text{provided } y \text{ not free in } e. \\ \\ \\
 \lambda x.e_1 \ e_2 = [x \mapsto e_2]e_1 \\
-\texttt{rec}(\lambda x.e_1, \lambda x.\lambda l.e_2, \lambda x.\lambda l.e_3) = 
-\lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.\lambda l.e_2, \lambda x.\lambda l.e_3)(e_2)(e_3))
+\texttt{rec}(\lambda x.a, ( \lambda x.\lambda l.h_1, \ldots \lambda x.\lambda l.h_n)
+( \lambda x.\lambda l.\hat{h_1}, \ldots \lambda x.\lambda l.\hat{h_n})= \\
+\lambda x.(e_1 + \sum_{i=1}^n(\texttt{rec}(\lambda x.a, \sum_{i=1}^n \lambda x.\lambda l.h_i, 
+\sum_{i=1}^n \lambda x.\lambda l.\hat{h_i}) h_i  \ \hat{h_i}))
 \end{array}
 \]
 \caption{Equational Semantics for the language.}
@@ -217,7 +219,7 @@ e = e \\ \\
  \llbracket e_1 = e_2 \rrbracket\eta &= 
  \begin{cases} 
       true \text{ if } (\llbracket e_1 \rrbracket\eta = \llbracket e_2 \rrbracket\eta) \\
-      false \text{  if } (\llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta\\
+      false \text{  if } (\llbracket e_1 \rrbracket\eta \neq \llbracket e_2\rrbracket\eta)\\
    \end{cases} \\
 \text{Similar rules for $<, \ \leq, >, \geq$} \\
   \llbracket \ifelse{e_1}{e_2}{e_3} \rrbracket \eta &= 
@@ -226,29 +228,28 @@ e = e \\ \\
       \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\ 
    \end{cases}
   \\
-    \llbracket  \texttt{rec} (a, h, \hat{h}) \rrbracket\eta &= rec: \N \rightarrow 
-    (\bigcup_{n\in \N} \Omega_n \rightarrow \N) \text{ s.t. } \forall n \in \N, \ 
-    \forall l \in \Omega_n, \\
-    rec(n)(l) &= \sum_{i=0}^{\infty} \llbracket a \rrbracket\eta(\#1k^i(n,l)) \\
-    &k^i \text{ is defined inductively as follows:} \\
-    k^0 &= (n, l) \\
-    k^i &= (\llbracket h \rrbracket\eta (n') (l'), \llbracket \hat{h} \rrbracket\eta (n') (l')), \\
-    &\text{ where } (n',l') = k^{i-1}(n, l) 
+    \llbracket  \texttt{rec} (a,\sum_{i=1}^n h_i,\sum_{i=1}^n \hat{h_i}) \rrbracket\eta &= rec: \N \rightarrow 
+    (\bigcup_{n\in \N} \Omega_n \rightarrow \N)   \text{ s.t. }  \\
+  \forall n \in \N, \ 
+    \forall l \in \Omega_n, 
+    rec(n)(l) &= \sum_{j=0}^{\infty}(\sum_{(n',l') \in S^j(n,l)} \llbracket a \rrbracket\eta(n')) \\
+    &S^j \text{ is defined inductively as follows:} \\
+    S^0(n,l) &= \{(n, l)\} \\
+    S^{j+1}(n,l) &= \bigcup_{0<i \leq n}\{(\llbracket h_i \rrbracket\eta(n')(l') , \llbracket \hat{h_i} \rrbracket\eta(n')(l')) \mid 
+    \forall (n', l') \in S^j \}
  \end{align*}
  \caption{Denotational semantics for expressions.}
  \end{figure}
 
-\section{Example}
 We want to gain some intuition that our denotation of a $\texttt{rec}$ expression is equivalent to the solution of
-the corresponding semantic recurrence. 
-
-We will look at a random variable $T$ describing the cost of quicksort, where the pivot is chosen to be the first element 
-of the list. Following Karp's definition, this random variable has the form 
+the corresponding semantic recurrence. To that end, we will show that, for a program $T$ describing a recurrence for 
+quicksort, the denotation of $T$ for valid inputs is equal to the actual cost of quicksorting. 
+ Following Karp's definition, this random variable has the form 
 \begin{align*}
 T(x)(l) = a(x) + T(h_1(x)(l))(\hat{h_1}(x)(l)) + T(h_2(x)(l))(\hat{h_2}(x)(l)), 
 \end{align*}
 where $a(x) = x-1$, the cost of one step of quicksort (i.e. comparing all other elements
-in the list to the pivot), $h_1(x)$ and $h_2(x)$ give the sizes of the left and right sublists of an input, and
+in the list to the head of the list), $h_1(x)$ and $h_2(x)$ give the sizes of the left and right sublists of an input, and
 $\hat{h_1}$ and $\hat{h_2}$ give the sublists themselves. 
 
 We may express this function in our expression language
@@ -256,7 +257,48 @@ as follows:
 \begin{align*}
 \texttt{T} = \texttt{rec}(a, (h_1, h_2), (\hat{h_1}, \hat{h_2}))
 \end{align*}
- 
- We want to gain some intuition that the interpretation of this expression corresponds to what we would expect
- the cost of quicksort to be. As a very simple example, let $l = [1,2,3]$ be a list of length $3$,
+Then, we want to prove the following claim:
+\begin{thm}
+For all $n \in \N, \ l \in \Omega_n$, suppose $\llbracket h_1 \rrbracket\eta (n)(l)$ and $\llbracket h_2 \rrbracket\eta (n)(l)$
+are equal to the number of elements in the $l$ less than and greater than or equal to the head of the $l$, respectively (that is,
+they accurately reflect the sizes of the subproblems of quicksort). Then $\llbracket T \rrbracket\eta (n)(l)$ is equal to the cost
+of performing quicksort on $l$. 
+\end{thm} 
+
+\begin{proof}
+By induction on $n$.
+
+Base case: $n = 1$.  For all $l \in \Omega_n, \ l$ is a list of length $1$. Then
+\begin{align*}
+\llbracket \texttt{T} \rrbracket\eta (n)(l) &=  \sum_{j=0}^{\infty}(\sum_{(n',l') \in S^j(n,l)} \llbracket a \rrbracket\eta(n')) \\
+&= \llbracket a \rrbracket\eta(n) + \sum_{j=1}^{\infty}(\sum_{(n',l') \in S^j(n,l)} \llbracket a \rrbracket\eta(n')) \\
+&= \llbracket a \rrbracket\eta(n) + 0 = n - 1 = 0,
+\end{align*}
+since the subproblems of quicksorting a list of length 1 both have size $0$. See that this is the actual cost of performing
+quicksort on a list of length $1$, so the claim holds in the base case.
+
+Inductive case: Suppose the claim holds for all $k < n$, and let $l \in \Omega_n$. Then
+\begin{align*}
+ \llbracket \texttt{T} \rrbracket\eta (n)(l) &=  \sum_{j=0}^{\infty}(\sum_{(n',l') \in S^j(n,l)} \llbracket a \rrbracket\eta(n')) \\
+ &= \llbracket a \rrbracket\eta(n) + \sum_{j=1}^{\infty}(\sum_{(n',l') \in S^j(n,l)} \llbracket a \rrbracket\eta(n')) \\
+&= (n-1) + \sum_{j=0}^{\infty}(\sum_{(n',l') \in S^j(\llbracket h_1 \rrbracket\eta(n),
+\llbracket \hat{h_1} \rrbracket \eta(l))} \llbracket a \rrbracket\eta(n')) \\
+ & \text{ \ \ \ \ \ \ \ \ \ \ \ \ } + \sum_{j=0}^{\infty}(\sum_{(n',l') \in S^j(\llbracket h_2 \rrbracket \eta(n),
+ \llbracket \hat{h_2} \rrbracket \eta(l))} \llbracket a \rrbracket\eta(n')) \\
+ &= (n-1) + \llbracket \texttt{T} \rrbracket\eta(\llbracket h_1 \rrbracket\eta(n)(l))(\llbracket \hat{h_1} \rrbracket\eta(n)(l)) \\
+ &\text{ \ \ \ \ \ \ \ \ \ \ \ \ }+  \llbracket \texttt{T} \rrbracket\eta(\llbracket h_2 \rrbracket\eta(n)(l))(\llbracket \hat{h_2} \rrbracket\eta(n)(l))  
+\end{align*}
+By inductive hypothesis, 
+\begin{align*}
+&\llbracket \texttt{T} \rrbracket\eta(\llbracket h_1 \rrbracket\eta(n)(l))(\llbracket \hat{h_1} \rrbracket\eta(n)(l)) \text{ and } \\
+&\llbracket \texttt{T} \rrbracket\eta(\llbracket h_2 \rrbracket\eta(n)(l))(\llbracket \hat{h_2} \rrbracket\eta(n)(l))
+\end{align*}
+ are equal
+to the cost of performing quicksort on the left and right sublists of $l$. Then $\llbracket \texttt{T} \rrbracket\eta (n)(l)$ is equal 
+to the sum of these costs, plus $n-1$; this is the cost of performing quicksort on $l$.
+
+Therefore, the claim holds for all $n$.
+\end{proof}
+Thus, we have a clearer indication that the syntax and denotational semantics defined in this chapter correctly 
+represent Karp's probabilistic recurrence relations.
 
