@@ -10,7 +10,7 @@ is, on average, much more efficient. Developing methods for extracting a tighter
 
 The cost of an algorithm is a function from the size of the input of the algorithm to the number of steps necessary to evaluate 
 that input. As an example, consider the following $\texttt{add}$ function, which adds an integer $x$ to every element 
-in a list $ys$ of integers:
+in a list $ys$ of integers: \\
 \begin{verbatim}
 let rec add x ys =
 	match ys with
@@ -118,14 +118,19 @@ both elements are comparable to only a bottom element $\perp$. In addition each 
 \llbracket \tau \rrbracket$. 
 
  While imposing these restrictions limits the programs we can interpret to some extent, it ensures 
-that every type interprets to a CPO, and every arrow type expression interprets to a continuous function. These two 
-criteria allow us to use the CPO fixed-point theorem to define a function $fix$ which assigns the least fixed point to continuous functions with type $\tau \rightarrow \tau$. This in turn allows us to interpret recurrence relations by defining a $\texttt{fix}$ operation and letting all $\texttt{fix}(\lambda f.\lambda x.e)$ expressions interpret to $fix(\llbracket\lambda f.\lambda x.e\rrbracket$. We show that our denotation of a recurrence is equal to the solution Karp offers,
-thus verifying that our recurrence relations are equivalent to Karp's.
+that every type interprets to a complete partial order (CPO), and every arrow type expression interprets to a continuous 
+function. These two criteria allow us to use the CPO fixed-point theorem to define a function $fix$ which assigns the least 
+fixed point to continuous functions with type $\tau \rightarrow \tau$. This in turn allows us to interpret recurrence relations 
+by defining a $\texttt{fix}$ operation and letting all $\texttt{fix}(\lambda f.\lambda x.e)$ expressions interpret to 
+$fix(\llbracket\lambda f.\lambda x.e\rrbracket$. We show that our denotation of a recurrence is equal to the solution Karp 
+offers, thus verifying that our recurrence relations are equivalent to Karp's.
  
  However, as we will see in chapters 2 and 5,  complications arise which  prohibit us from taking
  such an approach in all but one specific case (described in chapter 3). 
  For our syntaxes for general deterministic and probabilistic recurrences, we instead introduce a $\texttt{rec}$ 
  operator, allowing us to interpret a subset of recursive functions---including recurrences of the form
  described by Karp.
+ 
+ The last three paragraphs of Chapter 1 need some work.  This should be a sort of narrative table of contents of the remaining chapters, and should follow the order of those chapters.  Thus you might start off by saying that in Chapter 2 you will define a language and denotational semantics that formalizes deterministic recurrences.  A natural approach would be to use a general fixpoint construction and CPO semantics, but this turns out to result in unexpected problems.  Instead, you define a more restricted language that has a more restricted recursion construct, which you interpret using infinite sums.  However, the recurrences that Karp proves theorems about do not have the same form as the ones that come up in his examples of applications.  Thus in Chapter 3 you formulate a language for those recurrences, and there you are able to use a general fixpoint construction and CPO semantics.  You then investigate the difficulty of reconciling these two seemingly different forms of recursive definitions in Chapter 4.  Of course, the main point of Karp's paper is probabilistic recurrences, and so you turn to a language and semantics for them in Chapter 5.  This turns out to be quite complex, as the typing of these recurrences itself is already problematic.  The solution is to use dependent types.  However, it is quite difficult to combine dependent types with CPOs, so you focus on a semantics that corresponds to the infinite sum interpretation for deterministic recurrences.  You conclude in Chapter 6 with a discussion of how your work fits into Danner et al.'s recurrence extraction framework and further work.
  
 
