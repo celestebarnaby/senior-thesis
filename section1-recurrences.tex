@@ -193,6 +193,7 @@ If $\Gamma \vdash e:\tau$, then $\llbracket \Gamma \vdash e : \tau \rrbracket\et
       \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\
    \end{cases}
   \\
+    \llbracket (e_1,e_2) \rrbracket\eta &= (\llbracket e_1 \rrbracket\eta,\llbracket e_2 \rrbracket\eta) \\
    \llbracket  \texttt{rec} (\lambda x.e_1, \lambda x.e_2) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
    rec(d) &= \sum_{i=0}^{\infty}\llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2 \rrbracket\eta)^i(d))
  \end{align*}

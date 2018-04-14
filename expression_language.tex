@@ -1,5 +1,5 @@
-\chapter{Deterministic Recurrences as fixed-points}
-In section 2, Karp offers several example applications of his cost-bounding theorems. However, the recurrences
+\chapter{Deterministic Recurrences as Fixed Points}
+\cite[\S2]{Karp} offers several example applications of his cost-bounding theorems. However, the recurrences
 he offers here do not follow the definition he set forth in the prior section. For example, a recurrence for a randomized list 
 ranking algorithms is written as
 \begin{align*}
@@ -9,22 +9,21 @@ T(n) &= 1 + T(3/4n)
 The presence of an initial condition here is confusing: Karp has made no mention of initial conditions up to this point, and 
 there is no clear way to write the above equations as one equation of the form $T(x) = a(x) + T(m(x))$. Simply put, 
 this recurrence does not seem to be within the domain of recurrences Karp describes in section 1. Thus, we have no way
-of writing this recurrence using the expression language defined in the previous chapter. 
+of writing this recurrence using the language defined in the previous chapter. 
 
-In this chapter, we define an expression language which will allow us to write and type-check the recurrence relations offered 
-in section 2 of Karp's paper. The syntax of this language is mostly analogous to Programming Computable Functions (PCF) ---a typed functional language with a fixed-point combinator--- with one exception: instead of a 
+In this chapter, we define a language which allows us to write and type-check the recurrence relations offered in section 2 of Karp's paper. The syntax of this language is mostly analogous to Programming Computable Functions (PCF) ---a typed functional language with a fixed-point combinator--- with one exception: instead of a 
 $\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of the functions Karp discusses in this section. 
 We will circumvent the issues we had with this approach in the previous chapter by writing these recurrences
 using conditional statements $\ifelse{e_1}{e_2}{e_3}$, with $e_2$ corresponding to the initial condition and $e_3$
 to the general condition. We will see that this approach will allow us to have strict evaluation of base operations, while
-still obtaining correct solutions to recurrences.\\ 
+still obtaining correct solutions to recurrences.
 \[
 \begin{array}{rcl}
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e 
 \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \mid \\
+     \ifelse{e}{e}{e} \mid (e_1, e_2) \mid \\
      && \texttt{fix} (\lambda f.\lambda x.e) 
 \end{array}
 \]
@@ -43,6 +42,7 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 , \circ \in \{=, <, >, \geq, \leq\} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
 {\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
+\dfrac{\Gamma \vdash e_1 : \tau_1 \ \ \ \Gamma \vdash e_2: \tau_2}{\Gamma \vdash (e_1, e_2) : \tau_1 \times \tau_2}
 \dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
 {\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau} 
 \end{array}
@@ -70,18 +70,31 @@ e = e \\ \\
 \label{fig:typing}
 \end{figure}
 
-The denotational semantics of our expression language is  standard, with types interpreting to flat-ordered sets. 
-That is, each type interprets to a set with a bottom element, $\perp$, where each element of the set is comparable
-only to $\perp$. 
+The equational semantics of our language is given in Figure 2, and the denotational semantics is given in figures 3 and 4.
+This semantics is the standard one for PCF, where each type interprets to a complete
+partially ordered set (CPO). A CPO is a set $S$ with two defining properties. But before we state these properties,
+we first offer some definitions related to ordered sets. An element $\perp \in S$ is called the bottom element if for all
+$s \in S, \ \perp \leq s$. A subset $C \subset S$ is called a chain if $C = \{c_1, c_2, c_3, \dots\}$, where 
+$c_1 \leq c_2 \leq c_3 \leq \dots$. An upper bound on $C$ is an element $a \in S$ such that for all $i, \ c_i \leq a$. 
+The least upper bound $\bigvee C$ is an upper bound of C such that, for any upper bound $a$ of $C, \ \bigvee C \leq a$.
+
+With these definitions in mind, we say S is a CPO if
+\begin{align*}
+&\text{1) S has a bottom element }\perp.\\
+&\text{2) For any chain }C \subset S, \ \bigvee C \in S. \\
+\end{align*}
+
 \begin{figure}
  \begin{align*}
 \llbracket \texttt{real} \rrbracket &= \R_{\perp} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
+\text{For any set } S, \ S_{\perp} &= S \cup \{\perp\}, \text{ where for all } x, y\in S, \ x \leq y \iff x = \perp. \\
+ \text{This is called the}&\text{ flat ordering of } S.\\
  \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
- \text{For } \forall (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a<c \text{ and } b<d. \\ 
+ \text{For all } (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a<c \text{ and } b<d. \\ 
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
  \ f \text{ is continuous}\} \\
- \text{ For } \forall f, \ g \in \llbracket \tau \rightarrow \sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
+ \text{ For all } f, \ g \in \llbracket \tau \rightarrow \sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
  \llbracket \tau \rrbracket, \ f(x) \leq g(x) 
  \end{align*}
  \caption{Denotational semantics for types.}
@@ -116,6 +129,7 @@ only to $\perp$.
       \perp \text{      otherwise} \\
    \end{cases}
   \\
+  \llbracket (e_1,e_2) \rrbracket\eta &= (\llbracket e_1 \rrbracket\eta,\llbracket e_2 \rrbracket\eta) \\
    \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= fix\llbracket \lambda f.\lambda x.e \rrbracket\eta \\
  \text{where } fix &\text{ assigns the least fixed point to continuous functions} 
  \end{align*}
@@ -128,7 +142,7 @@ In order to use this theorem on the interpretation of $\texttt{fix}(\lambda f. \
 we must first show that for all types $\tau$, $\llbracket \tau \rrbracket$ is a CPO.
 \begin{thm}
 For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
-set with a bottom element, such that for $\forall C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
+set with a bottom element, such that for all $ C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
 upper bound in $\llbracket \tau \rrbracket$. 
 \end{thm}
 \begin{proof}
@@ -149,8 +163,8 @@ $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and
 Let $C \subset \llbracket \tau \rrbracket$ be a
 chain, and define
 \begin{center}
-$C_1 = \{x \in \llbracket \tau_1 \rrbracket : (x,y) \in C\},$ \\
-$C_2 = \{ y \in \llbracket \tau_2 \rrbracket: (x,y) \in C\}$. \\ 
+$C_1 = \{x \in \llbracket \tau_1 \rrbracket \mid \exists y \in \llbracket \tau_2 \rrbracket \text{ s.t. } (x,y) \in C\},$ \\
+$C_2 = \{ y \in \llbracket \tau_2 \rrbracket\mid \exists x \in \llbracket \tau_1 \rrbracket \text{ s.t. } (x,y) \in C\}$. \\ 
 \end{center}
 Then $C_1 \subset \llbracket \tau_1 \rrbracket$ and $C_2 \subset \llbracket \tau_2 \rrbracket$ are chains, so $\bigvee C_1$
 and $\bigvee C_2$ exist. We claim that $(\bigvee C_1, \bigvee C_2)$ is the least upper bound of $C$. 
@@ -162,36 +176,37 @@ Now let $(x,y) \in \llbracket \tau \rrbracket$ be an upper bound of C. Then $\fo
 bound of $C_1$. Similarly, $y$ is an upper bound of $C_2$. Thus, it must be that $\bigvee C_1 \leq x$ and 
 $\bigvee C_2 \leq y$, so $(\bigvee C_1, \bigvee C_2) \leq (x,y)$. Therefore, $(\bigvee C_1, \bigvee C_2)$ is the least upper
 bound of $C$.
- 
-See, then, that by definition $\llbracket \tau \rrbracket$ is a CPO.
 
 \item $\tau = \tau_1 \rightarrow \tau_2$ \\ \\
-Note $\llbracket \tau \rrbracket = \{f : \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket : f \text{ is continuous}\}
+Note $\llbracket \tau \rrbracket = \{f \mid \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket : f \text{ is continuous}\}
 $. By inductive hypothesis, $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom
 elements $\perp_1$ and $\perp_2$, respectively. Let $\perp: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 
-\rrbracket$ be a function such that, for $\forall x \in \llbracket \tau_1 \rrbracket, \ \perp(x) = \perp_2$. See, then, that 
+\rrbracket$ be the function such that, for all $ x \in \llbracket \tau_1 \rrbracket, \ \perp(x) = \perp_2$. See, then, that 
 $\perp$ is a continuous function that is less than or equal to every function in $\llbracket \tau \rrbracket$ (using pointwise
 ordering), so $\perp$ is the bottom element of $\llbracket \tau \rrbracket$.  
 
 Let $C \subset \llbracket \tau \rrbracket$ be a 
-chain, and consider that for $\forall x \in \tau_1, \{f(x) : f \in C\}$ is a chain in $\llbracket \tau_2 \rrbracket$. Call this set $F_x$,
+chain, and consider that for all $ x \in \tau_1, \{f(x) \mid f \in C\}$ is a chain in $\llbracket \tau_2 \rrbracket$. Call this set $F_x$,
 and note that $\bigvee F_x$ exists. We define a function $g: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket$ 
 such that $\forall x \in \llbracket \tau_1 \rrbracket, \ g(x) = \bigvee F_x$. We claim that $g = \bigvee C$. 
 
-Let $f \in C$, and note that for $\forall x \in \llbracket \tau_1 \rrbracket, \ f(x) \leq \bigvee F_x =g(x)$. Then $g$ is an upper bound of $C$.
+Let $f \in C$, and note that for all $ x \in \llbracket \tau_1 \rrbracket, \ f(x) \leq \bigvee F_x =g(x)$. Then $g$ is an upper bound of $C$.
 
-Now let $\rho \in \llbracket \tau \rrbracket$ be an upper bound of $C$. Then for $\forall x \in \llbracket \tau_1 \rrbracket, \forall f \in C, \ f(x) \leq \rho(x)$, so $\rho(x)$ is an upper bound of $\{f(x) : f \in C\} = F_x$. Thus $\rho(x) \geq F_x = g(x), \ \forall x \in 
+Now let $\rho \in \llbracket \tau \rrbracket$ be an upper bound of $C$. Then for all $ x \in \llbracket \tau_1 \rrbracket, f \in C, \ f(x) \leq \rho(x)$, so $\rho(x)$ is an upper bound of $\{f(x) : f \in C\} = F_x$. Thus $\rho(x) \geq F_x = g(x), \ \forall x \in 
 \llbracket \tau_1 \rrbracket$, so $g \leq \rho$. Therefore, g is the least upper bound of $C$.
-
-See, then, that by definition $\llbracket \tau \rrbracket$ is a CPO. 
 \end{itemize} 
 \end{proof}
 %
 
-Further, we must show that all $\texttt{fix}$ expressions interpret to continuous functions. It will suffice to prove type
-soundness of our denotational semantics: $\text{fix}$ expressions have type $\tau \rightarrow \tau$, and 
-$\llbracket \tau \rightarrow \tau \rrbracket$ is the set of continuous functions from $\llbracket \tau \rrbracket$ to
-$\llbracket \tau \rrbracket$. 
+Further, we must show that the argument $\lambda f\lambda x.e$ of a $\texttt{fix}$ expression interprets to a continuous function. Note that a function $f: P \rightarrow Q$ (where $P$ and $Q$ are CPOs) is defined to be continuous if, for every
+chain $C$ in $P, \ f(\bigvee C) = \bigvee f(C)$ It will suffice to prove type
+soundness of our denotational semantics: $\lambda f\lambda x.e$ expressions have type $(\tau \rightarrow \sigma) \rightarrow (\tau \rightarrow \sigma)$, and 
+$\llbracket (\tau \rightarrow \sigma) \rightarrow (\tau \rightarrow \sigma) \rrbracket$ is the set of continuous functions from $\llbracket \tau \rightarrow \sigma \rrbracket$ to
+$\llbracket \tau \rightarrow \sigma \rrbracket$. 
+
+We will see, that in order to prove type soundness for $\lambda x.e$ expressions, we will need to show that 
+$\llbracket \lambda x.e \rrbracket$ is a continuous function. Thus, the statement of type soundness has some additional
+complexities.
 
 \begin{thm} 
 For all expressions $e$ and environments $\Gamma$,
@@ -205,8 +220,7 @@ For all expressions $e$ and environments $\Gamma$,
 $\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
 \end{enumerate}
 \end{thm}
-We will see, that in order to prove type soundness for $\lambda x.e$ expressions, we will need to show that 
-$\llbracket \lambda x.e \rrbracket$ is a continuous function. Thus, it will be necessary to have $1$.
+
 \begin{proof}
 by induction on the structure of $e$. For all cases, let $\{ a_i \}^{\infty}_{i=1}$ be a chain, and suppose $ a = \bigvee_i a_i$. 
 Note that 2 is trivial in all but the abstraction and $\texttt{fix}$ cases.\\
@@ -215,14 +229,14 @@ Note that 2 is trivial in all but the abstraction and $\texttt{fix}$ cases.\\
  % real number constants
  \item $e \in \{ \texttt{0}, \ \texttt{1}, \ \ldots \}$
  % boolean constants
- \item $e \in \{ \texttt{true}, \ \texttt{false} \}$\\ \\
+ \item $e \in \{ \texttt{true}, \ \texttt{false} \}$\\ 
  %
   In both of these cases, $\llbracket \Gamma \vdash e : \tau \rrbracket$ is a constant function from a $\Gamma$-environment
  $\eta$ to an element of $\llbracket \tau \rrbracket$, so clearly $\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
 \bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$.
 
 % variable
- \item $e = x : \tau$ \\ \\
+ \item $e = x : \tau$ \\ 
  We want to show that $\tmden{\typing\Gamma x\tau}{\extend\eta y {\bigvee_i a_i}} =
 \bigvee_i\tmden{\typing\Gamma x\tau}{\extend\eta y {a_i}}$.
 
@@ -257,7 +271,7 @@ In the case that $ y \neq x$, note that
  \end{align*}
 
   % equality operation
-  \item $e = e_1 \circ e_2, \ \circ \in \{=,<,>,\leq,\geq\}$\\ \\
+  \item $e = e_1 \circ e_2, \ \circ \in \{=,<,>,\leq,\geq\}$\\ 
   In the case that 
  \begin{align*}
   \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} &= \perp \\ 
@@ -270,7 +284,7 @@ In the case that $ y \neq x$, note that
  \text{and } \llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto  \bigvee_i a_i\} &= \bigvee_i\llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto a_i\}, 
   \end{align*}
   so assuming WLOG that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = \perp$, 
-  it must be that for \\
+  it must be that \\
   $\forall i, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$. 
   Thus, $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$, so \\
   $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\} = 
@@ -296,12 +310,12 @@ In the case that $ y \neq x$, note that
  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \neq \perp$, by reasoning similar to the previous case see that $\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
  \bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  a_i\}$.
   % conditional
- \item $e = \ \ifelse{e_1}{e_2}{e_3} : \tau$ \\ \\
+ \item $e = \ \ifelse{e_1}{e_2}{e_3} : \tau$ \\ 
 In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = \perp$, note that $\llbracket \Gamma \vdash e : 
 \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} =  \perp$. By inductive hypothesis, 
 $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
 \bigvee_i\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$. 
-Then it must be that for 
+Then it must be that
 $\forall i, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$. 
 Thus, $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  a_i\} = \perp$, so 
 $\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
@@ -320,12 +334,23 @@ $\forall i > n, \llbracket \Gamma \vdash e_1 : \texttt{bool}
 $\forall i \leq n, \llbracket \Gamma \vdash e_1 : \texttt{bool}\rrbracket\eta\{x\mapsto  a_i\} = \perp$. Thus, it must 
 be that $\bigvee_i \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\} = 
 \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
-\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$. \\ \\
+\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$. \\ 
 %
 In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = false$, by reasoning parallel to the previous case $\bigvee_i \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\}  = 
 \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$.
+ %pair
+ \item $e = (e_1,e_2)$ 
+ \begin{align*}
+ \llbracket \Gamma \vdash e : \tau_1 \times \tau_2\rrbracket\eta\{x \mapsto a\}
+ &= (\llbracket \Gamma \vdash e_1 : \tau_1 \rrbracket\eta\{x \mapsto a\}, \llbracket \Gamma \vdash e_2 : \tau_2 \rrbracket\eta\{x \mapsto a\}) \\
+ \text{(by inductive hypothesis)} &= (\bigvee_i \llbracket \Gamma \vdash e_1 : \tau_1 \rrbracket\eta\{x \mapsto a_i\},
+ \bigvee_i \llbracket \Gamma \vdash e_2 : \tau_2 \rrbracket\eta\{x \mapsto a_i\}) \\
+ &= \bigvee_i ( \llbracket \Gamma \vdash e_1 : \tau_1 \rrbracket\eta\{x \mapsto a_i\},
+  \llbracket \Gamma \vdash e_2 : \tau_2 \rrbracket\eta\{x \mapsto a_i\}) \\
+  &= \bigvee_i \llbracket \Gamma \vdash (e_1, e_2): \tau_1 \times \tau_2 \rrbracket\eta\{x\mapsto a_i\}
+  \end{align*}
 % application
- \item $ e = e_1 \ e_2$ \\ \\
+ \item $ e = e_1 \ e_2$ \\ 
 Let $\beta = \llbracket \Gamma \vdash e_2 : \sigma \rrbracket$, and see that
 \begin{align*}
 \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i \} &=
@@ -341,13 +366,13 @@ Let $\beta = \llbracket \Gamma \vdash e_2 : \sigma \rrbracket$, and see that
 a_i\}\{y \mapsto (\beta \ \eta\{x \mapsto a_i\})\} \\
 &=\bigvee_i \llbracket \Gamma \vdash e_1: \sigma \rightarrow \tau\rrbracket\eta\{x\mapsto a_i\}
 (\beta \ \eta\{x\mapsto a_i\}) \\
-&= \bigvee_i \llbracket \Gamma \vdash e:\tau\rrbracket\eta\{ x \mapsto a_i\} \\
+&= \bigvee_i \llbracket \Gamma \vdash e:\tau\rrbracket\eta\{ x \mapsto a_i\} 
 \end{align*}
  % abstraction
  \item $e = \lambda (y : \tau) . (e' : \tau')$
  \begin{enumerate}
  \item Then $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$ 
- is a function $f: \llbracket \tau \rrbracket \rightarrow \llbracket \tau'  \rrbracket$ such that for 
+ is a function $f: \llbracket \tau \rrbracket \rightarrow \llbracket \tau'  \rrbracket$ such that 
  $\forall d \in \llbracket \tau \rrbracket, \ f(d) = \llbracket \Gamma \ y : \tau \vdash e' : \tau 
  \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}\{y \mapsto d\}$. We want to show that
  $\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
@@ -372,7 +397,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \begin{align*}
  \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(\bigvee_i a_i) &= \llbracket \Gamma.x : \tau 
  \vdash e' : \tau'\rrbracket\eta \{x \mapsto \bigvee_i a_i\} \\
- \text{(by 1)} &= \bigvee_i \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\eta\{x\mapsto a_i\}\\
+ \text{(by inductive hypothesis)} &= \bigvee_i \llbracket \Gamma.x : \tau \vdash e' : \tau'\rrbracket\eta\{x\mapsto a_i\}\\
  &= \bigvee_i \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta(a_i) 
  \end{align*}
  \end{enumerate} 
@@ -465,8 +490,7 @@ Since $fix$ assigns the least fixed point to continuous functions,
 $\llbracket \texttt{F} \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) = fix(\llbracket \texttt{F}\rrbracket\eta) =  \llbracket \texttt{fix}(\lambda f. \lambda x.e)\rrbracket \eta$.
 \end{proof}
  
-\section{Example}
-We will look at a recurrence Karp offers in this section as an example, to check whether recurrences in our expression
+We will look at a recurrence Karp offers in this section as an example, to check whether recurrences in our 
 language have the same solution. First, consider the following recurrence:
 \begin{align*}
 T(1) &= 0 \\
@@ -476,7 +500,7 @@ Consider that this recurrence only makes sense if its domain is the set $\{x \in
 we will assume that this set is the domain of $T$. 
  See, then, that $T(n) = 1 +  \log_{p}1/n $
 
-We may express this recurrence in our expression language as the follows:
+We may express this recurrence in our language as the follows:
 \begin{align*}
 \texttt{T} = \texttt{fix}(\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(p*x)})
  \end{align*}
@@ -487,7 +511,7 @@ We may express this recurrence in our expression language as the follows:
  \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ 
  &\text{ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rrbracket, \\   
  &F(\alpha) = \llbracket\lambda x.\ifelse{x=1}{0}{1 + f(p*x)}\rrbracket\{f \mapsto \alpha\} \\
- \llbracket \texttt{real}\rrbracket &= \R_{\perp}  \\
+ \llbracket \texttt{real}\rrbracket &= \R_{\perp}  
  \end{align*}
  By the CPO fixed-point theorem,  
 \begin{align*}
@@ -506,7 +530,7 @@ We may express this recurrence in our expression language as the follows:
  \end{lemma}
 \begin{proof}
 
-\emph{Base Cases: } n = 0
+\emph{Base Cases: } $n = 0$
 \begin{align*}
 F^{n+1}(\perp)(x) &= F(\perp) \\
 &= 
@@ -518,16 +542,16 @@ F^{n+1}(\perp)(x) &= F(\perp) \\
 \begin{cases}
 0 \text{ if } x=1 \\
 \perp \text{ otherwise}
-\end{cases} \\
+\end{cases} 
 \end{align*}
 Note $p^{n}x = p^0x = x$, so trivially the claim holds. \\
-\emph{Inductive Case: } Suppose the claim holds for $\forall k < n$.
+\emph{Inductive Case: } Suppose the claim holds for all $k < n$.
 \begin{align*}
 F^{n+1}(\perp)(x) &=  
 \begin{cases}
 0 \text{ if } x=1 \\
 1 + F^{n}(\perp)(px) \text{ otherwise}
-\end{cases} \\
+\end{cases} 
 \end{align*}
 By inductive hypothesis,
 \begin{align*}
@@ -554,13 +578,13 @@ n-1 \text{ if } p^{n}x = 1  \\
 \perp \text{ otherwise } 
 \end{cases}
 \end{align*}
-Therefore, the claim holds for $\forall n$.
+Therefore, the claim holds for all $n$.
 
-Then $\llbracket \texttt{T} \rrbracket = lim_{n \to \infty}\{F^n (\perp)\}$ is defined for $\forall x \in \{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$ as
+Then $\llbracket \texttt{T} \rrbracket = lim_{n \to \infty}\{F^n (\perp)\}$ is defined for all $x \in \{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$ as
 \begin{align*}
 \lim_{n \to \infty}\{F^n (\perp)\}(x) = n - 1
 \end{align*}
-Where $n \in \N$ is the minimum number such that $p^nx<1$. Then $\llbracket \texttt{T} \rrbracket(x) = 1 + \log_{p}1/n= T(x)$. Therefore, $\llbracket \texttt{T} \rrbracket = T$.
+Where $n \in \N$ is the minimum number such that $p^nx<1$. Then $\llbracket \texttt{T} \rrbracket(x) = 1 + \log_{p}1/n= T(x)$. Thus, $\llbracket \texttt{T} \rrbracket = T$.
  
 
 
