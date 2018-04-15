@@ -43,8 +43,8 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 \dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
 {\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \tau_1 \ \ \ \Gamma \vdash e_2: \tau_2}{\Gamma \vdash (e_1, e_2) : \tau_1 \times \tau_2}
-\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \tau) \rightarrow (\tau \rightarrow \tau)}
-{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \tau} 
+\dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \sigma) \rightarrow (\tau \rightarrow \sigma)}
+{\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \sigma} 
 \end{array}
 \]
 \caption{Typing for the language.}
@@ -88,7 +88,7 @@ With these definitions in mind, we say S is a CPO if
  \begin{align*}
 \llbracket \texttt{real} \rrbracket &= \R_{\perp} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}}_{\perp} \\
-\text{For any set } S, \ S_{\perp} &= S \cup \{\perp\}, \text{ where for all } x, y\in S, \ x \leq y \iff x = \perp. \\
+\text{For any set } S, \ S_{\perp} &= S \cup \{\perp\}, \text{ where }\forall x, y\in S, \ x \leq y \iff x = \perp. \\
  \text{This is called the}&\text{ flat ordering of } S.\\
  \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
  \text{For all } (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a<c \text{ and } b<d. \\ 
@@ -272,43 +272,61 @@ In the case that $ y \neq x$, note that
 
   % equality operation
   \item $e = e_1 \circ e_2, \ \circ \in \{=,<,>,\leq,\geq\}$\\ 
-  In the case that 
+  We have three cases to consider: either $\llbracket \Gamma \vdash e_1:\tau\rrbracket\{x\mapsto \bigvee_i a_i\} = 
+  \perp$,  $\llbracket \Gamma \vdash e_2:\tau\rrbracket\{x\mapsto \bigvee_i a_i\} = \perp$, or both 
+  $\llbracket \Gamma \vdash e_1:\tau\rrbracket\{x\mapsto \bigvee_i a_i\} \neq \perp$ and 
+  $\llbracket \Gamma \vdash e_2:\tau\rrbracket\{x\mapsto \bigvee_i a_i\} \neq \perp$.
+  
+  In the case that $\llbracket \Gamma \vdash e_1:\tau\rrbracket\{x\mapsto \bigvee_i a_i\} = \perp$, by inductive
+  hypothesis $\bigvee_i \llbracket \Gamma \vdash e_1 \rrbracket\{x\mapsto a_i\} = \perp$, so 
+  $ \llbracket \Gamma \vdash e_1 \rrbracket\{x\mapsto a_i\} = \perp$ for all $i$. Then
+  \begin{align*}
+  \llbracket \Gamma \vdash e_1 \circ e_2\rrbracket\eta\{x \mapsto \bigvee_i a_i\}
+  &=  \llbracket \Gamma \vdash e_1 \rrbracket\eta\{x \mapsto \bigvee_i a_i\} \circ
+  \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x \mapsto \bigvee_i a_i\}\\
+  &= \perp \circ \llbracket e_2\rrbracket\{x\mapsto\bigvee_i a_i\} = \perp 
+  \end{align*}
+  Also,
+  \begin{align*}
+  \bigvee_i \llbracket \Gamma \vdash e_1 \circ e_2\rrbracket\eta\{x \mapsto a_i\}
+  &= \bigvee_i \{ \llbracket \Gamma \vdash e_1 \rrbracket\eta\{x \mapsto a_i\} \circ
+  \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x \mapsto a_i\}\} \\
+  &=\bigvee_i \{ \perp \circ
+  \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x \mapsto a_i\}\} \\
+  &= \bigvee_i\{ \perp \} = \perp
+  \end{align*}
+
+  The same reasoning holds when $\llbracket \Gamma \vdash e_2:\tau\rrbracket\{x\mapsto \bigvee_i a_i\} = \perp$.
+  
+ In the case that both $\llbracket \Gamma \vdash e_1:\tau\rrbracket\{x\mapsto \bigvee_i a_i\} \neq \perp$ and 
+ $\llbracket \Gamma \vdash e_2:\tau\rrbracket\{x\mapsto \bigvee_i a_i\} \neq \perp$, by inductive hypothesis 
+ $\bigvee_i \llbracket \Gamma \vdash e_1:\tau\rrbracket\{x\mapsto a_i\} \neq \perp$ and
+ $\bigvee_i \llbracket \Gamma \vdash e_2:\tau\rrbracket\{x\mapsto a_i\} \neq \perp$.
+ Note $\llbracket \texttt{real} \rrbracket = \R_{\perp}$, so
  \begin{align*}
-  \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} &= \perp \\ 
-  \text{or }  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} &= \perp,
-  \end{align*} 
-  note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = \perp$. 
-  By inductive hypothesis, 
-  \begin{align*}
-  \llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto  \bigvee_i a_i\} &= \bigvee_i\llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto a_i\} \\
- \text{and } \llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto  \bigvee_i a_i\} &= \bigvee_i\llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto a_i\}, 
+ \exists i_1 \forall i \geq i_1, \llbracket \Gamma \vdash e_1\rrbracket\eta\{x\mapsto a_i\} = v_1 \in \R \\
+ \exists i_2 \forall i \geq i_2, \llbracket \Gamma \vdash e_2\rrbracket\eta\{x\mapsto a_i\} = v_2 \in \R \\ 
+ \end{align*}
+ Let $i' = max\{i_1, i_2\}$, and note
+ \begin{align*}
+  \llbracket \Gamma \vdash e_1 \circ e_2\rrbracket\eta\{x \mapsto \bigvee_i a_i\}
+  &=  \llbracket \Gamma \vdash e_1 \rrbracket\eta\{x \mapsto \bigvee_i a_i\} \circ
+  \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x \mapsto \bigvee_i a_i\}\\
+\text{(by inductive hypothesis) } &= \bigvee_i \llbracket \Gamma \vdash e_1 \rrbracket\eta\{x \mapsto  a_i\} \circ
+  \bigvee_i \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x \mapsto a_i\}\\
+  &= \bigvee_{i \geq i'} \llbracket \Gamma \vdash e_1 \rrbracket\eta\{x \mapsto  a_i\} \circ
+  \bigvee_{i \geq i'} \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x \mapsto a_i\}\\
+   &= v_1 \circ v_2
   \end{align*}
-  so assuming WLOG that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = \perp$, 
-  it must be that \\
-  $\forall i, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$. 
-  Thus, $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\} = \perp$, so \\
-  $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto a_i\} = 
-  \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}$.\\ \\
-  %
-  In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} 
-  \circ \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}, \ 
-  \llbracket \Gamma \vdash e_1:\tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \neq \perp, 
-  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \neq \perp$, 
-  note that $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = true$. 
- By inductive hypothesis, 
+  Also,
   \begin{align*}
-  \llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto  \bigvee_i a_i\} &= \bigvee_i\llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto a_i\} \\
- \text{and } \llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto  \bigvee_i a_i\} &= \bigvee_i\llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto a_i\}, 
-  \end{align*}
-  so $\bigvee_i\llbracket \Gamma \vdash e_1 : \tau \rrbracket\{x\mapsto a_i\} 
-  \circ \bigvee_i\llbracket \Gamma \vdash e_2 : \tau \rrbracket\{x\mapsto a_i\}$, with neither supremum equal to bottom. Thus there must $\exists n \in \mathbb{N} \text{ s.t. } \forall i \geq n, \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto   a_i\} \circ
-  \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto   a_i\}$. Therefore, $\bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  a_i\}\} = true$, so $\llbracket \Gamma \vdash e : \texttt{bool}\rrbracket\eta\{x\mapsto \bigvee_i a_i\} 
-  = \bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  a_i\}$. \\ \\
-  %
- In the case that $\llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \ \slashed{\circ} \ \llbracket \Gamma \vdash e_2 : \tau\rrbracket\eta\{x\mapsto  \bigvee_i a_i\}, \ \\
- \llbracket \Gamma \vdash e_1 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \neq \perp, 
- \llbracket \Gamma \vdash e_2 : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} \neq \perp$, by reasoning similar to the previous case see that $\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = 
- \bigvee_i\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto  a_i\}$.
+  \bigvee_i \llbracket \Gamma \vdash e_1 \circ e_2\rrbracket\eta\{x \mapsto a_i\}
+  &= \bigvee_i \{ \llbracket \Gamma \vdash e_1 \rrbracket\eta\{x \mapsto a_i\} \circ
+  \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x \mapsto a_i\}\} \\
+  &= \bigvee_{i \geq i'} \{ \llbracket \Gamma \vdash e_1 \rrbracket\eta\{x \mapsto a_i\} \circ
+  \llbracket \Gamma \vdash e_2 \rrbracket\eta\{x \mapsto a_i\}\} \\
+  &= \bigvee_{i \geq i'}\{ v_1 \circ v_2\} = v_1 \circ v_2
+  \end{align*}  
   % conditional
  \item $e = \ \ifelse{e_1}{e_2}{e_3} : \tau$ \\ 
 In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x\mapsto  \bigvee_i a_i\} = \perp$, note that $\llbracket \Gamma \vdash e : 
@@ -375,8 +393,11 @@ a_i\}\{y \mapsto (\beta \ \eta\{x \mapsto a_i\})\} \\
  is a function $f: \llbracket \tau \rrbracket \rightarrow \llbracket \tau'  \rrbracket$ such that 
  $\forall d \in \llbracket \tau \rrbracket, \ f(d) = \llbracket \Gamma \ y : \tau \vdash e' : \tau 
  \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}\{y \mapsto d\}$. We want to show that
- $\tmden{\typing\Gamma e\tau}{\extend\eta x {\bigvee_i a_i}} =
-\bigvee_i\tmden{\typing\Gamma e\tau}{\extend\eta x {a_i}}$
+ 
+ \begin{align*}
+ \tmden{\typing\Gamma e\tau \rightarrow \tau'}{\extend\eta x {\bigvee_i a_i}} &=
+\bigvee_i\tmden{\typing\Gamma e\tau \rightarrow \tau'}{\extend\eta x {a_i}}
+\end{align*}
  
 Let $d \in \llbracket \tau \rrbracket$, and consider that
 \begin{align*}

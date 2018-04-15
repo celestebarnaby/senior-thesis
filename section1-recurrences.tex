@@ -194,8 +194,8 @@ If $\Gamma \vdash e:\tau$, then $\llbracket \Gamma \vdash e : \tau \rrbracket\et
    \end{cases}
   \\
     \llbracket (e_1,e_2) \rrbracket\eta &= (\llbracket e_1 \rrbracket\eta,\llbracket e_2 \rrbracket\eta) \\
-   \llbracket  \texttt{rec} (\lambda x.e_1, \lambda x.e_2) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
-   rec(d) &= \sum_{i=0}^{\infty}\llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2 \rrbracket\eta)^i(d))
+   \llbracket  \texttt{rec} (\lambda x.a, \lambda x.m) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
+   rec(d) &= \sum_{i=0}^{\infty}\llbracket \lambda x.a \rrbracket\eta ((\llbracket \lambda x.m \rrbracket\eta)^i(d))
  \end{align*}
  \caption{Denotational semantics for expressions.}
  \label{fig:densemexps}
@@ -216,22 +216,22 @@ If $\Gamma \vdash e:\tau$, then $\llbracket \Gamma \vdash e : \tau \rrbracket\et
  We will verify only the equation for $\texttt{rec}$ expressions, as all others are trivial.
  Note that for all $d \in \R$,
  \begin{align*}
- \llbracket \lambda x.(e_1 + \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e_2)) \rrbracket \eta(d)
+ \llbracket \lambda x.(a + \texttt{rec}(\lambda x.a, \lambda x.m)(m)) \rrbracket \eta(d)
  &= \\  
-  \llbracket e_1 \rrbracket\{x\mapsto d\} &+ \llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2)(e_2)\rrbracket\eta
+  \llbracket a \rrbracket\{x\mapsto d\} &+ \llbracket \texttt{rec}(\lambda x.a, \lambda x.m)(m)\rrbracket\eta
  \{x\mapsto d\} \\
- = \llbracket \lambda x.e_1\rrbracket(d) &+ \llbracket\texttt{rec}(\lambda x.e_1, \lambda x.e_2)\rrbracket\eta
- (\llbracket e_2 \rrbracket\eta\{x \mapsto d\}) \\
- =  \llbracket \lambda x.e_1\rrbracket(d) &+ \llbracket\texttt{rec}(\lambda x.e_1, \lambda x.e_2)\rrbracket\eta
- (\llbracket \lambda x.e_2 \rrbracket(d)) \\
- = \llbracket \lambda x.e_1\rrbracket(d) &+ \sum_{i=0}^{\infty} \llbracket \lambda x.e_1\rrbracket\eta
- ((\llbracket \lambda x.e_2 \rrbracket\eta)^i (d)) \\
+ = \llbracket \lambda x.a\rrbracket(d) &+ \llbracket\texttt{rec}(\lambda x.a, \lambda x.m)\rrbracket\eta
+ (\llbracket m \rrbracket\eta\{x \mapsto d\}) \\
+ =  \llbracket \lambda x.a\rrbracket(d) &+ \llbracket\texttt{rec}(\lambda x.a, \lambda x.m)\rrbracket\eta
+ (\llbracket \lambda x.m \rrbracket(d)) \\
+ = \llbracket \lambda x.a\rrbracket(d) &+ \sum_{i=0}^{\infty} \llbracket \lambda x.a\rrbracket\eta
+ ((\llbracket \lambda x.m \rrbracket\eta)^i (d)) \\
  \end{align*}
  \begin{align*}
- = \llbracket \lambda x.e_1\rrbracket(d) &+ \sum_{i=1}^{\infty} \llbracket \lambda x.e_1\rrbracket\eta
- ((\llbracket \lambda x.e_2 \rrbracket\eta)^i (d)) \\
-&= \sum_{i=0}^\infty \llbracket \lambda x.e_1 \rrbracket\eta ((\llbracket \lambda x.e_2\rrbracket\eta)^i(d)) \\
-&=  \llbracket \texttt{rec}(\lambda x.e_1, \lambda x.e_2) \rrbracket \eta (d)
+ = \llbracket \lambda x.a\rrbracket(d) &+ \sum_{i=1}^{\infty} \llbracket \lambda x.a\rrbracket\eta
+ ((\llbracket \lambda x.m\rrbracket\eta)^i (d)) \\
+&= \sum_{i=0}^\infty \llbracket \lambda x.a \rrbracket\eta ((\llbracket \lambda x.m\rrbracket\eta)^i(d)) \\
+&=  \llbracket \texttt{rec}(\lambda x.a, \lambda x.m) \rrbracket \eta (d)
 \end{align*}
 \end{proof}
 
