@@ -1,5 +1,5 @@
 \chapter{Well-Typed Probabilistic Recurrence Relations}
-Karp's paper is premised on the notion that the cost of a stochastic algorithm may be described as a
+\cite{Karp} is premised on the notion that the cost of a stochastic algorithm may be described as a
 recurrence relation of the form
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x)).
@@ -59,22 +59,21 @@ $h_2(x)(l)$. The arguments to these random variables, then, should be the left a
  complications and ambiguities, which Karp never addresses directly. Most notably, we find that the types of the 
  functions $T, \ h,$ and $\hat{h}$ are dependent upon a real number $x$, describing the size of problems in the sample space.
  
-We define a syntax to write and type-check these recurrences. This syntax is inspired $\lambda$LF---a simple system of 
-dependent types (\cite{Pierce:2005aa}). However, instead of general dependent types, our syntax only needs to
+We define a language to write and type-check these recurrences. This language is inspired $\lambda$LF---a simple system of 
+dependent types (\cite{Pierce:2005aa}). However, instead of general dependent types, our language only needs to
 describe sample space types $\Omega_n$ which are dependent upon a natural number $n$. Thus, we introduce
 a constant $\lst$ to our syntax, which works as a function from expressions to types. That is, for each 
 expression $e$, $\lst(e)$ is a type. There are many stochastic divide-and-conquer algorithms involving sample spaces
 on datatypes other than lists; this language could easily be expanded to include other constants such as
  $\texttt{tree}, \ \texttt{graph}$, etc. Note that lists can only be indexed over natural numbers (it would not make 
  sense for a list to be any other size), so we include the type $\texttt{nat}$ in our language as well.
- 
  \[
 \begin{array}{rcl}
 \tau &::=& \texttt{real} \mid \texttt{nat} \mid \texttt{bool} \mid \tau \times \tau \mid \Pi x:\tau.\tau
 \mid \texttt{list}(e) \\
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \mid \\
+     \ifelse{e}{e}{e} \mid (e,e) \mid \\
      && \texttt{rec}(a, (h_1, \ldots, h_n), (\hat{h_1}, \ldots \hat{h_n})) 
 \end{array}
 \]
@@ -112,8 +111,6 @@ f(\bigvee C) = \bigvee f(C)$. That is, continuity of a function is premised on t
 a function are CPOs. However, it is not necessarily the case that
  $\bigcup_{a \in \llbracket \tau \rrbracket} \llbracket \sigma \rrbracket\{ x \mapsto a\}$ is a CPO, even though 
  $\llbracket \sigma \rrbracket\{x\mapsto a\}$ is a CPO for $\forall a \in \llbracket \tau \rrbracket$.
- 
-(XXXXX Should I elaborate more here?)
 
 As a result, continuity does not have any meaning for functions of type $\llbracket \Pi (x: \tau).\sigma \rrbracket$. 
 So we cannot use the $\texttt{fix}$ operator on arbitrary $\lambda f. \lambda x.e$ expressions, and the whole
@@ -138,9 +135,19 @@ As an alternative approach, we define a language which includes a $\texttt{rec}$
  of recursive functions; however, it does allow us to express the probabilistic recurrences described by Karp,
  without having to worry about the problem of requiring continuity on functions with dependent product types. 
 
-We offer standard type judgements, as well as judgements for when a type is well-formed, denoted by $\tau :: *$. We 
- also offer a denotational semantics for types and expressions. We may verify soundness of our denotation for
- $\texttt{rec}$ expressions with an argument analogous to the one given in chapter 2. 
+We offer standard type judgements in Figure 2, as well as judgements for when a type is well-formed, denoted by
+ $\tau :: *$, in Figure 1. We 
+ also offer an equational semantics in Figure 3 and denotational semantics for types and expressions in Figures 4 and 5. 
+ We may verify soundness of our denotational semantics with an argument analogous to the one given in chapter 2. 
+ 
+  \begin{thm}
+  If $\Gamma \vdash e_0 : \tau$ and $\Gamma \vdash e_1 : \tau$ and $e_0 = e_1$, then for all $\Gamma$-environments
+  $\eta$,   
+ \begin{align*}
+ \llbracket \Gamma \vdash e_0 \rrbracket \eta 
+ = \llbracket \Gamma \vdash e_1 \rrbracket \eta 
+ \end{align*} 
+ \end{thm}
 
 \begin{figure}
 \[
@@ -161,7 +168,8 @@ We offer standard type judgements, as well as judgements for when a type is well
 	, \circ \in \{=, <, >, \geq, \leq\} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
 	{\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
-\dfrac{\Gamma \vdash a: \Pi (n:\texttt{nat}).\texttt{nat} \ \ \ \Gamma \vdash h: \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat}) \ \ \ \Gamma \vdash \hat{h}: \Pi(n: \texttt{nat}).(\Pi(l : \lst(n)).\lst(h n l))}
+\dfrac{\Gamma \vdash e_1 : \tau_1 \ \ \ \Gamma \vdash e_2 : \tau_2}{\Gamma \vdash (e_1,e_2) : \tau_1 \times \tau_2}\\ \\
+\dfrac{\Gamma \vdash a: \Pi (n:\texttt{nat}).\texttt{nat} \ \ \ \Gamma \vdash h_i: \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat}) \ \ \ \Gamma \vdash \hat{h_i}: \Pi(n: \texttt{nat}).(\Pi(l : \lst(n)).\lst(h n l))}
 	{\Gamma \vdash \texttt{rec}(a, (h_1, \ldots, h_n), (\hat{h_1} \ldots \hat{h_n})) : \Pi(n:\texttt{nat}).(\Pi (l:\lst(n)).\texttt{nat})}
 \end{array}
 \]
@@ -181,7 +189,7 @@ e = e \\ \\
 \lambda x.e = \lambda y.[x \mapsto y]e, \text{provided } y \text{ not free in } e. \\ \\ \\
 \lambda x.e_1 \ e_2 = [x \mapsto e_2]e_1 \\
 \texttt{rec}(\lambda x.a, ( \lambda x.\lambda l.h_1, \ldots \lambda x.\lambda l.h_n)
-( \lambda x.\lambda l.\hat{h_1}, \ldots \lambda x.\lambda l.\hat{h_n})= \\
+( \lambda x.\lambda l.\hat{h_1}, \ldots \lambda x.\lambda l.\hat{h_n}))= \\
 \lambda x.(e_1 + \sum_{i=1}^n(\texttt{rec}(\lambda x.a, \sum_{i=1}^n \lambda x.\lambda l.h_i, 
 \sum_{i=1}^n \lambda x.\lambda l.\hat{h_i}) h_i  \ \hat{h_i}))
 \end{array}
@@ -200,7 +208,7 @@ e = e \\ \\
  \mid  \\
  &\forall a \in \llbracket \tau \rrbracket\eta, \ f(a) \in \llbracket \sigma\rrbracket\eta\{x\mapsto a\}\} \\
  \llbracket \lst(e) \rrbracket\eta &= \Omega_{\llbracket e \rrbracket\eta} \\
- \forall n \in \N, \ \Omega_n &\text{ is the sample space of all lists of length } n. \\
+ \forall n \in \N, \ \Omega_n &\text{ is the sample space of all lists of length } n. 
  \end{align*}
  \caption{Denotational semantics for types.}
  \end{figure}
@@ -228,6 +236,7 @@ e = e \\ \\
       \llbracket e_3 \rrbracket\eta \text{ if } \llbracket e_1 \rrbracket\eta = false \\ 
    \end{cases}
   \\
+  \llbracket (e_1,e_2) \rrbracket\eta &= (\llbracket e_1 \rrbracket\eta, \llbracket e_2 \rrbracket\eta) \\
     \llbracket  \texttt{rec} (a,\sum_{i=1}^n h_i,\sum_{i=1}^n \hat{h_i}) \rrbracket\eta &= rec: \N \rightarrow 
     (\bigcup_{n\in \N} \Omega_n \rightarrow \N)   \text{ s.t. }  \\
   \forall n \in \N, \ 
@@ -268,16 +277,16 @@ of performing quicksort on $l$.
 \begin{proof}
 By induction on $n$.
 
-Base case: $n = 1$.  For all $l \in \Omega_n, \ l$ is a list of length $1$. Then
+\emph{Base case}: $n = 1$.  For all $l \in \Omega_n, \ l$ is a list of length $1$. Then
 \begin{align*}
 \llbracket \texttt{T} \rrbracket\eta (n)(l) &=  \sum_{j=0}^{\infty}(\sum_{(n',l') \in S^j(n,l)} \llbracket a \rrbracket\eta(n')) \\
 &= \llbracket a \rrbracket\eta(n) + \sum_{j=1}^{\infty}(\sum_{(n',l') \in S^j(n,l)} \llbracket a \rrbracket\eta(n')) \\
 &= \llbracket a \rrbracket\eta(n) + 0 = n - 1 = 0,
 \end{align*}
 since the subproblems of quicksorting a list of length 1 both have size $0$. See that this is the actual cost of performing
-quicksort on a list of length $1$, so the claim holds in the base case.
+quicksort on a list of length $1$, so the claim holds.
 
-Inductive case: Suppose the claim holds for all $k < n$, and let $l \in \Omega_n$. Then
+\emph{Inductive case}: Suppose the claim holds for all $k < n$, and let $l \in \Omega_n$. Then
 \begin{align*}
  \llbracket \texttt{T} \rrbracket\eta (n)(l) &=  \sum_{j=0}^{\infty}(\sum_{(n',l') \in S^j(n,l)} \llbracket a \rrbracket\eta(n')) \\
  &= \llbracket a \rrbracket\eta(n) + \sum_{j=1}^{\infty}(\sum_{(n',l') \in S^j(n,l)} \llbracket a \rrbracket\eta(n')) \\

@@ -1,6 +1,10 @@
 \chapter{Reconciling the Two Semantics}
-In this chapter, we look at several attempts to connect the recurrences described in chapters 2 and 3. We will offer
-several methods of translating from one expression language to the other, and investigate the validity of these approaches.
+Chapter 2 and 3 have presented languages for defining the two distinct kinds of recurrences present in \cite{Karp}. 
+In this chapter, we look at several attempts to connect these two recurrences. In particular, we want to find a way 
+to write a recurrence with an initial condition as a recurrence of the form $T(x) = a(x) + T(m(x))$, as this is the kind
+of recurrence that Karp proves theorems about. We will offer
+several methods of translating from one expression language to the other, and investigate the validity of these 
+approaches.
 
 As a first attempt, we consider a simple recurrence with an initial condition
 \begin{align*}

@@ -91,7 +91,7 @@ With these definitions in mind, we say S is a CPO if
 \text{For any set } S, \ S_{\perp} &= S \cup \{\perp\}, \text{ where }\forall x, y\in S, \ x \leq y \iff x = \perp. \\
  \text{This is called the}&\text{ flat ordering of } S.\\
  \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
- \text{For all } (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a<c \text{ and } b<d. \\ 
+ \text{For all } (a, b), \ (c, d) \in \llbracket \tau \times \sigma \rrbracket &\text{, let }  (a,b) \leq (c,d) \text{ if and only if } a\leq c \text{ and } b \leq d. \\ 
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \ : 
  \ f \text{ is continuous}\} \\
  \text{ For all } f, \ g \in \llbracket \tau \rightarrow \sigma \rrbracket &\text{, let } f \leq g \text{ if and only if } \forall x \in 
@@ -393,7 +393,6 @@ a_i\}\{y \mapsto (\beta \ \eta\{x \mapsto a_i\})\} \\
  is a function $f: \llbracket \tau \rrbracket \rightarrow \llbracket \tau'  \rrbracket$ such that 
  $\forall d \in \llbracket \tau \rrbracket, \ f(d) = \llbracket \Gamma \ y : \tau \vdash e' : \tau 
  \rrbracket\eta\{x\mapsto  \bigvee_i a_i\}\{y \mapsto d\}$. We want to show that
- 
  \begin{align*}
  \tmden{\typing\Gamma e\tau \rightarrow \tau'}{\extend\eta x {\bigvee_i a_i}} &=
 \bigvee_i\tmden{\typing\Gamma e\tau \rightarrow \tau'}{\extend\eta x {a_i}}
@@ -409,7 +408,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
 \{x\mapsto a_i\} \\
 &=\bigvee_i\llbracket \Gamma.y:\tau\vdash e':\tau'\rrbracket(\eta\{x\mapsto a_i\})\{y\mapsto d\} \\
 &= \bigvee_i \llbracket \Gamma \vdash \lambda y : \tau.e' : \tau' \rrbracket \eta\{x\mapsto a_i\}(d) \\
-&= \bigvee_i \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket \eta\{x\mapsto a_i\}(d) \\ 
+&= \bigvee_i \llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket \eta\{x\mapsto a_i\}(d) 
 \end{align*}
 %
  \item We want to show that $\llbracket \Gamma \vdash e : \tau \rightarrow \tau' \rrbracket\eta \in \llbracket \tau \rightarrow 
@@ -424,18 +423,18 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{enumerate} 
  % fix operation
  We use several lemmas for this case, which are stated after the proof.
- \item $e = \texttt{fix} (\lambda f.\lambda x.e)$ \\
+ \item $e = \texttt{fix} (\lambda f.\lambda y.e)$ \\
  \begin{enumerate}
-\item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta\{x\mapsto a_i\}$, and consider that 
+\item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda y.e\rrbracket\eta\{x\mapsto a_i\}$, and consider that 
  \begin{align*}
- \llbracket \texttt{fix} (\lambda f.\lambda x.e)\rrbracket\eta\{x\mapsto \bigvee_i a_i\} &= 
- fix(\llbracket \lambda f. \lambda x.e \rrbracket\eta\{x\mapsto \bigvee_i a_i\})\\
+ \llbracket \texttt{fix} (\lambda f.\lambda y.e)\rrbracket\eta\{x\mapsto \bigvee_i a_i\} &= 
+ fix(\llbracket \lambda f. \lambda y.e \rrbracket\eta\{x\mapsto \bigvee_i a_i\})\\
  \text{(by inductive hypothesis)} &= fix(\bigvee_i(F_i)) \\
  &= \bigvee_j(\bigvee_i((F_i)^j )\perp) \\
  &= \bigvee_j(\bigvee_i((F_i)^j \perp)) \\ 
 \text{(by Lemma \ref{lem1})} &= \bigvee_i(\bigvee_j((F_i)^j \perp)) \\ 
 &= \bigvee_i(fix(F_i))\\
-&= \bigvee_i \llbracket \Gamma \vdash \texttt{fix}(\lambda f \lambda x.e)\rrbracket\eta\{x\mapsto a_i\}
+&= \bigvee_i \llbracket \Gamma \vdash \texttt{fix}(\lambda f \lambda y.e)\rrbracket\eta\{x\mapsto a_i\}
  \end{align*}
  %
  \item Let $F = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta$. We want to show that 
@@ -449,9 +448,9 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  &=(\bigvee_j F^j \perp)(\bigvee_i a_i)\\
  &= \bigvee_j (F^j \perp(\bigvee_i a_i))\\ 
  \text{(by continuity of $F^j \perp$) }&= \bigvee_j(\bigvee_i(F^j \perp(a_i)))\\ 
- \text{(by Lemma \ref{lem2})} &=\bigvee(\bigvee(F^j \perp(a_i))) \\
+ \text{(by Lemma \ref{lem2})} &=\bigvee_i(\bigvee_j(F^j \perp(a_i))) \\
  &= \bigvee_i(fix(F)(a_i))\\
- &= \bigvee_i(\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta(a_i))\\
+ &= \bigvee_i(\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta(a_i))
  \end{align*}
  \end{enumerate}
  \end{itemize}
@@ -459,7 +458,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  from $\llbracket \tau \rrbracket$ to $\llbracket \tau \rrbracket$.
  \end{proof}
  % Lemmas
- \begin{lemma} $\bigvee_j(\bigvee_i((F_i)^j \perp))= \bigvee_i(\bigvee_j((F_i)^j \perp))$\\
+ \begin{lemma} $\bigvee_j(\bigvee_i((F_i)^j \perp))= \bigvee_i(\bigvee_j((F_i)^j \perp))$
  \label{lem1}
  \end{lemma}
  \begin{proof}
@@ -471,32 +470,36 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  &\bigvee_j(\bigvee_i((F_i)^j \perp)) < \bigvee_i(\bigvee_j((F_i)^j \perp))\\ 
  \Rightarrow \exists i \text{ s.t. \ \  \ } &\bigvee_j(\bigvee_i((F_i)^j \perp)) < \bigvee_j (F_i)^j \\
  \Rightarrow \exists i, j \text{ s.t. } &\bigvee_j(\bigvee_i((F_i)^j \perp)) < (F_i)^j \perp  \ \
- \Rightarrow\Leftarrow\\
+ \Rightarrow\Leftarrow
  \end{align*}
  Thus, it must be that $\bigvee_j(\bigvee_i((F_i)^j \perp)) \geq  \bigvee_i(\bigvee_j((F_i)^j \perp))$ \\ \\
  $\Leftarrow$ By parallel reasoning, $\bigvee_j(\bigvee_i((F_i)^j \perp)) \leq  \bigvee_i(\bigvee_j((F_i)^j  \perp))$ \\ \\
  Therefore, $\bigvee_j(\bigvee_i((F_i)^j \perp)) = \bigvee_i(\bigvee_j((F_i)^j \perp))$ 
  \end{proof}
- %
+ 
  \begin{lemma}
  \label{lem2}
- $\bigvee_j(\bigvee_i(F^j \perp(x_i)))= \bigvee_i(\bigvee_j(F^j \perp(x_i)))$\\ 
+ $\bigvee_j(\bigvee_i(F^j \perp(x_i)))= \bigvee_i(\bigvee_j(F^j \perp(x_i)))$
  \end{lemma}
  \begin{proof} 
  By reasoning similar to Lemma \ref{lem1}. 
  \end{proof}
  %
 
- We will prove soundness of our denotational semantics for $\texttt{fix}$ expressions, in order to ensure that
+ We will prove equational soundness of our denotational semantics, in order to ensure that
  our interpretation of recurrences reflects their equational meaning.
- \begin{thm}
+  \begin{thm}
+  If $\Gamma \vdash e_0 : \tau$ and $\Gamma \vdash e_1 : \tau$ and $e_0 = e_1$, then for all $\Gamma$-environments
+  $\eta$,   
  \begin{align*}
- \llbracket \texttt{fix}(\lambda f. \lambda x.e)\rrbracket \eta = \llbracket \lambda x.e 
- 	\{ f \mapsto \texttt{fix}(\lambda f\lambda x.e)\} \rrbracket\eta
- \end{align*}
+ \llbracket \Gamma \vdash e_0 \rrbracket \eta 
+ = \llbracket \Gamma \vdash e_1 \rrbracket \eta 
+ \end{align*} 
  \end{thm}
  
 \begin{proof}
+ We will verify only the equation for $\texttt{fix}$ expressions, as all others are trivial.
+
 We may show by a simple inductive argument that 
 $\llbracket [x \mapsto e']e\rrbracket\eta = \llbracket e \rrbracket\eta\{x \mapsto \llbracket e' \rrbracket\eta\}$.
 Let $\texttt{F} = \lambda f \lambda x.e$, and see that
@@ -551,7 +554,7 @@ We may express this recurrence in our language as the follows:
  \end{lemma}
 \begin{proof}
 
-\emph{Base Cases: } $n = 0$
+\emph{Base Case: } $n = 0$
 \begin{align*}
 F^{n+1}(\perp)(x) &= F(\perp) \\
 &= 
