@@ -44,13 +44,15 @@ let rec map f ys =
 \end{verbatim}
 Suppose $ys$ is a list of lists of integers, and $f$ is a function that performs selection sort on a single list. Then $f(y)$ does
 not take a constant amount of work; rather, its cost is quadratic in the length of $y$. In order to write a correct recurrence
-for $\texttt{map}$, we need some information about the cost of $f(y)$, where the size of y is variable. This issue
+for $\texttt{map}$, we need some information about the cost of $f(y)$, where the size of $y$ is variable. This issue
 becomes even thornier if the function $f$ is a composition of functions $g \circ h$. In this case, we need information about the cost of $g(h(y))$, meaning we in turn need information about the \emph{size} of $h(y)$--- the list output by applying a list $y$ to $h$. 
 
 \cite{N.-Danner:2015aa} aim to resolve these issues by developing a formal method for extracting
-recurrences that bound the complexity of higher-order programs. This work offers an extraction function that maps programs written in a language with structural list recursion--- referred to as a source language--- to a complexity. A complexity is a pair consisting of a cost--- the steps required to evaluate the program---and a potential--- the size of the 
-output of this program. Further, it provides a bounding theorem which guarantees that this extracted complexity is a 
-bound on the actual cost of evaluating the source language program. 
+recurrences that bound the complexity of higher-order programs. This work offers an extraction function that maps 
+programs written in a language with structural list recursion--- referred to as a source language--- to a complexity. A 
+complexity is a pair consisting of a cost--- the steps required to evaluate the program---and a potential--- the size of the 
+output of this program. Further, this work provides a bounding theorem which guarantees that this extracted complexity is 
+a bound on the actual cost of evaluating the source language program. 
 
 The recurrences produced by the extraction function are all syntactic: they are cost-annotated source language
 programs, rather than what we would traditionally think of as a recurrence for an algorithm. Danner et al. define a 
@@ -76,7 +78,7 @@ T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x))
 where $x$ is a non-negative real number describing the size of the input, $h_1(x)$ through $h_n(x)$ are random 
 variables describing the sizes of the subproblems (e.g. in the case of quicksort $h_1(x)$ and $h_2(x)$ describe the sizes 
 of the two sublists), $a$ is a function describing the work necessary to generate these subproblems, and $T(x)$ is a 
-random variable describing the total running time of the algorithm on an input of size x. Karp then offers several methods 
+random variable describing the total running time of the algorithm on an input of size $x$. Karp then offers several methods 
 for obtaining tight bounds on the upper tails of the probability distribution of $T(x)$. 
 
 Note, however, that the recurrence relation $T(x) = a(x) + T(h(x))$ has some clear flaws that 
@@ -122,7 +124,7 @@ reconciling these two seemingly different forms of recursive definitions in Chap
  them in Chapter 5.  This turns out to be quite complex: as discussed above, the typing of these recurrences itself is 
  already problematic. Our solution is to support dependent types in our language. Since it proves to be quite difficult to 
  combine dependent types with CPOs, we focus on a semantics that corresponds to the infinite sum interpretation for
- deterministic recurrences.  You conclude in Chapter 6 with a discussion of how your work fits into Danner et al.'s 
+ deterministic recurrences. We conclude in Chapter 6 with a discussion of how your work fits into Danner et al.'s 
  recurrence extraction framework and further work.
  
 
