@@ -6,15 +6,14 @@ of recurrence that Karp proves theorems about. We will offer
 several methods of translating from one expression language to the other, and investigate the validity of these 
 approaches.
 
-As a first attempt, we consider a simple recurrence with an initial condition
+As a first attempt, we consider a simple recurrence with an initial condition.
 \begin{align*}
 T(1) &= 0 \\
 T(n) &= 1 + T(n/2 ) 
 \end{align*}
 As in the example in chapter 3, we assume that the domain of $T$ is positive powers of $2$.
-
 This is the kind of recurrence described in chapter 3. In order to make this fit the definition of a recurrence described in 
-chapter 2 --- that is, a recurrence of the form $T(n) = a(n) + T(m(n))$, we may interpret $a$ as a 
+chapter 2 --- that is, a recurrence of the form $T(n) = a(n) + T(m(n))$--- we may interpret $a$ as a 
 piecewise function with two sub-functions: one for the general recurrence and one for the initial condition.
 We can instead write this as a single recurrence
 \begin{align*}
@@ -55,14 +54,14 @@ a(n) &=
 We then express this recurrence using our chapter 2 syntax as
 \begin{align*}
 \texttt{T} &= \texttt{rec}(a,m) \\
-m &= \lambda x.x/\texttt{2} \\
-a &=\lambda x.\ifelse{x\leq\texttt{1}}{\texttt{1}}{\texttt{2}} \\
+m &= \lambda x.x/2 \\
+a &=\lambda x.\ifelse{x\leq1}{1}{2} \\
 \llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(a,m) \rrbracket(d) \\
 &= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(d)) \\
 &= \sum_{i=0}^{\log(n)-1} 2 + \sum_{i=\log(n) }^{\infty} 1 \\
 &= \infty
 \end{align*}
-Which, clearly, is not a correct solution to this recurrence.
+Which, clearly, is not a correct solution.
 
 A second attempt takes a similar approach to writing a recurrence with an initial condition as a recurrence of 
 the form $T(n) = a(n) + T(m(n))$. Suppose that we interpret $a$ as a piecewise function with three sub-functions:
@@ -76,7 +75,7 @@ a(n) &=
 0, \ n < 1 \\
 1, \ n = 1 \\
 2, \ n > 1
-\end{cases} \\
+\end{cases}
 \end{align*}
 We can express this recurrence using our fixed-point syntax as
 \begin{align*}
@@ -105,7 +104,7 @@ if $e$ is of a form that corresponds to a recurrence with an initial condition.
 
 Suppose we have a recurrence with an initial condition, given as follows:
 \begin{align*}
-T(b) &= c, \text{ where } b, \ c, \ \in \R \\
+T(b) &= c, \text{ where } b, c,  \in \R \\
 T(x) &= a(x) + T(m(x)).
 \end{align*}
 We write this recurrence in our chapter 3 syntax as 
@@ -120,7 +119,8 @@ c \text{ if } x = b \\
 a(x) + c \text{ if } m(x) = b \\
 a(x) + a(m(x)) + c \text{ if } m(m(x)) = b \\
 \ldots \\
-\sum_{i=1}^{n} a(m^{i-1}(x)) + c \text{ if } m^n(x) = b
+\sum_{i=1}^{n} a(m^{i-1}(x)) + c \text{ if } m^n(x) = b \\
+\ldots
 \end{cases}
 \end{align*}
 

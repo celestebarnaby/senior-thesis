@@ -76,12 +76,12 @@ partially ordered set (CPO). A CPO is a set $S$ with two defining properties. Bu
 we first offer some definitions related to ordered sets. An element $\perp \in S$ is called the bottom element if for all
 $s \in S, \ \perp \leq s$. A subset $C \subset S$ is called a chain if $C = \{c_1, c_2, c_3, \dots\}$, where 
 $c_1 \leq c_2 \leq c_3 \leq \dots$. An upper bound on $C$ is an element $a \in S$ such that for all $i, \ c_i \leq a$. 
-The least upper bound $\bigvee C$ is an upper bound of C such that, for any upper bound $a$ of $C, \ \bigvee C \leq a$.
+The least upper bound $\bigvee C$ is an upper bound of $C$ such that, for any upper bound $a$ of $C, \ \bigvee C \leq a$.
 
 With these definitions in mind, we say S is a CPO if
 \begin{align*}
-&\text{1) S has a bottom element }\perp.\\
-&\text{2) For any chain }C \subset S, \ \bigvee C \in S. \\
+&\text{(1) S has a bottom element }\perp.\\
+&\text{(2) For any chain }C \subset S, \ \bigvee C \in S. \\
 \end{align*}
 
 \begin{figure}
@@ -138,7 +138,7 @@ With these definitions in mind, we say S is a CPO if
  
  We will interpret $\texttt{fix}$ expressions using the CPO fixed-point theorem. This theorem states that, for a CPO $P$ and a continuous, order-preserving map $\Phi : P \rightarrow P$, the least fixed-point of $\Phi$ exists and is equal to $\bigvee_i \Phi^n(\perp)$.
 
-In order to use this theorem on the interpretation of $\texttt{fix}(\lambda f. \lambda x.e): \tau \rightarrow \tau$ expressions, 
+In order to use this theorem on the interpretation of $\texttt{fix}(\lambda f. \lambda x.e): \tau \rightarrow \sigma$ expressions, 
 we must first show that for all types $\tau$, $\llbracket \tau \rrbracket$ is a CPO.
 \begin{thm}
 For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
@@ -177,7 +177,7 @@ bound of $C_1$. Similarly, $y$ is an upper bound of $C_2$. Thus, it must be that
 $\bigvee C_2 \leq y$, so $(\bigvee C_1, \bigvee C_2) \leq (x,y)$. Therefore, $(\bigvee C_1, \bigvee C_2)$ is the least upper
 bound of $C$.
 
-\item $\tau = \tau_1 \rightarrow \tau_2$ \\ \\
+\item $\tau = \tau_1 \rightarrow \tau_2$ \\ 
 Note $\llbracket \tau \rrbracket = \{f \mid \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket : f \text{ is continuous}\}
 $. By inductive hypothesis, $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom
 elements $\perp_1$ and $\perp_2$, respectively. Let $\perp: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 
@@ -198,7 +198,7 @@ Now let $\rho \in \llbracket \tau \rrbracket$ be an upper bound of $C$. Then for
 \end{proof}
 %
 
-Further, we must show that the argument $\lambda f\lambda x.e$ of a $\texttt{fix}$ expression interprets to a continuous function. Note that a function $f: P \rightarrow Q$ (where $P$ and $Q$ are CPOs) is defined to be continuous if, for every
+Further, we must show that the argument $\lambda f.\lambda x.e$ of a $\texttt{fix}$ expression interprets to a continuous function. Note that a function $f: P \rightarrow Q$ (where $P$ and $Q$ are CPOs) is defined to be continuous if, for every
 chain $C$ in $P, \ f(\bigvee C) = \bigvee f(C)$ It will suffice to prove type
 soundness of our denotational semantics: $\lambda f\lambda x.e$ expressions have type $(\tau \rightarrow \sigma) \rightarrow (\tau \rightarrow \sigma)$, and 
 $\llbracket (\tau \rightarrow \sigma) \rightarrow (\tau \rightarrow \sigma) \rrbracket$ is the set of continuous functions from $\llbracket \tau \rightarrow \sigma \rrbracket$ to
@@ -423,7 +423,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{enumerate} 
  % fix operation
  We use several lemmas for this case, which are stated after the proof.
- \item $e = \texttt{fix} (\lambda f.\lambda y.e)$ \\
+ \item $e = \texttt{fix} (\lambda f.\lambda y.e)$ 
  \begin{enumerate}
 \item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda y.e\rrbracket\eta\{x\mapsto a_i\}$, and consider that 
  \begin{align*}
@@ -440,8 +440,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \item Let $F = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta$. We want to show that 
  $\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau 
  \rightarrow\tau\rrbracket\eta \in \llbracket \tau \rightarrow \tau \rrbracket$---that is, it is a continuous function from 
- $\llbracket \tau \rrbracket$ to $\llbracket \tau \rrbracket$. Let $\{a_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$,
-  and see that 
+ $\llbracket \tau \rrbracket$ to $\llbracket \tau \rrbracket$. Let $\{a_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$,  and see that 
  \begin{align*}
  (\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta)( \bigvee_i a_i) &= 
  fix(F)(\bigvee_i a_i)\\
@@ -489,7 +488,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  We will prove equational soundness of our denotational semantics, in order to ensure that
  our interpretation of recurrences reflects their equational meaning.
   \begin{thm}
-  If $\Gamma \vdash e_0 : \tau$ and $\Gamma \vdash e_1 : \tau$ and $e_0 = e_1$, then for all $\Gamma$-environments
+  If $\Gamma \vdash e_0 : \tau$, $\Gamma \vdash e_1 : \tau$, and $e_0 = e_1$, then for all $\Gamma$-environments
   $\eta$,   
  \begin{align*}
  \llbracket \Gamma \vdash e_0 \rrbracket \eta 

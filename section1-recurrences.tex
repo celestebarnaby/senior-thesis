@@ -14,10 +14,11 @@ such that the interpretation of our recurrences exhibit the same behavior as Kar
 
 Consider that, in order to describe recurrence relations, our language must have some way of defining recursive functions.
 A first attempt at this involves defining a PCF-like language with a $\texttt{real}$ type and a $\texttt{fix}$ operator
-that assigns the least fixed-point to continuous functions using the CPO fixed-point theorem. Our denotational semantics 
+that assigns the least fixed-point to continuous functions using the CPO fixed-point theorem
+(the details of such a language are described further in chapter 3). Our denotational semantics 
 then interprets all base types as flat-ordered CPOs---for instance, $\texttt{real}$  interprets to $R_{\perp}$, the reals with a 
 bottom element $\perp$, with each real number comparable only to $\perp$. Following standard PCF, arrow types
-$\tau \rightarrow \sigma$, interpret to a CPO whose bottom element is a function $\perp: \tau \rightarrow \sigma$ such
+$\tau \rightarrow \sigma$ interpret to a CPO whose bottom element is a function $\perp: \tau \rightarrow \sigma$ such
 that $\perp(x) = \perp_{\sigma}, \forall x \in \tau$. A recursively-defined function $f$ is interpreted as 
 $\bigvee_n\{F^n \perp\}$, where $F: (\real \rightarrow \real) \rightarrow (\real \rightarrow \real)$ is derived from
 the recursive definition.
@@ -28,12 +29,12 @@ such as $T(x) = a(x) + T(m(x))$ has the form $F(g)(x) = a(x) + g(m(x))$. But if 
 \begin{align*}
 F(\perp)(x) &= a(x) + \perp(px) = a(x) + \perp = \perp 
 \end{align*}
-so by induction we may show that for $\forall n, \ F^n(\perp)(x) = \perp, and so \bigvee\{F^n(\perp)\}^{\infty}_{n=1}  = \perp$. 
+so by induction we may show that for all $n, \ F^n(\perp)(x) = \perp$, so $\bigvee\{F^n(\perp)\}^{\infty}_{n=1}  = \perp$. 
 This result, is, clearly, not a solution to the recurrence $T(x) = a(x) + T(px)$, making this denotational semantics
 unsuitable. 
 
 A second approach involves altering the interpretation of the $\texttt{real}$ type to 
-$\extR$---that is, the non-negative, extended reals. See that $\extR$ is a CPO: $0$ is a bottom element,
+$\extR$---the non-negative, extended reals. See that $\extR$ is a CPO: $0$ is a bottom element,
 and any directed subset of $\extR$ must have a least upper bound. Such an interpretation
 resolves the issue of all recursive functions interpreting to $\perp$, because there is now a reasonable, non-strict
 interpretation of the base functions---e.g., $x + 0 = 0$. In the above example, for instance, we would have
@@ -66,7 +67,7 @@ list is non-empty. Then we must rewrite our interpretation of such expressions a
    \end{cases} 
 \end{align*}
 
-To see why this is a problem, consider the expression $x = \texttt{0}$ and the chain $\{n\}_{n=0}^{\infty} \in \llbracket 
+To see why this is a problem, consider the expression $x = 0$ and the chain $\{n\}_{n=0}^{\infty} \in \llbracket 
 \texttt{real} \rrbracket$. See, then, that
 \begin{align*}
 \llbracket x = \texttt{0} \rrbracket\{x \mapsto 0\} &= true \\
@@ -74,9 +75,9 @@ To see why this is a problem, consider the expression $x = \texttt{0}$ and the c
 \llbracket x = \texttt{0} \rrbracket\{x \mapsto 2\} &= false \\
 \ldots
 \end{align*}
-so, since there is no obvious ordering on $\llbracket \texttt{bool} \rrbracket$,
-$\{\llbracket x = \texttt{0}\rrbracket\{x \mapsto n\}\}_{n=0}^{\infty}$ has no supremum. However, as we will see in chapter 3,
-in order to use the CPO fixed-point theorem it will be necessary to show that for all expressions $e$, environments $\Gamma$,
+so, since the standard interpretation of $\llbracket \texttt{bool} \rrbracket$ is flat-ordered---and there is no obvious
+alternative interpretation---$\{\llbracket x = 0\rrbracket\{x \mapsto n\}\}_{n=0}^{\infty}$ has no supremum. However, as we will see in chapter 3,
+in order to use the CPO fixed-point theorem it will be necessary to show that for all expressions $e$
 and chains $a_0 \leq a_1 \leq \ldots,$
 \begin{align*}
   \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x\mapsto \bigvee_i a_i\}
@@ -97,7 +98,7 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 
 The $\texttt{rec}$ operator allows us to write 
 recurrences of the form $T(x) = a(x) + T(m(x))$, where $T$, $a$, and $m$ are real-valued functions.
-The recurrence for T corresponds to the expression $\texttt{rec}(\lambda x.a, \lambda x.m)$. As seen in the typing
+The recurrence for $T$ corresponds to the expression $\texttt{rec}(\lambda x.a, \lambda x.m)$. As seen in the typing
 rules, \texttt{rec} expressions describe recurrences only at type \texttt{real}.
  While this is a very restrictive subset of recursive functions, it allows us to express the recurrences described by 
  \cite[\S1]{Karp}, without running into the problems of the previous approaches. 
@@ -265,8 +266,8 @@ T(x) &=
  &= \sum_{i=0}^{\infty}\underline{a} (\underline{m}^i(d)) \\
  &= \sum_{i=0}^{\infty}\underline{a} (p^i(d))
  \end{align*}
-Note that, for $\forall d<1 \in \R, \ \llbracket \texttt{T} \rrbracket(d) = 0$
-and for $\forall d \geq 1 \in R$, since $p < 1, \ \exists k \in \N \text{ s.t } \dfrac{1}{p^{k-1}} \leq d < \dfrac{1}{p^k}$. Then
+Note that, for all $ d<1 \in \R, \ \llbracket \texttt{T} \rrbracket(d) = 0$
+and for all $d \geq 1 \in R$, since $p < 1, \ \exists k \in \N \text{ s.t } \dfrac{1}{p^{k-1}} \leq d < \dfrac{1}{p^k}$. Then
 $p^id < 1$ for $i \geq k$, so
 \begin{align*}
 \llbracket \texttt{T} \rrbracket(d)&= \sum_{i=0}^{\infty}\underline{a} (p^i(d)) \\
