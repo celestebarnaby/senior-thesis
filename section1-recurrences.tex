@@ -92,7 +92,7 @@ operator with a special-purpose recursive operator. Typing and equational semant
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \ | e \leq e \mid e \geq e \mid 
      \ifelse{e}{e}{e} \mid (e,e) \mid \\
-    && \texttt{rec}(\lambda x.e, \lambda x.e) 
+    && \texttt{floor}(e) \mid \texttt{rec}(\lambda x.e, \lambda x.e) 
 \end{array}
 \]
 
@@ -118,8 +118,9 @@ Karp, while avoiding the problems of the previous approaches.
 \dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
 {\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \tau_1 \ \ \ \Gamma \vdash e_2 : \tau_2}{\Gamma \vdash (e_1, e_2) : \tau_1 \times \tau_2} \\ \\
+\dfrac{\Gamma \vdash e : \texttt{real}}{\Gamma \vdash \texttt{floor}(e) : \texttt{real}} \\ \\
 \dfrac{\Gamma \vdash \lambda x.a : \texttt{real} \rightarrow \texttt{real} \ \ \ \Gamma \vdash \lambda x.m : 
-\texttt{real} \rightarrow \texttt{real}}
+\texttt{real} \rightarrow \texttt{real}} 
 {\Gamma \vdash \texttt{rec}(\lambda x.a, \lambda x.m) : \texttt{real} \rightarrow \texttt{real}} 
 \end{array}
 \]
@@ -197,6 +198,7 @@ If $\Gamma \vdash e:\tau$, then $\llbracket \Gamma \vdash e : \tau \rrbracket\et
    \end{cases}
   \\
     \llbracket (e_1,e_2) \rrbracket\eta &= (\llbracket e_1 \rrbracket\eta,\llbracket e_2 \rrbracket\eta) \\
+    \llbracket \texttt{floor}(e) \rrbracket\eta &= \lfloor \llbracket e \rrbracket\eta \rfloor \\
    \llbracket  \texttt{rec} (\lambda x.a, \lambda x.m) \rrbracket\eta &= rec : \R_{\infty} \rightarrow \R_{\infty} \text{ s.t. } \forall d \in \R_{\infty}, \\
    rec(d) &= \sum_{i=0}^{\infty}\llbracket \lambda x.a \rrbracket\eta ((\llbracket \lambda x.m \rrbracket\eta)^i(d))
  \end{align*}

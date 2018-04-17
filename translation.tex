@@ -14,12 +14,13 @@ approaches. Our goal here is to show that, for every expression of the form $\te
 As a first attempt, we consider a simple recurrence with an initial condition, as described in chapter 3.
 \begin{align*}
 T(1) &= 0 \\
-T(n) &= 1 + T(n/2 ) 
+T(n) &= 1 + T(n/2) 
 \end{align*}
-As in the example in chapter 3, we assume that the domain of $T$ is positive powers of $2$.
+As in the example in chapter 3, we assume that the actual meaning of the general recurrence
+is $T(n) = 1 + T(\lfloor n/2 \rfloor)$.
 We can write this recurrence as an expression \texttt{T} in our fixed-point language, where
 \begin{align*}
-\llbracket \texttt{T}\rrbracket_{fix}(n) = \log_2(n).
+\llbracket \texttt{T}\rrbracket_{fix}(n) = \lfloor \log_2(n) \rfloor.
 \end{align*} 
 
  In order to make this fit the definition of a recurrence described in 
@@ -28,7 +29,7 @@ piecewise function with two sub-functions: one for the general recurrence and on
 We write this as a single recurrence
 \begin{align*}
 T'(n) &= a(n) + T'(m(n)) \\
-m(n) &= n/2, \ \forall n \\ 
+m(n) &= \lfloor n/2 \rfloor, \ \forall n \\ 
 a(n) &=
 \begin{cases} 
 0, \ n \leq 1 \\
@@ -38,23 +39,23 @@ a(n) &=
 This recurrence can then be expressed in our infinite sum language as 
 \begin{align*}
 \texttt{T} &= \texttt{rec}(a,m) \\
-m &= \lambda x.x/\texttt{2} \\
+m &= \lambda x.\texttt{floor}(x/2) \\
 a &= \lambda x.\ifelse{x\leq 1}{0}{1} \\
 \llbracket \texttt{T} \rrbracket(n) &= \llbracket \texttt{rec}(a,m) \rrbracket(n) \\
 &= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(n)) \\
-&= \sum_{i=0}^{\log(n)} 1 + \sum_{i=\log(n)+1}^{\infty} 0 \\
-&= \log(n).
+&= \sum_{i=0}^{\lfloor \log_2(n) \rfloor} 1 + \sum_{i= \lfloor \log(n)\rfloor+1}^{\infty} 0 \\
+&=\lfloor \log_2(n) \rfloor.
 \end{align*}
 
 However, this approach will not work in every case. Let us try to use the same process on the following recurrence
 \begin{align*}
 T(1) &= 1 \\
-T(n) &= 2 + T(n/2) 
+T(n) &= 2 + T(\lfloor n/2\rfloor) 
 \end{align*}
 We first write this as a single recurrence. See that, unlike the previous example, $a$ never maps to $0$.
 \begin{align*}
 T'(n) &= a(n) + T'(m(n)) \\
-m(n) &= n/2, \ \forall n \\ 
+m(n) &= \lfloor n/2 \rfloor, \ \forall n \\ 
 a(n) &= 
 \begin{cases}
 1, \ n \leq 1 \\
@@ -64,11 +65,11 @@ a(n) &=
 We then express this recurrence using our infinite sum language as
 \begin{align*}
 \texttt{T} &= \texttt{rec}(a,m) \\
-m &= \lambda x.x/2 \\
+m &= \lambda x.\texttt{floor}(x/2) \\
 a &=\lambda x.\ifelse{x\leq1}{1}{2} \\
 \llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(a,m) \rrbracket(d) \\
 &= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(d)) \\
-&= \sum_{i=0}^{\log(n)} 2 + \sum_{i=\log(n)+1 }^{\infty} 1 \\
+&= \sum_{i=0}^{\lfloor \log(n) \rfloor} 2 + \sum_{i=\lfloor \log(n) \rfloor+1 }^{\infty} 1 \\
 &= \infty
 \end{align*}
 Which, clearly, is not the same as the fixed-point semantics for $T$.
@@ -78,7 +79,7 @@ one for the general recurrence, one for the initial condition, and one for value
 map to $0$. Considering the example that failed in the previous attempt, we would have
 \begin{align*}
 T'(n) &= a(n) + T'(m(n)) \\
-m &= n/2, \forall n \\
+m &= \lfloor n/2 \rfloor, \forall n \\
 a(n) &=
 \begin{cases}
 0, \ n < 1 \\
@@ -86,10 +87,10 @@ a(n) &=
 2, \ n > 1
 \end{cases}
 \end{align*}
-We can express this recurrence using our infinite sum syntax as
+We can express this recurrence using our infinite sum language as
 \begin{align*}
 \texttt{T} &= \texttt{rec}(a,m) \\
-m &= \lambda x.x/\texttt{2} \\
+m &= \lambda x.\texttt{floor}(x/2) \\
 a &= \lambda x.\ifelse{x <1}{0}{(\ifelse{x = 1}{1}{2})}.
 \end{align*}
 See, then, that
@@ -104,8 +105,8 @@ See, then, that
 \begin{align*}
 \llbracket \texttt{T} \rrbracket(n) &= \llbracket \texttt{rec}(a,m)\rrbracket(n) \\
 &= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(n)) \\
-&= \sum_{i=0}^{\log(n)} 2 + \sum_{i=\log(n)+1 }^{\log(n)+1} 1 + \sum_{i = \log(n) + 2}^{\infty} 0 \\
-&= 2\log(n) + 1
+&= \sum_{i=0}^{\lfloor \log(n) \rfloor} 2 + \sum_{i=\lfloor \log(n) \rfloor+1 }^{\lfloor \log(n) \rfloor+1} 1 + \sum_{i =\lfloor \log(n) \rfloor + 2}^{\infty} 0 \\
+&= \lfloor 2\log(n) \rfloor + 1
 \end{align*}
 
 This approach matches our intuition for how an initial condition should work---that once you reach the initial condition,
@@ -113,22 +114,34 @@ you stop recursing.
 
 With this in mind, we can identify a general strategy for extracting a recurrence in our chapter 2 syntax (with
 the $\texttt{rec}$ operator), given a recurrence in our chapter 3 syntax (with the $\texttt{fix}$ operator). 
+What we want to show is that for any $\texttt{fix}(\lambda f. \lambda x.e)$ expression, there are expressions $a$ and $m$
+in our infinite sum language such that $\llbracket \texttt{fix}(\lambda f.\lambda x.e)\rrbracket_{fix} = 
+\llbracket \texttt{rec}(a,m)\rrbracket_{sum}$. But we cannot prove this exact theorem, as not every
+expression $e$ is of a form that corresponds to a recurrence with an initial condition.
+
+What we can do instead is define a sublanguage of our fixed-point language such that, for any expression $E$ in this 
+sublanguage, we may translate $E$ to an expression $E^*$ in our infinite sum language. We may then prove
+that for any expression $E$, $\llbracket E \rrbracket_{fix}$ is equivalent to $\llbracket E^* \rrbracket$. However,
+there are some underlying complexities in our semantics that make this proof of equivalence non-trivial; formalizing
+this translation and proof is left for future work.
+
+Still, we can look at an example of what it might look like to make a translation from a $\texttt{fix}$ expression corresponding to a chapter 3 recurrence to a $\texttt{rec}$ expression corresponding to a chapter 2 recurrence.
 Suppose we have a recurrence with an initial condition, given as follows:
 \begin{align*}
-T(b) &= c, \text{ where } b, c  \in \R \\
-T(x) &= a(x) + T(m(x)).
+T(b) &= c, \text{ where } b, c  \in \R, b > 0 \\
+T(x) &= a(x) + T( m(x) ).
 \end{align*}
 We write this recurrence in our chapter 3 syntax as 
 \begin{align*}
-\texttt{fix}(\lambda f.\lambda x. \ifelse{x = b}{c}{a(x) + f(m(x))}),
+\texttt{fix}(\lambda f.\lambda x. \ifelse{x = b}{c}{a(x) + f((m(x)))}),
 \end{align*}
 an expression whose denotation will be a function $F$ such that
 \begin{align*}
 F(x) &=
 \begin{cases}
-c \text{ if } x = b \\
-a(x) + c \text{ if } m(x) = b \\
-a(x) + a(m(x)) + c \text{ if } m(m(x)) = b \\
+c \text{ if } x  = b \\
+a(x) + c \text{ if } m(x)  = b \\
+a(x) + a(m(x)) + c \text{ if } m(m(x))  = b \\
 \ldots \\
 \sum_{i=1}^{n} a(m^{i-1}(x)) + c \text{ if } m^n(x) = b \\
 \ldots

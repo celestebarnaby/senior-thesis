@@ -16,7 +16,9 @@ $\texttt{nat}$ type, we have a $\texttt{real}$ type, as this is the domain of th
 We will circumvent the issues we had with this approach in the previous chapter by writing these recurrences
 using conditional statements $\ifelse{e_1}{e_2}{e_3}$, with $e_2$ corresponding to the initial condition and $e_3$
 to the general condition. We will see that this approach will allow us to have strict evaluation of base operations, while
-still obtaining correct solutions to recurrences.
+still obtaining correct solutions to recurrences. Note that the above recurrence only makes for inputs $n$ such that
+$(3/4)^in = 1$ for some $i$. Thus, we interpret the actual meaning of the general clause to be
+$T(n) = 1 + T(\lfloor 3/4n \rfloor)$, and add a \texttt{floor} constant to the syntax. 
 \[
 \begin{array}{rcl}
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
@@ -24,7 +26,7 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
      \ifelse{e}{e}{e} \mid (e, e) \mid \\
-     && \texttt{fix} (\lambda f.\lambda x.e) 
+     && \texttt{floor} \mid \texttt{fix} (\lambda f.\lambda x.e) 
 \end{array}
 \]
 
@@ -42,7 +44,8 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 , \circ \in \{=, <, >, \geq, \leq\} \\ \\ 
 \dfrac{\Gamma \vdash e_1 : \texttt{bool} \ \ \ \Gamma \vdash e_2 : \tau \ \ \ \Gamma \vdash e_3 : \tau}
 {\Gamma \vdash \ifelse{e_1}{e_2}{e_3} : \tau} \\ \\ 
-\dfrac{\Gamma \vdash e_1 : \tau_1 \ \ \ \Gamma \vdash e_2: \tau_2}{\Gamma \vdash (e_1, e_2) : \tau_1 \times \tau_2}
+\dfrac{\Gamma \vdash e_1 : \tau_1 \ \ \ \Gamma \vdash e_2: \tau_2}{\Gamma \vdash (e_1, e_2) : \tau_1 \times \tau_2} \\ \\
+\dfrac{\Gamma \vdash e : \texttt{real}}{\Gamma \vdash \texttt{floor}(e) : \texttt{real}} \\ \\
 \dfrac{\Gamma \vdash \lambda f. \lambda x.e : (\tau \rightarrow \sigma) \rightarrow (\tau \rightarrow \sigma)}
 {\Gamma \vdash \texttt{fix}(\lambda f. \lambda x.e) : \tau \rightarrow \sigma} 
 \end{array}
@@ -80,9 +83,8 @@ The least upper bound $\bigvee C$ is an upper bound of $C$ such that, for any up
 With these definitions in mind, we say $S$ is a CPO if
 \begin{align*}
 &\text{(1) $S$ has a bottom element }\perp.\\
-&\text{(2) For any chain }C \subset S, \ \bigvee C \in S. \\
+&\text{(2) For any chain }C \subset S, \ \bigvee C \in S. 
 \end{align*}
-
 Further, if $P$ and $Q$ are CPO's, we say a function $f: P \rightarrow Q$ is continuous if, for every chain $C \subset P$, 
 $f(\bigvee C) = \bigvee f(C)$.
 
@@ -132,6 +134,7 @@ $f(\bigvee C) = \bigvee f(C)$.
    \end{cases}
   \\
   \llbracket (e_1,e_2) \rrbracket\eta &= (\llbracket e_1 \rrbracket\eta,\llbracket e_2 \rrbracket\eta) \\
+  \llbracket \texttt{floor}(e) \rrbracket\eta &= \lfloor \llbracket e \rrbracket\eta \rfloor \\
    \llbracket  \texttt{fix} (\lambda f.\lambda x.e) \rrbracket\eta &= fix\llbracket \lambda f.\lambda x.e \rrbracket\eta \\
  \text{where } fix &\text{ assigns the least fixed point to continuous functions} 
  \end{align*}
@@ -306,9 +309,9 @@ In the case that $ y \neq x$, note that
  Note $\llbracket \texttt{real} \rrbracket = \R_{\perp}$, so
  \begin{align*}
  \exists i_1 \forall i \geq i_1, \llbracket \Gamma \vdash e_1\rrbracket\eta\{x\mapsto a_i\} = v_1 \in \R \\
- \exists i_2 \forall i \geq i_2, \llbracket \Gamma \vdash e_2\rrbracket\eta\{x\mapsto a_i\} = v_2 \in \R \\ 
+ \exists i_2 \forall i \geq i_2, \llbracket \Gamma \vdash e_2\rrbracket\eta\{x\mapsto a_i\} = v_2 \in \R 
  \end{align*}
- Let $i' = max\{i_1, i_2\}$, and note
+ Let $i' = \max\{i_1, i_2\}$, and note
  \begin{align*}
   \llbracket \Gamma \vdash e_1 \circ e_2\rrbracket\eta\{x \mapsto \bigvee_i a_i\}
   &=  \llbracket \Gamma \vdash e_1 \rrbracket\eta\{x \mapsto \bigvee_i a_i\} \circ
@@ -368,6 +371,13 @@ In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x
   \llbracket \Gamma \vdash e_2 : \tau_2 \rrbracket\eta\{x \mapsto a_i\}) \\
   &= \bigvee_i \llbracket \Gamma \vdash (e_1, e_2): \tau_1 \times \tau_2 \rrbracket\eta\{x\mapsto a_i\}
   \end{align*}
+  %floor
+  \item $e = \texttt{floor}(e_1)$
+  \begin{align*}
+   \llbracket \Gamma \vdash e \rrbracket\eta\{x \mapsto a\} &= 
+   \lfloor \llbracket e_1 \rrbracket\eta\{x \mapsto a\} \rfloor \\
+  \text{(by inductive hypothesis)} &= \bigvee_i \lfloor \llbracket e_1 \rrbracket\eta\{x \mapsto a_i\} \rfloor
+   \end{align*}
 % application
  \item $ e = e_1 \ e_2$ \\ 
  We use Lemma 5 in this case, which is stated after the proof.
@@ -451,7 +461,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  $\llbracket \sigma \rrbracket$ to $\llbracket \tau \rrbracket$. Let $\{a_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \sigma \rrbracket$,  and see that 
  \begin{align*}
  (\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta)( \bigvee_i a_i) &= 
- fix(F)(\bigvee_i a_i)\\
+ fix(F)(\bigvee_i a_i)\\ 
  &=(\bigvee_j F^j \perp)(\bigvee_i a_i)\\
  &= \bigvee_j (F^j \perp(\bigvee_i a_i))\\ 
  \text{(by continuity of $F^j \perp$) }&= \bigvee_j(\bigvee_i(F^j \perp(a_i)))\\ 
@@ -552,24 +562,22 @@ language have the same solution. First, consider the following recurrence:
 T(1) &= 0 \\
 T(n) &= 1 + T(pn), \ 0 < p < 1
 \end{align*} 
-Consider that this recurrence only makes sense if its input is in the set $\{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$; we will assume that this is the domain of $T$. 
- See, then, that for all $ x \in \{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}, \ T(x) = \log_{p}1/x $
-
+Again, we assume that the actual meaning of the general recurrence is $T(n) = 1 + T(\lfloor pn \rfloor)$.
 We may express this recurrence in our language as follows:
 \begin{align*}
-\texttt{T} &= \texttt{fix}(\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(p*x)})
+\texttt{T} &= \texttt{fix}(\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(\texttt{floor}(p*x))})
  \end{align*}
  We want to show that the interpretation of this expression is equal to the solution of the recurrence described above. 
  First, let 
  \begin{align*}
- \texttt{F} =\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(p*x)},
+ \texttt{F} =\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(\texttt{floor}(p*x))},
  \end{align*}
  and note the following: 
  \begin{align*}
  \llbracket \texttt{T} \rrbracket &= fix(\llbracket \texttt{F} \rrbracket) \\
  \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ 
  &\text{ s.t. } \forall \alpha \in \llbracket \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rrbracket, \\   
- &F(\alpha) = \llbracket\lambda x.\ifelse{x=1}{0}{1 + f(p*x)}\rrbracket\{f \mapsto \alpha\} \\
+ &F(\alpha) = \llbracket\lambda x.\ifelse{x=1}{0}{1 + f(\texttt{floor}(p*x))}\rrbracket\{f \mapsto \alpha\} \\
  \llbracket \texttt{real}\rrbracket &= \R_{\perp}  
  \end{align*}
  By the CPO fixed-point theorem,  
@@ -580,10 +588,10 @@ We may express this recurrence in our language as follows:
  \begin{lemma}
  $\forall x \in \R_{\perp}, \ F^{n+1}(\perp)(x) =  
  \begin{cases}
- 0 \text{ if } x = 1 \\
- 1 \text{ if } px = 1 \\
+ 0 \text{ if }\lfloor x \rfloor = 1  \\
+ 1 \text{ if } \lfloor px  \rfloor= 1 \\
  \dots \\
- n  \text{ if } \ p^{n}x = 1  \\
+ n  \text{ if }  \lfloor p^{n}x \rfloor = 1  \\
  \perp \text{ otherwise}
  \end{cases}$
  \end{lemma}
@@ -594,12 +602,12 @@ We may express this recurrence in our language as follows:
 F^{n+1}(\perp)(x) &= F(\perp) \\
 &= 
 \begin{cases}
-0 \text{ if } x=1 \\
-1 + \perp(px) \text{ otherwise}
+0 \text{ if }\lfloor x \rfloor=1 \\
+1 + \perp(\lfloor px \rfloor) \text{ otherwise}
 \end{cases} \\
 &=
 \begin{cases}
-0 \text{ if } x=1 \\
+0 \text{ if } \lfloor x \rfloor=1 \\
 \perp \text{ otherwise}
 \end{cases} 
 \end{align*}
@@ -608,7 +616,7 @@ Note $p^{n}x = p^0x = x$, so trivially the claim holds. \\
 \begin{align*}
 F^{n+1}(\perp)(x) &=  
 \begin{cases}
-0 \text{ if } x=1 \\
+0 \text{ if } \lfloor x \rfloor =1 \\
 1 + F^{n}(\perp)(px) \text{ otherwise}
 \end{cases} 
 \end{align*}
@@ -617,10 +625,10 @@ By inductive hypothesis,
 F^{n}(\perp)(px) &= F^{(n-1) + 1}(\perp)(px) \\
 &=  
  \begin{cases}
- 0 \text{ if } px = 1 \\
- 1 \text{ if } p^2x = 1  \\
+ 0 \text{ if } \lfloor px \rfloor = 1 \\
+ 1 \text{ if } \lfloor  p^2x \rfloor = 1  \\
  \dots \\
- n - 1 \text{ if }  p^{n}x =1  \\
+ n - 1 \text{ if }  \lfloor p^{n}x \rfloor =1  \\
  \perp \text{ otherwise}
  \end{cases}
  \end{align*}
@@ -629,22 +637,22 @@ See, then, that
 \begin{align*}
 F^{n+1}(\perp)(x) &=  
 \begin{cases}
-0 \text{ if } x=1 \\
-1 \text{ if } px = 1 \\
-2 \text{ if } p^2x = 1  \\
+0 \text{ if } \lfloor x \rfloor =1 \\
+1 \text{ if } \lfloor px \rfloor = 1 \\
+2 \text{ if } \lfloor p^2x \rfloor = 1  \\
 \dots \\
-n \text{ if } p^{n}x = 1  \\
+n \text{ if } \lfloor p^{n}x \rfloor = 1  \\
 \perp \text{ otherwise } 
 \end{cases}
 \end{align*}
 Therefore, the claim holds for all $n$.
 
-Then $\llbracket \texttt{T} \rrbracket = \lim_{n \to \infty}\{F^n (\perp)\}$ is defined for all $x \in \{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$ as
+Then $\llbracket \texttt{T} \rrbracket = \lim_{n \to \infty}\{F^n (\perp)\}$ is defined for all $x \in \R$ as
 \begin{align*}
 \lim_{n \to \infty}\{F^n (\perp)\}(x) = k
 \end{align*}
-Where $p^kx=1$. Then $k = \log_{p}1/x$, so
- $\llbracket \texttt{T} \rrbracket(x) = \log_{p}1/x= T(x)$. Thus, $\llbracket \texttt{T} \rrbracket = T$.
+Where $\lfloor p^kx \rfloor =1$. Then $k = \lfloor \log_{p}1/x \rfloor$, so
+ $\llbracket \texttt{T} \rrbracket(x) = \lfloor \log_{p}1/x \rfloor= T(x)$. Thus, $\llbracket \texttt{T} \rrbracket = T$.
  
 
 
