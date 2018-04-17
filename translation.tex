@@ -114,10 +114,10 @@ you stop recursing.
 
 With this in mind, we can identify a general strategy for extracting a recurrence in our chapter 2 syntax (with
 the $\texttt{rec}$ operator), given a recurrence in our chapter 3 syntax (with the $\texttt{fix}$ operator). 
-What we want to show is that for any $\texttt{fix}(\lambda f. \lambda x.e)$ expression, there are expressions $a$ and $m$
+What we would like to now show is that for any $\texttt{fix}(\lambda f. \lambda x.e)$ expression, there are expressions $a$ and $m$
 in our infinite sum language such that $\llbracket \texttt{fix}(\lambda f.\lambda x.e)\rrbracket_{fix} = 
 \llbracket \texttt{rec}(a,m)\rrbracket_{sum}$. But we cannot prove this exact theorem, as not every
-expression $e$ is of a form that corresponds to a recurrence with an initial condition.
+expression $e$ is of a form that corresponds to a valid recurrence with an initial condition.
 
 What we can do instead is define a sublanguage of our fixed-point language such that, for any expression $E$ in this 
 sublanguage, we may translate $E$ to an expression $E^*$ in our infinite sum language. We may then prove
