@@ -1,9 +1,9 @@
 \chapter{Conclusion}
 
-We have defined three syntaxes which allow us to write and type-check the several types of recurrences
+We have defined three languages which allow us to write and type-check the several types of recurrences
 described by Karp. The first allows us to describe deterministic recurrences of the form $T(x) = a(x) + T(m(x))$, where $a$ and $m$ are real-valued functions. The second allows us to describe recurrences of this form, but with an added initial 
 condition $T(m) = c$. And the third allows us to describe probabilistic recurrences of the form 
-$T(x) = a(x) + T(h(x)(l))\hat{h}(x)(l)$, where $a$ is a real-valued function, $h(x)$ is a random variable of type
+$T(x) = a(x) + T(h(x)(l))(\hat{h}(x)(l))$, where $a$ is a real-valued function, $h(x)$ is a random variable of type
 $\Omega_x \rightarrow \R$, and $\hat{h}(x)$ is a random variable of type
  $\prod_{l \in \Omega_x} \Omega_{h(x)(l)}$. Moreover, we have discussed a means of translating between
  the first and second syntaxes. 

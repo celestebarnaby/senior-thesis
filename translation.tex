@@ -1,7 +1,7 @@
 \chapter{Reconciling the Two Semantics}
-Chapter 2 and 3 have presented languages for defining the two distinct kinds of recurrences present in \cite{Karp}. 
-In this chapter, we look at several attempts to connect these two recurrences. In particular, we want to find a way 
-to write a recurrence with an initial condition as a recurrence of the form $T(x) = a(x) + T(m(x))$, as this is the kind
+Chapters 2 and 3 have presented languages for defining the two distinct kinds of deterministic recurrences present in 
+\cite{Karp}. In this chapter, we look at several attempts to connect these two recurrences. In particular, we want to find a 
+way to write a recurrence with an initial condition as a recurrence of the form $T(x) = a(x) + T(m(x))$, as this is the kind
 of recurrence for which Karp proves tail bounds. We will offer
 several methods of translating from one expression language to the other, and investigate the validity of these 
 approaches. Our goal here is to show that, for every expression of the form $\texttt{fix}(\lambda f.\lambda x.e)$ in our
@@ -11,22 +11,21 @@ approaches. Our goal here is to show that, for every expression of the form $\te
  3, respectively. We will see that this will only be possible for $e$ of a certain form, but that this form covers all the 
  examples that Karp provides.
 
-As a first attempt, we consider a simple recurrence with an initial condition.
+As a first attempt, we consider a simple recurrence with an initial condition, as described in chapter 3.
 \begin{align*}
 T(1) &= 0 \\
 T(n) &= 1 + T(n/2 ) 
 \end{align*}
 As in the example in chapter 3, we assume that the domain of $T$ is positive powers of $2$.
-This is the kind of recurrence described in chapter 3. Using the same argument as in chapter 3,
-we can write this as $\texttt{fix}(\lambda f.\lambda x.e)$, where 
+We can write this recurrence as an expression \texttt{T} in our fixed-point language, where
 \begin{align*}
-\llbracket \texttt{fix}(\lambda f.\lambda x.e)\rrbracket_{fix}(n) = \log(n) - 1.
+\llbracket \texttt{T}\rrbracket_{fix}(n) = \log_2(n).
 \end{align*} 
 
  In order to make this fit the definition of a recurrence described in 
 chapter 2 --- that is, a recurrence of the form $T(n) = a(n) + T(m(n))$--- we may interpret $a$ as a 
 piecewise function with two sub-functions: one for the general recurrence and one for the initial condition.
-We can instead write this as a single recurrence
+We write this as a single recurrence
 \begin{align*}
 T'(n) &= a(n) + T'(m(n)) \\
 m(n) &= n/2, \ \forall n \\ 
@@ -36,15 +35,15 @@ a(n) &=
 1, \ n > 1
 \end{cases}
 \end{align*} 
-This recurrence can then be expressed in our chapter 2 syntax as 
+This recurrence can then be expressed in our infinite sum language as 
 \begin{align*}
 \texttt{T} &= \texttt{rec}(a,m) \\
 m &= \lambda x.x/\texttt{2} \\
 a &= \lambda x.\ifelse{x\leq 1}{0}{1} \\
 \llbracket \texttt{T} \rrbracket(n) &= \llbracket \texttt{rec}(a,m) \rrbracket(n) \\
 &= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(n)) \\
-&= \sum_{i=0}^{\log(n)-1} 1 + \sum_{i=log(n)}^{\infty} 0 \\
-&= \log(n) - 1.
+&= \sum_{i=0}^{\log(n)} 1 + \sum_{i=\log(n)+1}^{\infty} 0 \\
+&= \log(n).
 \end{align*}
 
 However, this approach will not work in every case. Let us try to use the same process on the following recurrence
@@ -62,20 +61,19 @@ a(n) &=
 2, \ n > 1
 \end{cases}
 \end{align*}
-We then express this recurrence using our chapter 2 syntax as
+We then express this recurrence using our infinite sum language as
 \begin{align*}
 \texttt{T} &= \texttt{rec}(a,m) \\
 m &= \lambda x.x/2 \\
 a &=\lambda x.\ifelse{x\leq1}{1}{2} \\
 \llbracket \texttt{T} \rrbracket(d) &= \llbracket \texttt{rec}(a,m) \rrbracket(d) \\
 &= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(d)) \\
-&= \sum_{i=0}^{\log(n)-1} 2 + \sum_{i=\log(n) }^{\infty} 1 \\
+&= \sum_{i=0}^{\log(n)} 2 + \sum_{i=\log(n)+1 }^{\infty} 1 \\
 &= \infty
 \end{align*}
 Which, clearly, is not the same as the fixed-point semantics for $T$.
 
-A second attempt takes a similar approach to writing a recurrence with an initial condition as a recurrence of 
-the form $T(n) = a(n) + T(m(n))$. Suppose that we interpret $a$ as a piecewise function with three sub-functions:
+A second attempt takes a similar but slightly altered approach. Suppose that we interpret $a$ as a piecewise function with three sub-functions:
 one for the general recurrence, one for the initial condition, and one for values smaller than the initial condition, which all
 map to $0$. Considering the example that failed in the previous attempt, we would have
 \begin{align*}
@@ -106,8 +104,8 @@ See, then, that
 \begin{align*}
 \llbracket \texttt{T} \rrbracket(n) &= \llbracket \texttt{rec}(a,m)\rrbracket(n) \\
 &= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(n)) \\
-&= \sum_{i=0}^{\log(n)-1} 2 + \sum_{i=\log(n) }^{\log(n)} 1 + \sum_{i = \log(n) + 1}^{\infty} 0 \\
-&= 2\log(n) - 1
+&= \sum_{i=0}^{\log(n)} 2 + \sum_{i=\log(n)+1 }^{\log(n)+1} 1 + \sum_{i = \log(n) + 2}^{\infty} 0 \\
+&= 2\log(n) + 1
 \end{align*}
 
 This approach matches our intuition for how an initial condition should work---that once you reach the initial condition,
@@ -115,12 +113,9 @@ you stop recursing.
 
 With this in mind, we can identify a general strategy for extracting a recurrence in our chapter 2 syntax (with
 the $\texttt{rec}$ operator), given a recurrence in our chapter 3 syntax (with the $\texttt{fix}$ operator). 
-While we cannot extract a recurrence from every $\texttt{fix}(\lambda f \lambda x.e)$ expression, we can achieve this
-if $e$ is of a form that corresponds to a recurrence with an initial condition. 
-
 Suppose we have a recurrence with an initial condition, given as follows:
 \begin{align*}
-T(b) &= c, \text{ where } b, c,  \in \R \\
+T(b) &= c, \text{ where } b, c  \in \R \\
 T(x) &= a(x) + T(m(x)).
 \end{align*}
 We write this recurrence in our chapter 3 syntax as 

@@ -10,7 +10,7 @@ $m^i$ is the $i^{th}$ iterate of $m$.
 
 In this chapter, we will define an expression language that allows us to write and type-check
 deterministic recurrences such as $T'$. Further, we will define a denotational semantics for this language, 
-such that the interpretation of our recurrences exhibit the same behavior as Karp's recurrences. 
+such that the interpretations of a recurrence is equal to its solution. 
 
 Consider that, in order to describe recurrence relations, our language must have some way of defining recursive functions.
 A first attempt at this involves defining a PCF-like language with a $\texttt{real}$ type and a $\texttt{fix}$ operator
@@ -37,7 +37,7 @@ A second approach involves altering the interpretation of the $\texttt{real}$ ty
 $\extR$---the non-negative, extended reals. See that $\extR$ is a CPO: $0$ is a bottom element,
 and any directed subset of $\extR$ must have a least upper bound. Such an interpretation
 resolves the issue of all recursive functions interpreting to $\perp$, because there is now a reasonable, non-strict
-interpretation of the base functions---e.g., $x + 0 = 0$. In the above example, for instance, we would have
+interpretation of the base functions---e.g., $x + 0 = x$. In the above example, for instance, we would have
 \begin{align*}
 F(\perp)(x) &= a(x) + \perp(px) = a(x) + 0 = a(x) \\
 F(F(\perp))(x) &= a(x) + F(\perp)(px) = a(x) + a(px)
@@ -45,7 +45,7 @@ F(F(\perp))(x) &= a(x) + F(\perp)(px) = a(x) + a(px)
 so, by induction, 
 $\forall n, \ F^n(\perp)(x) = \sum_{i=1}^{n}a(p^{i-1}x)$, and hence $\bigvee\{F^n(\perp)\}^{\infty}_{n=1}(x) = \sum_{i=1}
 ^{\infty}a(p^{i-1}x)$. This $\emph{is}$ the solution to the recurrence $T(x) = a(x) + T(px)$, suggesting that this is the 
-appropriate denotational semantics to use. However, this causes unexpected problems. For one, note that
+appropriate denotational semantics to use. However, this causes unexpected problems. Note that
  the standard interpretation of the equality operator is as follows:
 \begin{align*}
  \llbracket e_1 = e_2 \rrbracket\eta &= 
@@ -57,8 +57,8 @@ appropriate denotational semantics to use. However, this causes unexpected probl
 \end{align*}
 with similar rules for $<, >, \leq, \geq$. But if our bottom element of $\llbracket \texttt{real} \rrbracket$ is $0$, this 
 prohibits us from writing a program where we compare a number to $0$. This is too restrictive, as there are many 
-divide-and-conquer algorithms where we continue a process on the condition that an integer is non-negative, or a 
-list is non-empty. Then we must rewrite our interpretation of such expressions as
+divide-and-conquer algorithms where we continue a process on the condition that, say, an integer is non-negative, or a 
+list is non-empty. Then we have to rewrite our interpretation of such expressions as
 \begin{align*}
  \llbracket e_1 = e_2 \rrbracket\eta &= 
  \begin{cases} 
@@ -84,8 +84,8 @@ and chains $a_0 \leq a_1 \leq \ldots,$
   = \bigvee_i \llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto a_i\}
 \end{align*}
 
-Thus, this approach will not work. In light of this, we define the a language that replaces the general fixed-point operator
-with a special-purpose recursive operator. Typing and equational semantics are given in Figures 1 and 2.
+Thus, this approach will not work either. In light of this, we define the a language that replaces the general fixed-point 
+operator with a special-purpose recursive operator. Typing and equational semantics are given in Figures 1 and 2.
 \[
 \begin{array}{rcl}
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
@@ -101,7 +101,7 @@ recurrences of the form $T(x) = a(x) + T(m(x))$, where $T$, $a$, and $m$ are rea
 The recurrence for $T$ corresponds to the expression $\texttt{rec}(\lambda x.a, \lambda x.m)$. As seen in the typing
 rules, \texttt{rec} expressions describe recurrences only at type \texttt{real}.
  While this is a very restrictive subset of recursive functions, it allows us to express the recurrences described by 
- \cite[\S1]{Karp}, without running into the problems of the previous approaches. 
+Karp, while avoiding the problems of the previous approaches. 
 
 \begin{figure}
 \[
@@ -147,7 +147,7 @@ e = e \\ \\
 \label{fig:eqsem}
 \end{figure}
 
-The denotational semantics is given in Figures 3 and 4. Note, in these figures, that $\Gamma$ is a partial function mapping variables to types, and a
+The denotational semantics for this language is given in Figures 3 and 4. Note, in these figures, that $\Gamma$ is a partial function mapping variables to types, and a
  $\Gamma$-environment $\eta$ is a partial function that maps a variable $x$ to a value in the
  denotation of $\Gamma(x)$. Note, also, that the denotation of $\texttt{real}$, is $\R \cup \{\infty\}$. This is because
  we may write a recurrence of the form $T(x) = a(x) + T(m(x))$ whose only solution is $\infty$---see that this is true
@@ -217,7 +217,7 @@ If $\Gamma \vdash e:\tau$, then $\llbracket \Gamma \vdash e : \tau \rrbracket\et
  
  \begin{proof}
  We will verify only the equation for $\texttt{rec}$ expressions, as all others are trivial.
- Note that for all $d \in \R$,
+ Note that for all $d \in \R_{\infty}$,
  \begin{align*}
  \llbracket \lambda x.(a + \texttt{rec}(\lambda x.a, \lambda x.m)(m)) \rrbracket \eta(d)
  &= \\  
@@ -240,10 +240,9 @@ If $\Gamma \vdash e:\tau$, then $\llbracket \Gamma \vdash e : \tau \rrbracket\et
 
 We want to gain some intuition that the denotation of a $\texttt{rec}(a,m)$ expression is equal to the solution of the 
 corresponding recurrence, $T(x) = a(x) + T(m(x))$.
-Consider the example Karp offers, wherein $m(x) = px$, with $p$ a
+Consider this example Karp offers, wherein $m(x) = px$, with $p$ a
 positive constant less than 1, and $a(x) = 0, \ x < 1, \ a(x) = 1, \ x \geq 1$.
 Then $T(x) = a(x) + T(px)$, so by a simple inductive argument we can show that 
-
 \begin{align*}
 T(x) &= 
  \begin{cases}
@@ -251,11 +250,11 @@ T(x) &=
  k \text{ if }  \dfrac{1}{p^{k-1}} \leq x < \dfrac{1}{p^k} \\
  \end{cases}
  \end{align*}
- We express this function in our expression language as follows: 
+ We express this function in our language as follows: 
  \begin{align*}
  \texttt{T} = \texttt{rec}(\lambda x.(\ifelse{x<\texttt{1}}{\texttt{0}}{\texttt{1}}), \lambda x. \texttt{p}*x)
  \end{align*}
- We want to show that the interpretation of this expression has the same solution as the function described by Karp.
+ We want to show that the interpretation of this expression has the same solution as the recurrence described by Karp.
  Let $\texttt{a} = \lambda x.\ifelse{x<1}{0}{1}, \ \texttt{m} = \lambda x.\texttt{p}*x$, and see that
  \begin{align*}
   \llbracket \texttt{a} \rrbracket &= a : \R \rightarrow \R \text{ s.t. } a(d) = 0, 
@@ -269,7 +268,7 @@ T(x) &=
  &= \sum_{i=0}^{\infty}a (p^i(d))
  \end{align*}
 Note that, for all $ d<1 \in \R, \ \llbracket \texttt{T} \rrbracket(d) = 0$
-and for all $d \geq 1 \in R$, since $p < 1, \ \exists k \in \N \text{ s.t } \dfrac{1}{p^{k-1}} \leq d < \dfrac{1}{p^k}$. Then
+and for all $d \geq 1 \in \R$, since $p < 1, \ \exists k \in \N \text{ s.t } \dfrac{1}{p^{k-1}} \leq d < \dfrac{1}{p^k}$. Then
 $p^id < 1$ for $i \geq k$, so
 \begin{align*}
 \llbracket \texttt{T} \rrbracket(d)&= \sum_{i=0}^{\infty}a (p^i(d)) \\

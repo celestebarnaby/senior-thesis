@@ -4,7 +4,7 @@ for automating the analysis of program complexity, which would allow us to make 
 
 However, such work has so far only offered a method for obtaining an upper bound on the worst-case runtime of an algorithm---which in certain cases does not reflect the actual runtime of an algorithm. In particular, this method does not
 provide useful bounds on algorithms with stochastic processes, where the runtime may be quite slow in the worst case but
-is, on average, much more efficient. Developing methods for extracting a tighter upper-bound on the cost of probabilistic algorithms would allow us to analyze a wider array of programs.
+is, on average, much more efficient. Developing methods for extracting tighter upper-bounds on the costs of probabilistic algorithms would allow us to analyze a wider array of programs.
 
 \section{Automated Complexity Analysis}
 
@@ -27,11 +27,11 @@ T(n) &= c + T(n-1)
 To determine the cost of $\texttt{add}$, we need only solve this recurrence. We find that $T(n) = cn$, meaning this function
 is linear in the length of the list. 
 
-However, this approach has several problems. To start, this is an ad hoc way to analyze cost. We cannot generalize
-this result for use in other functions; thus, all traditional cost analyses involve writing recurrences by hand. Further, there is 
-no formal connection between the algorithm and the recurrence, meaning we must also manually verify that the recurrence
-we write down accurately describes the function we are analyzing. The combination of these issues creates a lot of potential
-for human error.
+This approach has several shortcomings. To start, it is an ad hoc way to analyze cost. We cannot generalize
+this result for use in other functions; thus, all traditional cost analyses involve writing recurrences by hand. Further, there 
+is no formal connection between the algorithm and the recurrence, meaning we must manually verify that the recurrence
+we write down accurately describes the function we are analyzing. The combination of these issues creates a lot of 
+potential for human error.
 
 Another problem is that we assume that the work done to each element of the list requires a constant number of steps. 
 This assumption is fine in the case of $\texttt{add}$, where all we are doing is adding integers; however, if we consider
@@ -76,7 +76,7 @@ imprecise, ad hoc arguments: that is, they cannot be applied to other algorithms
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x))
 \end{align*}
 where $x$ is a non-negative real number describing the size of the input, $h_1(x)$ through $h_n(x)$ are random 
-variables describing the sizes of the subproblems (e.g. in the case of quicksort $h_1(x)$ and $h_2(x)$ describe the sizes 
+variables describing the sizes of the subproblems (e.g. in the case of quicksort, $h_1(x)$ and $h_2(x)$ describe the sizes 
 of the two sublists), $a$ is a function describing the work necessary to generate these subproblems, and $T(x)$ is a 
 random variable describing the total running time of the algorithm on an input of size $x$. Karp then offers several methods 
 for obtaining tight bounds on the upper tails of the probability distribution of $T(x)$. 
@@ -86,7 +86,7 @@ emerge when we attempt to assign types to its expressions. Since $T(x)$ is suppo
 variable over inputs of size $x$, $T(x)$ is a function of type 
 $\Omega_x \rightarrow \R$, where $\Omega_x$ is the sample space of inputs of size $x$. Then $T$ is essentially a 
 function of type $\R \rightarrow (\Omega_x \rightarrow \R)$. However, we see that $T$ recursively takes 
-$h(x)$ as an argument, even though $h(x)$ is a described as random variable with type $\Omega_x \rightarrow \R$, 
+$h(x)$ as an argument, even though $h(x)$ is described as a random variable with type $\Omega_x \rightarrow \R$, 
 rather than $\R$. This type-checking error is likely a result of the informality of the recurrence description, 
 and we are meant to understand that $T$ takes not the 
 random variable $h(x)$ as an argument, but the result of plugging an input $l \in \Omega_x$ into $h(x)$. Using this 
@@ -107,7 +107,7 @@ these observations.
 Karp offers the equation $T'(x) = a(x) + T'(m(x))$ as a deterministic counterpart of a recurrence relation $T(x) = a(x) + 
 T(h(x))$, where, for all $x$, $m(x)$ is equal to the upper bound of $h(x)$. This thesis defines languages that allow
 us to write and type-check both probabilistic recurrences of the form $T'$, and deterministic recurrences
-of the form $T$. These languages comprise a simple expression language including natural number constants, identifiers, basic arithmetic operations, booleans, and application. Further, these languages must provide
+of the form $T$. These languages comprise a simple expression language including real number constants, identifiers, basic arithmetic operations, booleans, and application. These languages must also provide
 a way to express recursive functions, since this work centers around expressing recurrence relations. 
  
 In Chapter 2 we will define a language and denotational semantics that formalizes deterministic recurrences.  A natural 
@@ -120,7 +120,7 @@ examples of applications take a different form. Thus in Chapter 3, we formulate 
 we are in fact able to use a general fixed-point construction and CPO semantics.  We then investigate the difficulty of 
 reconciling these two seemingly different forms of recursive definitions in Chapter 4. 
 
- Of course, the main point of Karp's paper is probabilistic recurrences, and so we define a language and semantics for 
+ Of course, the main point of Karp's paper is probabilistic recurrences, so we define a language and semantics for 
  them in Chapter 5.  This turns out to be quite complex: as discussed above, the typing of these recurrences itself is 
  already problematic. Our solution is to support dependent types in our language. Since it proves to be quite difficult to 
  combine dependent types with CPOs, we focus on a semantics that corresponds to the infinite sum interpretation for

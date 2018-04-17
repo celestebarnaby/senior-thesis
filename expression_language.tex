@@ -23,7 +23,7 @@ still obtaining correct solutions to recurrences.
 e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lambda x.e \mid e \ e \mid e + e \mid e - e \mid  e  *  e 
 \mid e / e \mid \texttt{true} \mid \texttt{false} \mid \\
   && e  =  e \mid e < e \mid e > e \mid e \leq e \mid e \geq e \mid 
-     \ifelse{e}{e}{e} \mid (e_1, e_2) \mid \\
+     \ifelse{e}{e}{e} \mid (e, e) \mid \\
      && \texttt{fix} (\lambda f.\lambda x.e) 
 \end{array}
 \]
@@ -72,17 +72,19 @@ e = e \\ \\
 
 The equational semantics of our language is given in Figure 2, and the denotational semantics is given in figures 3 and 4.
 This semantics is the standard one for PCF, where each type interprets to a complete
-partially ordered set (CPO). A CPO is a set $S$ with two defining properties. But before we state these properties,
-we first offer some definitions related to ordered sets. An element $\perp \in S$ is called the bottom element if for all
-$s \in S, \ \perp \leq s$. A subset $C \subset S$ is called a chain if $C = \{c_1, c_2, c_3, \dots\}$, where 
+partially ordered set (CPO). A CPO is a set $S$ with two defining properties. Before we state these properties,
+we first offer some definitions related to ordered sets. An element $a \in S$ is called the bottom element (denoted by $\perp$) if for all $s \in S, \ a \leq s$. A subset $C \subset S$ is called a chain if $C = \{c_1, c_2, c_3, \dots\}$, where 
 $c_1 \leq c_2 \leq c_3 \leq \dots$. An upper bound on $C$ is an element $a \in S$ such that for all $i, \ c_i \leq a$. 
 The least upper bound $\bigvee C$ is an upper bound of $C$ such that, for any upper bound $a$ of $C, \ \bigvee C \leq a$.
 
-With these definitions in mind, we say S is a CPO if
+With these definitions in mind, we say $S$ is a CPO if
 \begin{align*}
-&\text{(1) S has a bottom element }\perp.\\
+&\text{(1) $S$ has a bottom element }\perp.\\
 &\text{(2) For any chain }C \subset S, \ \bigvee C \in S. \\
 \end{align*}
+
+Further, if $P$ and $Q$ are CPO's, we say a function $f: P \rightarrow Q$ is continuous if, for every chain $C \subset P$, 
+$f(\bigvee C) = \bigvee f(C)$.
 
 \begin{figure}
  \begin{align*}
@@ -136,10 +138,10 @@ With these definitions in mind, we say S is a CPO if
  \caption{Denotational semantics for expressions.}
  \end{figure}
  
- We will interpret $\texttt{fix}$ expressions using the CPO fixed-point theorem. This theorem states that, for a CPO $P$ and a continuous, order-preserving map $\Phi : P \rightarrow P$, the least fixed-point of $\Phi$ exists and is equal to $\bigvee_i \Phi^n(\perp)$.
+ We will interpret $\texttt{fix}$ expressions using the CPO fixed-point theorem. This theorem states that, for a CPO $P$ and a continuous, order-preserving map $\Phi : P \rightarrow P$, the least fixed-point of $\Phi$ exists and is equal to $\bigvee \Phi^n(\perp)$.
 
 In order to use this theorem on the interpretation of $\texttt{fix}(\lambda f. \lambda x.e): \tau \rightarrow \sigma$ expressions, 
-we must first show that for all types $\tau$, $\llbracket \tau \rrbracket$ is a CPO.
+we must first prove the following.
 \begin{thm}
 For all types $\tau, \ \llbracket \tau \rrbracket$ is a CPO --- that is, $\llbracket \tau \rrbracket$ is an ordered 
 set with a bottom element, such that for all $ C \subset \llbracket \tau \rrbracket$, if  $C$ is a chain, then $C$ has a least 
@@ -193,13 +195,12 @@ such that $\forall x \in \llbracket \tau_1 \rrbracket, \ g(x) = \bigvee F_x$. We
 Let $f \in C$, and note that for all $ x \in \llbracket \tau_1 \rrbracket, \ f(x) \leq \bigvee F_x =g(x)$. Then $g$ is an upper bound of $C$.
 
 Now let $\rho \in \llbracket \tau \rrbracket$ be an upper bound of $C$. Then for all $ x \in \llbracket \tau_1 \rrbracket, f \in C, \ f(x) \leq \rho(x)$, so $\rho(x)$ is an upper bound of $\{f(x) : f \in C\} = F_x$. Thus $\rho(x) \geq F_x = g(x), \ \forall x \in 
-\llbracket \tau_1 \rrbracket$, so $g \leq \rho$. Therefore, g is the least upper bound of $C$.
+\llbracket \tau_1 \rrbracket$, so $g \leq \rho$. Therefore, $g$ is the least upper bound of $C$.
 \end{itemize} 
 \end{proof}
 %
 
-Further, we must show that the argument $\lambda f.\lambda x.e$ of a $\texttt{fix}$ expression interprets to a continuous function. Note that a function $f: P \rightarrow Q$ (where $P$ and $Q$ are CPOs) is defined to be continuous if, for every
-chain $C$ in $P, \ f(\bigvee C) = \bigvee f(C)$ It will suffice to prove type
+Further, we must show that the argument $\lambda f.\lambda x.e$ of a $\texttt{fix}$ expression interprets to a continuous function. It will suffice to prove type
 soundness of our denotational semantics: $\lambda f\lambda x.e$ expressions have type $(\tau \rightarrow \sigma) \rightarrow (\tau \rightarrow \sigma)$, and 
 $\llbracket (\tau \rightarrow \sigma) \rightarrow (\tau \rightarrow \sigma) \rrbracket$ is the set of continuous functions from $\llbracket \tau \rightarrow \sigma \rrbracket$ to
 $\llbracket \tau \rightarrow \sigma \rrbracket$. 
@@ -222,7 +223,7 @@ $\tmden{\typing\Gamma e\tau}\eta\in\tyden{\tau}$.
 \end{thm}
 
 \begin{proof}
-by induction on the structure of $e$. For all cases, let $\{ a_i \}^{\infty}_{i=1}$ be a chain, and suppose $ a = \bigvee_i a_i$. 
+By induction on the structure of $e$. For all cases, let $\{ a_i \}^{\infty}_{i=1}$ be a chain, and let $ a = \bigvee_i a_i$. 
 Note that 2 is trivial in all but the abstraction and $\texttt{fix}$ cases.\\
  \emph{Base Cases: } 
  \begin{itemize}
@@ -426,7 +427,7 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{align*}
  \end{enumerate} 
  % fix operation
- \item $e = \texttt{fix} (\lambda f.\lambda y.e)$ 
+ \item $e = \texttt{fix} (\lambda f.\lambda y.e)$ \\
   We use several Lemmas 6 and 7 for this case, which are stated after the proof.
  \begin{enumerate}
 \item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda y.e\rrbracket\eta\{x\mapsto a_i\}$, and consider that 
@@ -551,15 +552,19 @@ language have the same solution. First, consider the following recurrence:
 T(1) &= 0 \\
 T(n) &= 1 + T(pn), \ 0 < p < 1
 \end{align*} 
-Consider that this recurrence only makes sense if its input is in the set $\{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$; we will assume that this set is the domain of $T$. 
- See, then, that $T(n) = \log_{p}1/n $
+Consider that this recurrence only makes sense if its input is in the set $\{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$; we will assume that this is the domain of $T$. 
+ See, then, that for all $ x \in \{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}, \ T(x) = \log_{p}1/x $
 
-We may express this recurrence in our language as the follows:
+We may express this recurrence in our language as follows:
 \begin{align*}
-\texttt{T} = \texttt{fix}(\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(p*x)})
+\texttt{T} &= \texttt{fix}(\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(p*x)})
  \end{align*}
- We want to show that the denotation of this expression has the same behavior as the recurrence described above. 
- First, let $\texttt{F} =\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(p*x)}$, and note the following: 
+ We want to show that the interpretation of this expression is equal to the solution of the recurrence described above. 
+ First, let 
+ \begin{align*}
+ \texttt{F} =\lambda f. \lambda x.\ifelse{x=1}{0}{1 + f(p*x)},
+ \end{align*}
+ and note the following: 
  \begin{align*}
  \llbracket \texttt{T} \rrbracket &= fix(\llbracket \texttt{F} \rrbracket) \\
  \llbracket \texttt{F} \rrbracket &= F : \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \rightarrow \llbracket \texttt{real} \rightarrow \texttt{real}\rrbracket \\ 
@@ -634,12 +639,12 @@ n \text{ if } p^{n}x = 1  \\
 \end{align*}
 Therefore, the claim holds for all $n$.
 
-Then $\llbracket \texttt{T} \rrbracket = \lim_{n \to \infty}\{F^n (\perp)\}$ is defined for all $x \in \R$ such that $p^kx = 1$
-for some $k \in \N$ as
+Then $\llbracket \texttt{T} \rrbracket = \lim_{n \to \infty}\{F^n (\perp)\}$ is defined for all $x \in \{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$ as
 \begin{align*}
-\lim_{n \to \infty}\{F^n (\perp)\}(x) = k = \log_{p}1/x
+\lim_{n \to \infty}\{F^n (\perp)\}(x) = k
 \end{align*}
-Then $\llbracket \texttt{T} \rrbracket(x) = \log_{p}1/x= T(x)$. Thus, $\llbracket \texttt{T} \rrbracket = T$.
+Where $p^kx=1$. Then $k = \log_{p}1/x$, so
+ $\llbracket \texttt{T} \rrbracket(x) = \log_{p}1/x= T(x)$. Thus, $\llbracket \texttt{T} \rrbracket = T$.
  
 
 

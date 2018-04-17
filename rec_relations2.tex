@@ -1,5 +1,5 @@
 \chapter{Well-Typed Probabilistic Recurrence Relations}
-\cite{Karp} is premised on the notion that the cost of a stochastic algorithm may be described as a
+We now turn to recurrences describing the cost of probabilistic algorithms. \cite{Karp} is premised on the notion that the cost of a stochastic algorithm may be described as a
 recurrence relation of the form
 \begin{align*}
 T(x) = a(x) + T(h_1(x)) + \dots + T(h_n(x)).
@@ -13,7 +13,7 @@ T &: \prod_{x \in \R} (\Omega_x \rightarrow \R) \\
 a &: \R \rightarrow \R
 \end{align*}
 Notice that the type of $T$ is dependent upon a real number $x$.
-For other terms, it is less clear what the type should should be. Karp alternates between saying that $h$ is a random 
+For other terms, it is less clear what the type should be. Karp alternates between saying that $h$ is a random 
 variable and $h(x)$ is a random variable, so it is not immediately obvious 
 what the meaning of this function is. However, since $h$ takes $x \in \R$ as an input, it would not make sense for $h$ to be a 
 random variable of type $\R \rightarrow \R$. This would make $h$ a function that takes an input size and returns the 
@@ -78,8 +78,8 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 \end{array}
 \]
 
-In this syntax, we replace the arrow type $\sigma \rightarrow \tau$ with the dependent product type
-$\Pi x:\sigma.\tau$, and introduce type families. 
+In this syntax, we replace the arrow type $\tau \rightarrow \sigma$ with the dependent product type
+$\Pi (x:\tau).\sigma$, and introduce type families. 
 These are collections of types that depend on an input: for instance,
 the type $\Pi n:\texttt{nat}.\lst(n)$, where the type $\lst(n)$ is dependent upon an input $n$ of type \texttt{nat}.
 As with our languages for deterministic recurrences, we need a way of defining recursive functions. 
@@ -105,12 +105,12 @@ to a list of length $n$.
 But there is a problem here, stemming from the fact that our denotation of dependent product types must be a 
 set of \emph{continuous} functions. This is the case because the denotation of our fix operator,
 $\llbracket \texttt{fix}(\lambda f. \lambda x.e) \rrbracket$, is $fix(\llbracket \lambda f. \lambda x.e \rrbracket)$, where $fix$ 
-is a function that assigns the least fixed point to continuous functions. Thus, we must be able to guarantee that the denotation of any $\lambda f. \lambda x.e$ expression--that is, any expression with a dependent product type--- must be continuous. But continuity of a function is premised on the fact that the domain and range of
+is a function that assigns the least fixed point to continuous functions. Thus, we must be able to guarantee that the denotation of any $\lambda f. \lambda x.e$ expression is a continuous function. But continuity of a function is premised on the fact that the domain and range of
 a function are CPOs. It is not necessarily the case that
  $\bigcup_{a \in \llbracket \tau \rrbracket} \llbracket \sigma \rrbracket\{ x \mapsto a\}$ is a CPO, even though 
  $\llbracket \sigma \rrbracket\{x\mapsto a\}$ is a CPO for all $a \in \llbracket \tau \rrbracket$.
  For instance, $\llbracket \lst(n) \rrbracket\{n \mapsto a\}$ is a CPO for all $a \in \N$, but 
- $\bigcup_{a \in \N} \llbracket\lst(n)\rrbracket{n \mapsto a}$---the union of all samples spaces $\Omega_n$---is not. 
+ $\bigcup_{a \in \N} \llbracket\lst(n)\rrbracket\{n \mapsto a\}$---the union of all samples spaces $\Omega_n$---is not. 
 
 As a result, continuity does not have any meaning for functions of type $\llbracket \Pi (x: \tau).\sigma \rrbracket$. 
 So we cannot use the $\texttt{fix}$ operator on arbitrary $\lambda f. \lambda x.e$ expressions, and the whole
@@ -130,8 +130,9 @@ framework of our denotational semantics falls apart.
 \end{figure}
 
 As an alternative approach, we define a language which includes a $\texttt{rec}$ operator similar to the one in chapter 2,
- which allows to write recurrences of the form $T(x)(l) = a(x) + T(h(x)(l))\hat{h}(x)(l)$, where $T, \ a, \ h$, and $\hat{h}$ 
- are functions with types as described above. As in chapter 2, this approach restricts us to expressing only a small subset
+ which allows to write recurrences of the form 
+ $T(x)(l) = a(x) + T(h_1(x)(l))\hat{h_1}(x)(l) + \ldots + T(h_n(x)(l))\hat{h_n}(x)(l)$, where $T, \ a, \ h_i$, and $\hat{h_i}$ 
+ are functions with types as described above. As in chapter 2, this approach restricts us to expressing only a subset
  of recursive functions; however, it does allow us to express the probabilistic recurrences described by Karp,
  without having to worry about the problem of requiring continuity on functions with dependent product types. 
 
@@ -255,7 +256,7 @@ e = e \\ \\
 
 We want to gain some intuition that our denotation of a $\texttt{rec}$ expression is equivalent to the solution of
 the corresponding semantic recurrence. To this end, we will show that, for a program $T$ describing a recurrence for 
-quicksort, the denotation of $T$ for valid inputs is equal to the actual cost of quicksorting. 
+quicksort, the denotation of $T$ is equal to the actual cost of quicksorting. 
  Following Karp's definition, this random variable has the form 
 \begin{align*}
 T(x)(l) = a(x) + T(h_1(x)(l))(\hat{h_1}(x)(l)) + T(h_2(x)(l))(\hat{h_2}(x)(l)), 
@@ -275,7 +276,7 @@ For all $n \in \N, \ l \in \Omega_n$, suppose $\llbracket h_1 \rrbracket\eta (n)
 are equal to the number of elements in $l$ less than and greater than or equal to the head of the $l$, respectively (that is,
 they accurately reflect the sizes of the subproblems of quicksort). Likewise, suppose
 $\llbracket \hat{h_1} \rrbracket\eta (n)(l)$ and $\llbracket \hat{h_2} \rrbracket\eta (n)(l)$ are equal to lists containing the
-elements less than and greater than or equal to the head of $l$, respectively. 
+elements of $l$ less than and greater than or equal to the head of $l$, respectively. 
  Then $\llbracket T \rrbracket\eta (n)(l)$ is equal to the cost
 of performing quicksort on $l$. 
 \end{thm} 
