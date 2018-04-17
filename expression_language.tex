@@ -85,7 +85,7 @@ With these definitions in mind, we say $S$ is a CPO if
 &\text{(1) $S$ has a bottom element }\perp.\\
 &\text{(2) For any chain }C \subset S, \ \bigvee C \in S. 
 \end{align*}
-Further, if $P$ and $Q$ are CPO's, we say a function $f: P \rightarrow Q$ is continuous if, for every chain $C \subset P$, 
+Further, if $P$ and $Q$ are CPOs, we say a function $f: P \rightarrow Q$ is continuous if, for every chain $C \subset P$, 
 $f(\bigvee C) = \bigvee f(C)$.
 
 \begin{figure}
@@ -162,7 +162,7 @@ In this case, $\llbracket \tau \rrbracket$ is a set with flat ordering, and is t
 \begin{itemize}
 \item $\tau = \tau_1 \times \tau_2$  \\
 Note $\llbracket \tau \rrbracket = \llbracket \tau_1 \rrbracket \times \llbracket \tau_2 \rrbracket$. By inductive hypothesis,
-$\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom elements $\perp_1$ and $
+$\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPOs, and thus have bottom elements $\perp_1$ and $
 \perp_2$, respectively. Thus $(\perp_1, \perp_2)$ is a bottom element of $\tau$. 
 
 Let $C \subset \llbracket \tau \rrbracket$ be a
@@ -184,7 +184,7 @@ bound of $C$.
 
 \item $\tau = \tau_1 \rightarrow \tau_2$ \\ 
 Note $\llbracket \tau \rrbracket = \{f \mid \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 \rrbracket : f \text{ is continuous}\}
-$. By inductive hypothesis, $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPO's, and thus have bottom
+$. By inductive hypothesis, $\llbracket \tau_1 \rrbracket$ and $\llbracket \tau_2 \rrbracket$ are CPOs, and thus have bottom
 elements $\perp_1$ and $\perp_2$, respectively. Let $\perp: \llbracket \tau_1 \rrbracket \rightarrow \llbracket \tau_2 
 \rrbracket$ be the function such that, for all $ x \in \llbracket \tau_1 \rrbracket, \ \perp(x) = \perp_2$. See, then, that 
 $\perp$ is a continuous function that is less than or equal to every function in $\llbracket \tau \rrbracket$ (using pointwise
