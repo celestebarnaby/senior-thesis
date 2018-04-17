@@ -147,10 +147,12 @@ e = e \\ \\
 \label{fig:eqsem}
 \end{figure}
 
-The denotational semantics is given in Figures 3 and 4. We define the interpretation of terms---
-i.e., typing derivation. Note, in these figures, that $\Gamma$ is a partial function mapping variables to types, and a
+The denotational semantics is given in Figures 3 and 4. Note, in these figures, that $\Gamma$ is a partial function mapping variables to types, and a
  $\Gamma$-environment $\eta$ is a partial function that maps a variable $x$ to a value in the
- denotation of $\Gamma(x)$. Figure 4 defines $\llbracket \Gamma \vdash e: \tau\rrbracket\eta$ for 
+ denotation of $\Gamma(x)$. Note, also, that the denotation of $\texttt{real}$, is $\R \cup \{\infty\}$. This is because
+ we may write a recurrence of the form $T(x) = a(x) + T(m(x))$ whose only solution is $\infty$---see that this is true
+ for $T(x) = 1 + T(x)$.
+ Figure 4 defines $\llbracket \Gamma \vdash e: \tau\rrbracket\eta$ for 
 a $\Gamma$-environment $\eta$, but we elide mentions of $\Gamma$ and $\tau$ for convenience and just write
 $\llbracket e\rrbracket\eta$. Type-soundness is straightforward; thus, proof of the following theorem is omitted.
 
@@ -160,7 +162,7 @@ If $\Gamma \vdash e:\tau$, then $\llbracket \Gamma \vdash e : \tau \rrbracket\et
 
 \begin{figure}
  \begin{align*}
-\llbracket \texttt{real} \rrbracket &= \R \\
+\llbracket \texttt{real} \rrbracket &= \R_{\infty} \\
  \llbracket \texttt{bool} \rrbracket &= {\{true, false\}} \\
  \llbracket \tau \times \sigma \rrbracket &= \llbracket \tau \rrbracket \times \llbracket \sigma \rrbracket  \\
  \llbracket \tau \rightarrow \sigma \rrbracket &= \{f: \llbracket \tau \rrbracket \rightarrow \llbracket \sigma \rrbracket \mid
@@ -195,7 +197,7 @@ If $\Gamma \vdash e:\tau$, then $\llbracket \Gamma \vdash e : \tau \rrbracket\et
    \end{cases}
   \\
     \llbracket (e_1,e_2) \rrbracket\eta &= (\llbracket e_1 \rrbracket\eta,\llbracket e_2 \rrbracket\eta) \\
-   \llbracket  \texttt{rec} (\lambda x.a, \lambda x.m) \rrbracket\eta &= rec : \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
+   \llbracket  \texttt{rec} (\lambda x.a, \lambda x.m) \rrbracket\eta &= rec : \R_{\infty} \rightarrow \R_{\infty} \text{ s.t. } \forall d \in \R_{\infty}, \\
    rec(d) &= \sum_{i=0}^{\infty}\llbracket \lambda x.a \rrbracket\eta ((\llbracket \lambda x.m \rrbracket\eta)^i(d))
  \end{align*}
  \caption{Denotational semantics for expressions.}
@@ -256,22 +258,22 @@ T(x) &=
  We want to show that the interpretation of this expression has the same solution as the function described by Karp.
  Let $\texttt{a} = \lambda x.\ifelse{x<1}{0}{1}, \ \texttt{m} = \lambda x.\texttt{p}*x$, and see that
  \begin{align*}
-  \llbracket \texttt{a} \rrbracket &= \underline{a} : \R \rightarrow \R \text{ s.t. } \underline{a}(d) = 0, 
-  \ d<1, \underline{a}(d) = 1, \ d \geq 1  \\
- \llbracket \texttt{m} \rrbracket &= \underline{m} : \R \rightarrow \R \text{ s.t } \forall d \in \R, \
- \underline{m}(d) = pd \\
+  \llbracket \texttt{a} \rrbracket &= a : \R \rightarrow \R \text{ s.t. } a(d) = 0, 
+  \ d<1, a(d) = 1, \ d \geq 1  \\
+ \llbracket \texttt{m} \rrbracket &= m : \R \rightarrow \R \text{ s.t } \forall d \in \R, \
+ m(d) = pd \\
  \llbracket \texttt{T} \rrbracket&= \llbracket \texttt{rec}(\texttt{a}, \texttt{m}) \rrbracket \\
  &= rec: \R \rightarrow \R \text{ s.t. } \forall d \in \R, \\
  &rec(d) = \sum_{i=0}^{\infty}\llbracket \texttt{a} \rrbracket (\llbracket \texttt{m} \rrbracket^i(d)) \\
- &= \sum_{i=0}^{\infty}\underline{a} (\underline{m}^i(d)) \\
- &= \sum_{i=0}^{\infty}\underline{a} (p^i(d))
+ &= \sum_{i=0}^{\infty}a (m^i(d)) \\
+ &= \sum_{i=0}^{\infty}a (p^i(d))
  \end{align*}
 Note that, for all $ d<1 \in \R, \ \llbracket \texttt{T} \rrbracket(d) = 0$
 and for all $d \geq 1 \in R$, since $p < 1, \ \exists k \in \N \text{ s.t } \dfrac{1}{p^{k-1}} \leq d < \dfrac{1}{p^k}$. Then
 $p^id < 1$ for $i \geq k$, so
 \begin{align*}
-\llbracket \texttt{T} \rrbracket(d)&= \sum_{i=0}^{\infty}\underline{a} (p^i(d)) \\
-&= \sum_{i=0}^{k-1}\underline{a} (p^i(d)) + \sum_{i=k}^{\infty}\underline{a} (p^i(d)) \\
+\llbracket \texttt{T} \rrbracket(d)&= \sum_{i=0}^{\infty}a (p^i(d)) \\
+&= \sum_{i=0}^{k-1}a (p^i(d)) + \sum_{i=k}^{\infty}a (p^i(d)) \\
 &= k + 0 = k
 \end{align*}
 Therefore, $\llbracket \texttt{T} \rrbracket = T$.

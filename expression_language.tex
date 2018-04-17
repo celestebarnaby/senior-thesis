@@ -1,10 +1,10 @@
 \chapter{Deterministic Recurrences as Fixed Points}
 \cite[\S2]{Karp} offers several example applications of his cost-bounding theorems. However, the recurrences
 he offers here do not follow the definition he set forth in the prior section. For example, a recurrence for a randomized list 
-ranking algorithms is written as
+ranking algorithm is written as
 \begin{align*}
 T(1) &= 1 \\
-T(n) &= 1 + T(3/4n)
+T(n) &= 1 + T(3/4n).
 \end{align*}
 The presence of an initial condition here is confusing: Karp has made no mention of initial conditions up to this point, and 
 there is no clear way to write the above equations as one equation of the form $T(x) = a(x) + T(m(x))$. Simply put, 
@@ -369,22 +369,26 @@ In the case that $\llbracket \Gamma \vdash e_1 : \texttt{bool} \rrbracket\eta\{x
   \end{align*}
 % application
  \item $ e = e_1 \ e_2$ \\ 
-Let $\beta = \llbracket \Gamma \vdash e_2 : \sigma \rrbracket$, and see that
+ We use Lemma 5 in this case, which is stated after the proof.
+ 
+Let $\alpha = \llbracket \Gamma \vdash e_1 : \sigma \rightarrow \tau \rrbracket\eta$,  $\beta = \llbracket \Gamma \vdash e_2 : \sigma \rrbracket\eta$. By inductive hypothesis, 
 \begin{align*}
-\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i \} &=
-\llbracket \Gamma \vdash e_1 : \sigma \rightarrow \tau \rrbracket\eta\{x \mapsto \bigvee_i a_i\}
-(\beta \ \eta\{x \mapsto \bigvee_i a_i\}) \\
-&= \llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto a\}
-(\beta \ \eta\{x \mapsto a\}) \\
-\text{(by inductive hypothesis)} &= 
-\llbracket \Gamma \vdash \lambda (y:\sigma).e' : \tau \rrbracket\eta\{x \mapsto a\}
-(\bigvee_i\beta\ \eta\{x \mapsto a_i\}) \\
-&= \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto a\}\{y \mapsto (\bigvee_i\beta\ \eta\{x \mapsto a_i\})\} \\
-\text{(by inductive hypothesis)}&= \bigvee_i \llbracket \Gamma. y : \sigma \vdash e' : \tau' \rrbracket\eta\{x \mapsto 
-a_i\}\{y \mapsto (\beta \ \eta\{x \mapsto a_i\})\} \\
-&=\bigvee_i \llbracket \Gamma \vdash e_1: \sigma \rightarrow \tau\rrbracket\eta\{x\mapsto a_i\}
-(\beta \ \eta\{x\mapsto a_i\}) \\
-&= \bigvee_i \llbracket \Gamma \vdash e:\tau\rrbracket\eta\{ x \mapsto a_i\} 
+\alpha\{x\mapsto \bigvee _i a_i\} &= \bigvee_i \alpha\{x \mapsto a_i\} \text{ and }\\
+\beta\{x\mapsto \bigvee _j a_j\} &= \bigvee_j \beta\{x \mapsto a_j\} 
+\end{align*}
+For all $i, \ \alpha\{x \mapsto a_i\} \in \llbracket \sigma \rightarrow \tau \rrbracket$, which is 
+ the set of continuous functions from $\llbracket \sigma \rrbracket$ to $\llbracket \tau \rrbracket$. Further, since
+ $\{a_i\}_i$ is a chain, $\{\alpha\{x \mapsto a_i\}\}_i$ is a chain as well. Then, since $\llbracket \sigma \rightarrow 
+ \tau\rrbracket$ is a CPO, the supremum of $\{\alpha\{x \mapsto a_i\}\}_i$ is an element of $\llbracket \sigma \rightarrow 
+ \tau\rrbracket$. That is, $\bigvee \alpha\{x \mapsto a_i\}$ is a continuous function from 
+ $\llbracket \sigma \rrbracket$ to $\llbracket \tau \rrbracket$. Then
+\begin{align*}
+\llbracket \Gamma \vdash e : \tau \rrbracket\eta\{x \mapsto \bigvee_j a_j\} &=
+	\alpha\{x\mapsto \bigvee _i a_i\}(\beta\{x\mapsto \bigvee _j a_j\}) \\
+&=  (\bigvee_i \alpha\{x \mapsto a_i\})(\bigvee_j \beta\{x \mapsto a_j\}) \\
+\text{(by continuity of $\bigvee_i \alpha\{x \mapsto a_i\}$) }&= \bigvee_j(\bigvee_i \alpha\{x \mapsto a_i \})(\beta\{ x \mapsto a_j\}) \\
+\text{(by Lemma 5)}&= \bigvee_i \alpha\{x \mapsto a_i \}(\beta\{ x \mapsto a_i\}) \\
+&= \bigvee_i \llbracket \Gamma \vdash e : \tau\rrbracket\eta\{x \mapsto a_i\}
 \end{align*}
  % abstraction
  \item $e = \lambda (y : \tau) . (e' : \tau')$
@@ -422,8 +426,8 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{align*}
  \end{enumerate} 
  % fix operation
- We use several lemmas for this case, which are stated after the proof.
  \item $e = \texttt{fix} (\lambda f.\lambda y.e)$ 
+  We use several Lemmas 6 and 7 for this case, which are stated after the proof.
  \begin{enumerate}
 \item Let $F_i = \llbracket \Gamma \vdash \lambda f. \lambda y.e\rrbracket\eta\{x\mapsto a_i\}$, and consider that 
  \begin{align*}
@@ -438,9 +442,12 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{align*}
  %
  \item Let $F = \llbracket \Gamma \vdash \lambda f. \lambda x.e\rrbracket\eta$. We want to show that 
- $\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau 
- \rightarrow\tau\rrbracket\eta \in \llbracket \tau \rightarrow \tau \rrbracket$---that is, it is a continuous function from 
- $\llbracket \tau \rrbracket$ to $\llbracket \tau \rrbracket$. Let $\{a_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \tau \rrbracket$,  and see that 
+ \begin{align*}
+ \llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) :  \sigma 
+ \rightarrow\tau\rrbracket\eta \in \llbracket \sigma \rightarrow \tau \rrbracket.
+ \end{align*}
+ That is, it is a continuous function from 
+ $\llbracket \sigma \rrbracket$ to $\llbracket \tau \rrbracket$. Let $\{a_i\}^{\infty}_{i=1}$ be a chain of elements in $\llbracket \sigma \rrbracket$,  and see that 
  \begin{align*}
  (\llbracket\Gamma\vdash\texttt{fix}(\lambda f \lambda x.e) : \tau \rightarrow\tau\rrbracket\eta)( \bigvee_i a_i) &= 
  fix(F)(\bigvee_i a_i)\\
@@ -457,13 +464,39 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  from $\llbracket \tau \rrbracket$ to $\llbracket \tau \rrbracket$.
  \end{proof}
  % Lemmas
+ \begin{lemma}
+ Let $\{f_i\}_i$ be a chain of functions of type $\llbracket \sigma \rrbracket \to \llbracket \tau \rrbracket$, and let
+ $\{x_i\}_i$ be a chain in $\llbracket \sigma \rrbracket$. Then
+ \begin{align*}
+ \bigvee_j\{(\bigvee_i f_i)(x_j)\} = \bigvee_i \{f_i (x_i)\}
+ \end{align*}
+ \end{lemma}
+ \begin{proof}
+ $\Rightarrow$ Towards contradiction, suppose $\bigvee_j\{(\bigvee_i f_i)(x_j)\} < \bigvee_i \{f_i (x_i)\}$. Then
+ \begin{align*}
+ &\exists k \text{ s.t. } \bigvee_j\{(\bigvee_i f_i)(x_j)\} < f_k(x_k) \\
+ &\Rightarrow (\bigvee_i f_i)(x_k) < \bigvee_j\{(\bigvee_i f_i)(x_j)\} < f_k(x_k) \Rightarrow \Leftarrow
+ \end{align*}
+ Therefore, $\bigvee_j\{(\bigvee_i f_i)(x_j)\} \geq \bigvee_i \{f_i (x_i)\}$
+ 
+$\Leftarrow$ Suppose, now, that $\bigvee_j\{(\bigvee_i f_i)(x_j)\} > \bigvee_i \{f_i (x_i)\}$. Then
+ \begin{align*}
+&\exists k_1 \text{ s.t. }  (\bigvee_i f_i)(x_{k_1})  >\bigvee_i \{f_i (x_i)\} \\
+&\Rightarrow \exists k_1, k_2 \text{ s.t. }  f_{k_2} (x_{k_1}) >  \bigvee_i \{f_i (x_i)\}  \\
+&\text{Let } k = \max(k_1,k_2). \text{ Then}\\
+&f_{k_1}(x_{k_2}) > \bigvee_i\{f_i(x_i)\} >   f_k(x_k) \Rightarrow\Leftarrow
+\end{align*}
+Therefore, $\bigvee_j\{(\bigvee_i f_i)(x_j)\} \leq \bigvee_i \{f_i (x_i)\}$, so 
+$\bigvee_j\{(\bigvee_i f_i)(x_j)\} = \bigvee_i \{f_i (x_i)\}$
+ \end{proof}
+ 
  \begin{lemma} $\bigvee_j(\bigvee_i((F_i)^j \perp))= \bigvee_i(\bigvee_j((F_i)^j \perp))$
  \label{lem1}
  \end{lemma}
  \begin{proof}
  $\Rightarrow$ We want to show that\\ \\ \centerline{$\bigvee_j(\bigvee_i((F_i)^j \perp))
   \geq  \bigvee_i(\bigvee_j((F_i)^j \perp))$} \\ \\ First, notice that $\forall i, j \bigvee_j(\bigvee_i
- ((F_i)^j \perp)) \geq (F_i)^j$. \\
+ ((F_i)^j \perp)) \geq (F_i)^j \perp$. \\
  Suppose, now, that 
  \begin{align*}
  &\bigvee_j(\bigvee_i((F_i)^j \perp)) < \bigvee_i(\bigvee_j((F_i)^j \perp))\\ 
@@ -507,10 +540,9 @@ Let $\texttt{F} = \lambda f \lambda x.e$, and see that
 &= \llbracket \lambda x.e\rrbracket\eta\{f \mapsto \llbracket \texttt{fix}(\texttt{F})\rrbracket\} \\
 &=\llbracket \lambda x.e\rrbracket\eta\{f \mapsto fix\}(\llbracket \texttt{F} \rrbracket\eta)\} \\
 &= \llbracket \lambda f.\lambda x.e \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)\} \\
-&= \llbracket F \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) 
+&= \llbracket F \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) \\ 
+&= fix(\llbracket \texttt{F}\rrbracket\eta) =  \llbracket \texttt{fix}(\lambda f. \lambda x.e)\rrbracket \eta
 \end{align*}
-Since $fix$ assigns the least fixed point to continuous functions, 
-$\llbracket \texttt{F} \rrbracket\eta(fix(\llbracket \texttt{F}\rrbracket\eta)) = fix(\llbracket \texttt{F}\rrbracket\eta) =  \llbracket \texttt{fix}(\lambda f. \lambda x.e)\rrbracket \eta$.
 \end{proof}
  
 We will look at a recurrence Karp offers in this section as an example, to check whether recurrences in our 
@@ -519,9 +551,8 @@ language have the same solution. First, consider the following recurrence:
 T(1) &= 0 \\
 T(n) &= 1 + T(pn), \ 0 < p < 1
 \end{align*} 
-Consider that this recurrence only makes sense if its domain is the set $\{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$;
-we will assume that this set is the domain of $T$. 
- See, then, that $T(n) = 1 +  \log_{p}1/n $
+Consider that this recurrence only makes sense if its input is in the set $\{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$; we will assume that this set is the domain of $T$. 
+ See, then, that $T(n) = \log_{p}1/n $
 
 We may express this recurrence in our language as the follows:
 \begin{align*}
@@ -547,7 +578,7 @@ We may express this recurrence in our language as the follows:
  0 \text{ if } x = 1 \\
  1 \text{ if } px = 1 \\
  \dots \\
- n - 1 \text{ if } \ p^{n}x = 1  \\
+ n  \text{ if } \ p^{n}x = 1  \\
  \perp \text{ otherwise}
  \end{cases}$
  \end{lemma}
@@ -597,17 +628,18 @@ F^{n+1}(\perp)(x) &=
 1 \text{ if } px = 1 \\
 2 \text{ if } p^2x = 1  \\
 \dots \\
-n-1 \text{ if } p^{n}x = 1  \\
+n \text{ if } p^{n}x = 1  \\
 \perp \text{ otherwise } 
 \end{cases}
 \end{align*}
 Therefore, the claim holds for all $n$.
 
-Then $\llbracket \texttt{T} \rrbracket = lim_{n \to \infty}\{F^n (\perp)\}$ is defined for all $x \in \{x \in \R \mid \exists k \in \N \text{ s.t. } p^kx = 1\}$ as
+Then $\llbracket \texttt{T} \rrbracket = \lim_{n \to \infty}\{F^n (\perp)\}$ is defined for all $x \in \R$ such that $p^kx = 1$
+for some $k \in \N$ as
 \begin{align*}
-\lim_{n \to \infty}\{F^n (\perp)\}(x) = n - 1
+\lim_{n \to \infty}\{F^n (\perp)\}(x) = k = \log_{p}1/x
 \end{align*}
-Where $n \in \N$ is the minimum number such that $p^nx<1$. Then $\llbracket \texttt{T} \rrbracket(x) = 1 + \log_{p}1/n= T(x)$. Thus, $\llbracket \texttt{T} \rrbracket = T$.
+Then $\llbracket \texttt{T} \rrbracket(x) = \log_{p}1/x= T(x)$. Thus, $\llbracket \texttt{T} \rrbracket = T$.
  
 
 

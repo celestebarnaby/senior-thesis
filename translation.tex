@@ -36,11 +36,11 @@ a(n) &=
 1, \ n > 1
 \end{cases}
 \end{align*} 
-This recurrence can then by expressed in our chapter 2 syntax as 
+This recurrence can then be expressed in our chapter 2 syntax as 
 \begin{align*}
 \texttt{T} &= \texttt{rec}(a,m) \\
 m &= \lambda x.x/\texttt{2} \\
-a &= \lambda x.\ifelse{x\leq\texttt{1}}{\texttt{0}}{\texttt{1}} \\
+a &= \lambda x.\ifelse{x\leq 1}{0}{1} \\
 \llbracket \texttt{T} \rrbracket(n) &= \llbracket \texttt{rec}(a,m) \rrbracket(n) \\
 &= \sum_{i=0}^{\infty}\llbracket a \rrbracket(\llbracket m\rrbracket^i(n)) \\
 &= \sum_{i=0}^{\log(n)-1} 1 + \sum_{i=log(n)}^{\infty} 0 \\
