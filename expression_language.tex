@@ -53,7 +53,7 @@ e &::=& x  \mid \texttt{0} \mid \texttt{1} \mid \texttt{2} \mid \dotsc \mid \lam
 \end{array}
 \]
 \caption{Typing for the language.}
-\label{fig:typing}
+\label{fig:cpo-typing}
 \end{figure}
 
 \begin{figure}
@@ -72,10 +72,11 @@ e = e \\ \\
 \end{array}
 \]
 \caption{Equational Semantics for the language.}
-\label{fig:typing}
+\label{fig:cpo-eq-sem}
 \end{figure}
 
-The equational semantics of our language is given in Figure 2, and the denotational semantics is given in figures 3 and 4.
+The equational semantics of our language is given in Figure~\ref{fig:cpo-eq-sem}, and the denotational semantics is given in figures~\ref{fig:cpo-den-type} 
+and~\ref{fig:cpo-den-term}.
 This semantics is the standard one for PCF, where each type interprets to a complete
 partially ordered set (CPO). A CPO is a set $S$ with two defining properties. Before we state these properties,
 we first offer some definitions related to ordered sets. An element $a \in S$ is called the bottom element (denoted by $\perp$) if for all $s \in S, \ a \leq s$. A subset $C \subset S$ is called a chain if $C = \{c_1, c_2, c_3, \dots\}$, where 
@@ -104,6 +105,7 @@ $f(\bigvee C) = \bigvee f(C)$.
  \llbracket \tau \rrbracket, \ f(x) \leq g(x) 
  \end{align*}
  \caption{Denotational semantics for types.}
+ \label{fig:cpo-den-type}
  \end{figure}
  \begin{figure}
  \begin{align*}
@@ -141,6 +143,7 @@ $f(\bigvee C) = \bigvee f(C)$.
  \text{where } fix &\text{ assigns the least fixed point to continuous functions} 
  \end{align*}
  \caption{Denotational semantics for expressions.}
+ \label{fig:cpo-den-term}
  \end{figure}
  
  We will interpret $\texttt{fix}$ expressions using the CPO fixed-point theorem. This theorem states that, for a CPO $P$ and a continuous, order-preserving map $\Phi : P \rightarrow P$, the least fixed-point of $\Phi$ exists and is equal to $\bigvee \Phi^n(\perp)$.

@@ -85,7 +85,7 @@ and chains $a_0 \leq a_1 \leq \ldots,$
 \end{align*}
 
 Thus, this approach will not work either. In light of this, we define the a language that replaces the general fixed-point 
-operator with a special-purpose recursive operator. Typing and equational semantics are given in Figures 1 and 2.
+operator with a special-purpose recursive operator. Typing and equational semantics are given in Figures~\ref{fig:sum-typing} and~\ref{fig:sum-eq-sem}.
 \[
 \begin{array}{rcl}
 \tau &::=& \texttt{real} \mid \texttt{bool} \mid \tau \times \tau \mid \tau \rightarrow \tau \\
@@ -125,7 +125,7 @@ Karp, while avoiding the problems of the previous approaches.
 \end{array}
 \]
 \caption{Typing for the language.}
-\label{fig:typing}
+\label{fig:sum-typing}
 \end{figure}
 
 \begin{figure}
@@ -145,7 +145,7 @@ e = e \\ \\
 \end{array}
 \]
 \caption{Equational semantics for the language.}
-\label{fig:eqsem}
+\label{fig:sum-eq-sem}
 \end{figure}
 
 The denotational semantics for this language is given in Figures 3 and 4. Note, in these figures, that $\Gamma$ is a partial function mapping variables to types, and a
