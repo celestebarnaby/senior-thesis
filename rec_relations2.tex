@@ -106,11 +106,10 @@ But there is a problem here, stemming from the fact that our denotation of depen
 set of \emph{continuous} functions. This is the case because the denotation of our fix operator,
 $\llbracket \texttt{fix}(\lambda f. \lambda x.e) \rrbracket$, is $fix(\llbracket \lambda f. \lambda x.e \rrbracket)$, where $fix$ 
 is a function that assigns the least fixed point to continuous functions. Thus, we must be able to guarantee that the denotation of any $\lambda f. \lambda x.e$ expression is a continuous function. But continuity of a function is premised on the fact that the domain and range of
-a function are CPOs. It is not necessarily the case that
- $\bigcup_{a \in \llbracket \tau \rrbracket} \llbracket \sigma \rrbracket\{ x \mapsto a\}$ is a CPO, even though 
- $\llbracket \sigma \rrbracket\{x\mapsto a\}$ is a CPO for all $a \in \llbracket \tau \rrbracket$.
- For instance, $\llbracket \lst(n) \rrbracket\{n \mapsto a\}$ is a CPO for all $a \in \N$, but 
- $\bigcup_{a \in \N} \llbracket\lst(n)\rrbracket\{n \mapsto a\}$---the union of all samples spaces $\Omega_n$---is not. 
+a function are CPOs. In general, it is not the case that the union of an infinite sequence of CPOs is itself a CPO. For 
+instance, consider a sequence $\{P_n\}_n$, where for all $n, \ P_n = \{0, 1, 2, \dots, n\}$ with 
+$0 \leq 1 \leq 2 \leq \dots \leq n$. Then each $P_n$ is a CPO, but $\bigcup_n P_n = \{0, 1, 2, \dots\}$, with
+$0 \leq 1 \leq 2 \leq \dots$, is not. 
 
 As a result, continuity does not have any meaning for functions of type $\llbracket \Pi (x: \tau).\sigma \rrbracket$. 
 So we cannot use the $\texttt{fix}$ operator on arbitrary $\lambda f. \lambda x.e$ expressions, and the whole

@@ -485,21 +485,21 @@ Let $d \in \llbracket \tau \rrbracket$, and consider that
  \end{align*}
  \end{lemma}
  \begin{proof}
- $\Rightarrow$ Towards contradiction, suppose $\bigvee_j\{(\bigvee_i f_i)(x_j)\} < \bigvee_i \{f_i (x_i)\}$. Then
+ $\Rightarrow$ Note that for all $j$,
  \begin{align*}
- &\exists k \text{ s.t. } \bigvee_j\{(\bigvee_i f_i)(x_j)\} < f_k(x_k) \\
- &\Rightarrow (\bigvee_i f_i)(x_k) < \bigvee_j\{(\bigvee_i f_i)(x_j)\} < f_k(x_k) \Rightarrow \Leftarrow
+ (\bigvee_i f_i)(x_j) &= (\bigvee_{i \geq j} f_i)(x_j) \\
+ &= \bigvee_{i \geq j} \{f_i(x_j)\} \\
+ &\leq \bigvee_{i \geq j} \{f_i(x_i)\} \\
+ &= \bigvee_{i} \{f_i(x_i)\}
  \end{align*}
- Therefore, $\bigvee_j\{(\bigvee_i f_i)(x_j)\} \geq \bigvee_i \{f_i (x_i)\}$
+ Thus, $\bigvee_j\{(\bigvee_i f_i)(x_j)\} \leq \bigvee_i \{f_i (x_i)\}$.
  
-$\Leftarrow$ Suppose, now, that $\bigvee_j\{(\bigvee_i f_i)(x_j)\} > \bigvee_i \{f_i (x_i)\}$. Then
+$\Leftarrow$ Note, also, that for all $i'$,
  \begin{align*}
-&\exists k_1 \text{ s.t. }  (\bigvee_i f_i)(x_{k_1})  >\bigvee_i \{f_i (x_i)\} \\
-&\Rightarrow \exists k_1, k_2 \text{ s.t. }  f_{k_2} (x_{k_1}) >  \bigvee_i \{f_i (x_i)\}  \\
-&\text{Let } k = \max(k_1,k_2). \text{ Then}\\
-&f_{k_1}(x_{k_2}) > \bigvee_i\{f_i(x_i)\} >   f_k(x_k) \Rightarrow\Leftarrow
+(f_{i'}) (x_{i'}) &\leq (\bigvee_i f_i) (x_{i'}) \\
+&\leq \bigvee_j \{(\bigvee_i f_i)(x_j)\}
 \end{align*}
-Therefore, $\bigvee_j\{(\bigvee_i f_i)(x_j)\} \leq \bigvee_i \{f_i (x_i)\}$, so 
+Therefore, $\bigvee_j\{(\bigvee_i f_i)(x_j)\} \geq \bigvee_i \{f_i (x_i)\}$, so 
 $\bigvee_j\{(\bigvee_i f_i)(x_j)\} = \bigvee_i \{f_i (x_i)\}$
  \end{proof}
  
